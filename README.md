@@ -1,6 +1,11 @@
 # AI_DIET_GENERATOR
 A personalized diet generator using AI, which is an engineering thesis project
 
+### Pre-requisites
+
+1. Running docker daemon
+2. Mysql workbench installed
+
 ### Mysql server setup with docker
 
 ```bash
