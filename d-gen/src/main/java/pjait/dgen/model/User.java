@@ -1,15 +1,19 @@
 package pjait.dgen.model;
 
-import pjait.dgen.utils.Authority;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import javax.persistence.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "users")
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
     @Column(name = "first_name")
@@ -28,18 +32,26 @@ public class User {
     private String password;
 
     @Column(name = "authority")
-    private Authority authority;
+    private String authority;
 
     public User() {
 
     }
 
-    public User(String firstName, String lastName, String email, String username, String password, Authority authority) {
+    public User(String username, String password, String authority){
+        super();
+        this.username = username;
+        this.password = password;
+        this.authority = authority;
+    }
+
+    public User(String firstName, String lastName, String email, String username, String password) {
+        super();
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.username = username;
-        this.authority = authority;
+        this.password = password;
     }
 
     public Long getId() {
@@ -90,11 +102,35 @@ public class User {
         this.password = password;
     }
 
-    public Authority getAuthority() {
+    public String getAuthority() {
         return authority;
     }
 
-    public void setAuthority(Authority authority) {
+    public void setAuthority(String authority) {
         this.authority = authority;
+    }
+
+
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return Arrays
+                .stream(this.authority.split(","))
+                .map(String::trim)
+                .filter(authority -> !authority.equals(""))
+                .map(SimpleGrantedAuthority::new)
+                .collect(Collectors.toList());
+    }
+
+    public void addAuthority(GrantedAuthority authority) {
+        String newAuthority = authority.getAuthority().trim();
+        String currentAuthorities = this.authority == null ? "" : (this.authority + ",");
+        this.authority = currentAuthorities + newAuthority;
+    }
+
+    public void removeAuthority(GrantedAuthority authority) {
+        String deletedAuthority = authority.getAuthority().trim();
+        String remainingAuthorities = this.authority.replace(deletedAuthority, "")
+                .replace(",,", "")
+                .trim();
+        this.authority = remainingAuthorities;
     }
 }
