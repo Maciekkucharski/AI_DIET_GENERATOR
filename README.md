@@ -24,3 +24,7 @@ Use **jajco123** as root password
 ### Create new database schema 
 
 ![obraz](https://user-images.githubusercontent.com/66561544/197417223-6f9ed678-6218-4967-a822-e52ae5808048.png)
+
+### Add MySQL datasource in intelliJ
+
+![obraz](https://user-images.githubusercontent.com/66561544/197417845-501a28aa-eed5-4cd9-aa67-0e270c812ad0.png)
