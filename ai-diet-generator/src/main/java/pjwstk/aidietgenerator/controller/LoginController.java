@@ -1,11 +1,15 @@
 package pjwstk.aidietgenerator.controller;
 
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pjwstk.aidietgenerator.exception.UnauthorizedException;
 import pjwstk.aidietgenerator.request.LoginRequest;
 import pjwstk.aidietgenerator.security.AuthenticationService;
+
+import javax.servlet.http.HttpServletResponse;
+import javax.transaction.Transactional;
 
 @RestController
 @RequestMapping("/login")
@@ -18,7 +22,7 @@ public class LoginController {
     }
 
     @PostMapping
-    public void login(LoginRequest loginRequest){
+    public void login(@RequestBody LoginRequest loginRequest){
         var isLogged = authenticationService.login(loginRequest.getUsername(), loginRequest.getPassword());
         if(!isLogged){
             throw new UnauthorizedException();
