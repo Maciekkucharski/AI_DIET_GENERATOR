@@ -3,19 +3,20 @@ package pjwstk.aidietgenerator.security;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
-import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
+import org.springframework.security.oauth2.client.web.HttpSessionOAuth2AuthorizationRequestRepository;
+import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.web.SecurityFilterChain;
 
-import static org.springframework.security.oauth2.jose.jws.SignatureAlgorithm.RS512;
-
 @Configuration
-public class SecurityConfig {
+public class SecurityConfig{
 
+    @Bean
+    public AuthorizationRequestRepository<OAuth2AuthorizationRequest>
+            authorizationRequestRepository() {
+        return new HttpSessionOAuth2AuthorizationRequestRepository();
+    }
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
@@ -24,8 +25,13 @@ public class SecurityConfig {
                         .antMatchers(HttpMethod.GET, "/api/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
+                .csrf().disable()
                 .oauth2Login()
-                .and().csrf().disable();
+                .defaultSuccessUrl("/loginSuccess")
+                .failureUrl("/loginFailure")
+                .authorizationEndpoint()
+                .baseUri("/oauth2/authorize-client")
+                .authorizationRequestRepository(authorizationRequestRepository());
         return http.build();
     }
 
