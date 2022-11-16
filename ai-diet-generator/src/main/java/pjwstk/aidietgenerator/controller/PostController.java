@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import pjwstk.aidietgenerator.entity.Post;
 import pjwstk.aidietgenerator.repository.PostRepository;
+import pjwstk.aidietgenerator.request.PostRequest;
 import pjwstk.aidietgenerator.service.PostService;
 import pjwstk.aidietgenerator.view.PostView;
 
@@ -15,9 +16,7 @@ import java.util.List;
 @RequestMapping("/api/posts")
 public class PostController {
 
-    @Autowired
     private final PostRepository postRepository;
-
     private final PostService postService;
 
     public PostController(PostRepository postRepository, PostService postService) {
@@ -37,8 +36,8 @@ public class PostController {
 
     @PostMapping
     @Transactional
-    public void createPost(Post post, HttpServletResponse response){
-        postService.create(post, response);
+    public void createPost(@RequestBody PostRequest postRequest, HttpServletResponse response){
+        postService.create(postRequest, response);
     }
 
 //    @PutMapping("/{id}")

@@ -6,10 +6,13 @@ import org.springframework.stereotype.Service;
 import pjwstk.aidietgenerator.entity.Comment;
 import pjwstk.aidietgenerator.entity.Post;
 import pjwstk.aidietgenerator.entity.User;
+import pjwstk.aidietgenerator.repository.PostRepository;
+import pjwstk.aidietgenerator.request.PostRequest;
 import pjwstk.aidietgenerator.view.PostView;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
+import javax.persistence.PersistenceContext;
 import javax.servlet.http.HttpServletResponse;
 import java.time.Instant;
 import java.util.Date;
@@ -19,22 +22,25 @@ import java.util.List;
 @Service
 public class PostService {
 
+    private final PostRepository postRepository;
+    @PersistenceContext
     private final EntityManager entityManager;
 
-    public PostService(EntityManager entityManager) {
+    public PostService(PostRepository postRepository, EntityManager entityManager) {
+        this.postRepository = postRepository;
         this.entityManager = entityManager;
     }
 
     public PostView view(long postId, HttpServletResponse response) {
         Post post = entityManager.find(Post.class, postId);
-        if(post == null){
+        if (post == null) {
             response.setStatus(HttpStatus.NOT_FOUND.value());
             return null;
-        }else {
+        } else {
             HashMap<Long, String> postComments = new HashMap<>();
             try {
                 postComments = getComments(post);
-            } catch (NoResultException e){
+            } catch (NoResultException e) {
                 e.printStackTrace();
             }
             response.setStatus(HttpStatus.OK.value());
@@ -42,22 +48,22 @@ public class PostService {
         }
     }
 
-    public void create(Post post, HttpServletResponse response) {
+    public void create(PostRequest post, HttpServletResponse response) {
         User currentUser = findCurrentUser();
-        if(currentUser == null){
+        if (currentUser == null) {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
-        }else {
+        } else {
             if (post.getDescription() == null || post.getTitle() == null) {
                 response.setStatus(HttpStatus.BAD_REQUEST.value());
             } else {
                 Post newPost = new Post();
-                Date currDate = new Date();
-                Instant inst = Instant.now();
+                newPost.setTitle(post.getTitle());
+                newPost.setImagePath(post.getImage_path());
                 newPost.setUser(currentUser);
                 newPost.setCreatedAt();
                 newPost.setDescription(post.getDescription());
+                postRepository.save(newPost);
                 response.setStatus(HttpStatus.CREATED.value());
-                entityManager.persist(newPost);
             }
         }
     }
@@ -68,12 +74,12 @@ public class PostService {
 
     public void delete(HttpServletResponse response, long postId) {
         User currentUser = findCurrentUser();
-        Post existingPost = entityManager.find(Post.class, postId);
-        if(existingPost==null) {
+        Post existingPost = postRepository.getReferenceById(postId);
+        if (existingPost == null) {
             response.setStatus(HttpStatus.NOT_FOUND.value());
-        }else {
+        } else {
             if (currentUser != null && currentUser.getId() == existingPost.getUser().getId()) {
-                entityManager.remove(existingPost);
+                postRepository.delete(existingPost);
                 response.setStatus(HttpStatus.ACCEPTED.value());
             } else {
                 response.setStatus(HttpStatus.UNAUTHORIZED.value());
@@ -83,26 +89,28 @@ public class PostService {
 
     public String getCurrentUsername() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if(principal instanceof User) {
+        if (principal instanceof User) {
             String username = ((User) principal).getUsername();
             return username;
-        }else {
+        } else {
             return principal.toString();
         }
     }
 
     private User findCurrentUser() {
-        return entityManager.createQuery("SELECT user FROM User user WHERE user.username= :username", User.class)
-                .setParameter ("username", getCurrentUsername())
-                .getSingleResult ();
+        User currentUser = null;
+        try {
+            currentUser = entityManager.createQuery("SELECT user FROM User user WHERE user.username= :username", User.class).setParameter("username", getCurrentUsername()).getSingleResult();
+        } catch (NoResultException e) {
+            System.out.println(e.getMessage());
+        }
+        return currentUser;
     }
 
-    public HashMap<Long, String> getComments(Post post){
+    public HashMap<Long, String> getComments(Post post) {
         HashMap<Long, String> comments = new HashMap<>();
-        List<Comment> commentValues = entityManager.createQuery("SELECT comments FROM Comment comments WHERE comments.post.id = :id", Comment.class)
-                .setParameter("id", post.getId())
-                .getResultList();
-        for(Comment comment : commentValues){
+        List<Comment> commentValues = entityManager.createQuery("SELECT comments FROM Comment comments WHERE comments.post.id = :id", Comment.class).setParameter("id", post.getId()).getResultList();
+        for (Comment comment : commentValues) {
             comments.put(comment.getId(), comment.getContent());
         }
         return comments;
