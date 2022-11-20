@@ -1,0 +1,12 @@
+requests
+pandas
+sklearn
+implicit
+scipy
+tqdm
+numpy
+matplotlib
+seaborn
+mlxtend
+plotly==5.9.0
+black
