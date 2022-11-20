@@ -37,4 +37,19 @@ public class AuthenticationService {
             return false;
         }
     }
+
+    public boolean oauth2Login(String email){
+        String username = userService.findByEmail(email).getUsername();
+        if(userService.doesUserExist(username)){
+            final User currentUser = userService.findUserByUsername(username);
+
+            userSession.logIn();
+            User user = new User(currentUser.getUsername(), currentUser.getPassword(), userService.findUserByUsername(username).getAuthority());
+            SecurityContextHolder.getContext().setAuthentication(new AppAuthentication(user));
+            return true;
+        } else {
+            System.out.println("User doesn't exist");
+            return false;
+        }
+    }
 }
