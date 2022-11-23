@@ -22,7 +22,7 @@ public class SocialsService {
 
 
     public Socials saveSocials(HttpServletResponse response, Socials socials){
-        User currentUser = this.userService.findCurrentUser();
+        User currentUser = userService.findCurrentUser();
         if (currentUser == null) {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             return null;
@@ -36,6 +36,7 @@ public class SocialsService {
                 newSocials.setTelegram(socials.getTelegram());
                 newSocials.setTwitter(socials.getTwitter());
                 newSocials.setYoutube(socials.getYoutube());
+                newSocials.setUser(currentUser);
                 this.socialsRepository.save(newSocials);
                 response.setStatus(HttpStatus.CREATED.value());
                 return newSocials;
