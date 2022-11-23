@@ -5,18 +5,22 @@ import org.springframework.stereotype.Service;
 import pjwstk.aidietgenerator.entity.Socials;
 import pjwstk.aidietgenerator.entity.User;
 import pjwstk.aidietgenerator.repository.SocialsRepository;
+import pjwstk.aidietgenerator.repository.UserRepository;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.Optional;
 
 @Service
 public class SocialsService {
 
     private final UserService userService;
     private final SocialsRepository socialsRepository;
+    private final UserRepository userRepository;
 
-    public SocialsService(UserService userService, SocialsRepository socialsRepository) {
+    public SocialsService(UserService userService, SocialsRepository socialsRepository, UserRepository userRepository) {
         this.userService = userService;
         this.socialsRepository = socialsRepository;
+        this.userRepository = userRepository;
     }
 
 
@@ -49,6 +53,17 @@ public class SocialsService {
                 if(socials.getYoutube() != null) existingSocials.setYoutube(socials.getYoutube());
                 return this.socialsRepository.save(existingSocials);
             }
+        }
+    }
+
+    public Socials getUserSocials(HttpServletResponse response, long userId) {
+        Optional<User> user = this.userRepository.findById(userId);
+        if (user.isEmpty()) {
+            response.setStatus(HttpStatus.NOT_FOUND.value());
+            return null;
+        } else {
+            Socials socials = this.socialsRepository.findByuser(user.get());
+            return socials;
         }
     }
 }
