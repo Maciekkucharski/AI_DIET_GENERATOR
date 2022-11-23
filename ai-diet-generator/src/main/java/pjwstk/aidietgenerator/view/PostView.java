@@ -8,13 +8,15 @@ public class PostView {
     private String title;
     private String description;
     private Timestamp timestamp;
+    private String image_path;
     private HashMap<Long, String> comments;
 
-    public PostView(Long id, String title, String description, Timestamp timestamp, HashMap<Long, String> comments) {
+    public PostView(Long id, String title, String description, Timestamp timestamp, String image_path, HashMap<Long, String> comments) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.timestamp = timestamp;
+        this.image_path = image_path;
         this.comments = comments;
     }
 
@@ -44,6 +46,14 @@ public class PostView {
 
     public Timestamp getTimestamp() {
         return timestamp;
+    }
+
+    public String getImage_path() {
+        return image_path;
+    }
+
+    public void setImage_path(String image_path) {
+        this.image_path = image_path;
     }
 
     public void setTimestamp(Timestamp timestamp) {

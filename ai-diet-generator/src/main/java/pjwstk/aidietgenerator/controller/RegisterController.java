@@ -15,7 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
 
 @RestController
-@RequestMapping("/register")
+@RequestMapping("/account/register")
 public class RegisterController {
 
     @Autowired
@@ -25,13 +25,13 @@ public class RegisterController {
     @Transactional
     public void register(@RequestBody RegisterRequest registerRequest, HttpServletResponse response){
 
-        if(userService.doesUserExist (registerRequest.getUsername ())){
+        if(userService.doesUserExist (registerRequest.getEmail ())){
             response.setStatus (HttpStatus.CONFLICT.value ()); //User already exists.
         }else {
             if(registerRequest.getPassword () == null || registerRequest.getPassword () == ""){
                 response.setStatus (HttpStatus.CONFLICT.value ()); //Invalid password.
             }else {
-                User newUser = new User(registerRequest.getFirst_name(), registerRequest.getLast_name(), registerRequest.getEmail() ,registerRequest.getUsername(),registerRequest.getPassword()); //New user created.
+                User newUser = new User(registerRequest.getEmail() , registerRequest.getPassword()); //New user created.
                 if(userService.isEmpty ()){
                     GrantedAuthority adminAuthority = () -> "ROLE_ADMIN";
                     newUser.addAuthority(adminAuthority);

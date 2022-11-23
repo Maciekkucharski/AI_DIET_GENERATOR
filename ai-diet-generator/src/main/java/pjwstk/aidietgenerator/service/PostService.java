@@ -6,7 +6,9 @@ import org.springframework.stereotype.Service;
 import pjwstk.aidietgenerator.entity.Comment;
 import pjwstk.aidietgenerator.entity.Post;
 import pjwstk.aidietgenerator.entity.User;
+import pjwstk.aidietgenerator.exception.ResourceNotFoundException;
 import pjwstk.aidietgenerator.repository.PostRepository;
+import pjwstk.aidietgenerator.repository.UserRepository;
 import pjwstk.aidietgenerator.request.PostRequest;
 import pjwstk.aidietgenerator.view.PostView;
 
@@ -22,13 +24,17 @@ import java.util.List;
 @Service
 public class PostService {
 
-    private final PostRepository postRepository;
     @PersistenceContext
     private final EntityManager entityManager;
 
-    public PostService(PostRepository postRepository, EntityManager entityManager) {
-        this.postRepository = postRepository;
+    private final PostRepository postRepository;
+
+    private final UserService userService;
+
+    public PostService(EntityManager entityManager, PostRepository postRepository, UserService userService) {
+        this.userService = userService;
         this.entityManager = entityManager;
+        this.postRepository = postRepository;
     }
 
     public PostView view(long postId, HttpServletResponse response) {
@@ -44,12 +50,12 @@ public class PostService {
                 e.printStackTrace();
             }
             response.setStatus(HttpStatus.OK.value());
-            return new PostView(post.getId(), post.getTitle(), post.getDescription(), post.getTimestamp(), postComments);
+            return new PostView(post.getId(), post.getTitle(), post.getDescription(), post.getTimestamp(), post.getImagePath(), postComments);
         }
     }
 
     public void create(PostRequest post, HttpServletResponse response) {
-        User currentUser = findCurrentUser();
+        User currentUser = this.userService.findCurrentUser();
         if (currentUser == null) {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
         } else {
@@ -68,12 +74,8 @@ public class PostService {
         }
     }
 
-//    public Post edit(Post post, HttpServletResponse response, long postId) {
-//
-//    }
-
     public void delete(HttpServletResponse response, long postId) {
-        User currentUser = findCurrentUser();
+        User currentUser = this.userService.findCurrentUser();
         Post existingPost = postRepository.getReferenceById(postId);
         if (existingPost == null) {
             response.setStatus(HttpStatus.NOT_FOUND.value());
@@ -87,26 +89,6 @@ public class PostService {
         }
     }
 
-    public String getCurrentUsername() {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (principal instanceof User) {
-            String username = ((User) principal).getUsername();
-            return username;
-        } else {
-            return principal.toString();
-        }
-    }
-
-    private User findCurrentUser() {
-        User currentUser = null;
-        try {
-            currentUser = entityManager.createQuery("SELECT user FROM User user WHERE user.username= :username", User.class).setParameter("username", getCurrentUsername()).getSingleResult();
-        } catch (NoResultException e) {
-            System.out.println(e.getMessage());
-        }
-        return currentUser;
-    }
-
     public HashMap<Long, String> getComments(Post post) {
         HashMap<Long, String> comments = new HashMap<>();
         List<Comment> commentValues = entityManager.createQuery("SELECT comments FROM Comment comments WHERE comments.post.id = :id", Comment.class).setParameter("id", post.getId()).getResultList();
@@ -114,5 +96,27 @@ public class PostService {
             comments.put(comment.getId(), comment.getContent());
         }
         return comments;
+    }
+
+    public List<Post> getSelectedUserPosts(String username, HttpServletResponse response) {
+        List<Post> userPosts = null;
+        User user = userService.findUserByUsername(username);
+        userPosts = entityManager.createQuery("SELECT post FROM Post post WHERE post.user = :user", Post.class).setParameter("user", user).getResultList();
+        return userPosts;
+    }
+
+    public void edit(PostRequest post, HttpServletResponse response, long postId) {
+        Post existingPost = this.postRepository.findById(postId)
+                .orElseThrow(() -> new ResourceNotFoundException("Post not found with id :" + postId));
+        User currentUser = this.userService.findCurrentUser();
+        if(currentUser == existingPost.getUser()) {
+            if (post.getTitle() != null) existingPost.setTitle(post.getTitle());
+            if (post.getDescription() != null) existingPost.setDescription(post.getDescription());
+            if (post.getImage_path() != null) existingPost.setImagePath(post.getImage_path());
+            this.postRepository.save(existingPost);
+            response.setStatus(HttpStatus.OK.value());
+        } else {
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+        }
     }
 }

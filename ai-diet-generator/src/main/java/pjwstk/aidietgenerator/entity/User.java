@@ -1,5 +1,6 @@
 package pjwstk.aidietgenerator.entity;
 
+import com.sun.istack.NotNull;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -25,12 +26,11 @@ public class User {
     private String lastName;
 
     @Column(name = "email")
+    @NotNull
     private String email;
 
-    @Column(name = "username")
-    private String username;
-
     @Column(name = "login_password")
+    @NotNull
     private String password;
 
     @Column(name = "authority")
@@ -43,19 +43,16 @@ public class User {
 
     }
 
-    public User(String username, String password, String authority){
+    public User(String email, String password, String authority){
         super();
-        this.username = username;
+        this.email = email;
         this.password = password;
         this.authority = authority;
     }
 
-    public User(String firstName, String lastName, String email, String username, String password) {
+    public User(String email, String password) {
         super();
-        this.firstName = firstName;
-        this.lastName = lastName;
         this.email = email;
-        this.username = username;
         this.password = password;
     }
 
@@ -89,14 +86,6 @@ public class User {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
     }
 
     public String getPassword() {

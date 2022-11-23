@@ -17,11 +17,14 @@ public class UserController {
 
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder ();
 
-    @Autowired
     private UserRepository userRepository;
 
+    public UserController(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
     // get all users
-    @GetMapping
+    @GetMapping("/all")
     public List<User> getAllUsers(){
         return this.userRepository.findAll();
     }
@@ -38,9 +41,6 @@ public class UserController {
     public User createUser(User user){
         User newUser = new User ();
         newUser.setEmail (user.getEmail ());
-        newUser.setFirstName (user.getFirstName ());
-        newUser.setLastName (user.getLastName ());
-        newUser.setUsername (user.getUsername ());
         newUser.setPassword (passwordEncoder.encode(user.getPassword ()));
         newUser.setCreatedAt();
         return this.userRepository.save(newUser);

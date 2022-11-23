@@ -8,6 +8,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 
@@ -27,16 +28,15 @@ public class UserService {
         userEntity.setFirstName(user.getFirstName());
         userEntity.setLastName(user.getLastName());
         userEntity.setEmail(user.getEmail());
-        userEntity.setUsername (user.getUsername());
         userEntity.setPassword (passwordEncoder.encode(user.getPassword()));
         userEntity.setAuthority(String.join(",", user.getAuthority()));
         userEntity.setCreatedAt();
         entityManager.persist(userEntity);
     }
 
-    public boolean doesUserExist (String username){
-        if (entityManager.createQuery ("SELECT ue FROM User ue WHERE ue.username= :username", User.class)
-                .setParameter ("username", username)
+    public boolean doesUserExist (String email){
+        if (entityManager.createQuery ("SELECT ue FROM User ue WHERE ue.email= :email", User.class)
+                .setParameter ("email", email)
                 .getResultList ().isEmpty ()) return false;
         else return true;
     }
@@ -46,25 +46,31 @@ public class UserService {
         else return false;
     }
 
-    public User findUserByUsername(String username){
-        return entityManager.createQuery ("SELECT ue FROM User ue WHERE ue.username= :username", User.class)
-                .setParameter ("username", username)
+    public User findUserByUsername(String email){
+            return entityManager.createQuery ("SELECT ue FROM User ue WHERE ue.email= :email", User.class)
+                .setParameter ("email", email)
                 .getSingleResult ();
     }
 
-    public User findCurrentUser(){
-        return entityManager.createQuery ("SELECT ue FROM User ue WHERE ue.username= :username", User.class)
-                .setParameter ("username", getCurrentUsername())
-                .getSingleResult ();
-    }
-
-    public String getCurrentUsername() {
+    public String getCurrentUserEmail() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if(principal instanceof User) {
-            String username = ((User) principal).getUsername();
-            return username;
-        }else {
+        if (principal instanceof User) {
+            String email = ((User) principal).getEmail();
+            return email;
+        } else {
             return principal.toString();
         }
+    }
+
+    public User findCurrentUser() {
+        User currentUser = null;
+        try {
+            currentUser = entityManager.createQuery("SELECT user FROM User user WHERE user.email= :email", User.class)
+                    .setParameter("email", getCurrentUserEmail())
+                    .getSingleResult();
+        } catch (NoResultException e) {
+            System.out.println(e.getMessage());
+        }
+        return currentUser;
     }
 }

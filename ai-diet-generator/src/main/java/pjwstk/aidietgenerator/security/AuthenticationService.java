@@ -25,7 +25,7 @@ public class AuthenticationService {
 
             if(encoder.matches(password, currentUser.getPassword())){
                 userSession.logIn();
-                User user = new User(currentUser.getUsername(), currentUser.getPassword(), userService.findUserByUsername(username).getAuthority());
+                User user = new User(currentUser.getEmail(), currentUser.getPassword(), userService.findUserByUsername(username).getAuthority());
                 SecurityContextHolder.getContext().setAuthentication(new AppAuthentication(user));
                 return true;
             } else {

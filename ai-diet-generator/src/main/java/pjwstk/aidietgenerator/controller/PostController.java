@@ -34,17 +34,22 @@ public class PostController {
         return postService.view(postId, response);
     }
 
+    @GetMapping("/user/{username}")
+    public List<Post> getAllUserPosts(@PathVariable(value = "username") String username, HttpServletResponse response){
+        return postService.getSelectedUserPosts(username, response);
+    }
+
     @PostMapping
     @Transactional
     public void createPost(@RequestBody PostRequest postRequest, HttpServletResponse response){
         postService.create(postRequest, response);
     }
 
-//    @PutMapping("/{id}")
-//    @Transactional
-//    public Post putPoem(Post post, @PathVariable("id") long postId, HttpServletResponse response){
-////        return postService.edit(post, response, postId);
-//    }
+    @PutMapping("/{id}")
+    @Transactional
+    public void putPoem(@RequestBody PostRequest post, @PathVariable("id") long postId, HttpServletResponse response){
+        postService.edit(post, response, postId);
+    }
 
     @DeleteMapping("/{id}")
     @Transactional
