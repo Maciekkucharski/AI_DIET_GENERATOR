@@ -23,13 +23,15 @@ public class RegisterController {
 
     @PostMapping
     @Transactional
-    public void register(@RequestBody RegisterRequest registerRequest, HttpServletResponse response){
+    public User register(@RequestBody RegisterRequest registerRequest, HttpServletResponse response){
 
         if(userService.doesUserExist (registerRequest.getEmail ())){
             response.setStatus (HttpStatus.CONFLICT.value ()); //User already exists.
+            return null;
         }else {
             if(registerRequest.getPassword () == null || registerRequest.getPassword () == ""){
                 response.setStatus (HttpStatus.CONFLICT.value ()); //Invalid password.
+                return null;
             }else {
                 User newUser = new User(registerRequest.getEmail() , registerRequest.getPassword()); //New user created.
                 if(userService.isEmpty ()){
@@ -39,6 +41,8 @@ public class RegisterController {
                 GrantedAuthority defaultAuthority = () -> "ROLE_USER";
                 newUser.addAuthority(defaultAuthority);
                 userService.saveUser(newUser);
+                response.setStatus(HttpStatus.CREATED.value());
+                return newUser;
             }
         }
     }
