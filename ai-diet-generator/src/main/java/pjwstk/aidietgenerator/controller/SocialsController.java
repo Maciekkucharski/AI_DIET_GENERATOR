@@ -4,10 +4,8 @@ import org.springframework.web.bind.annotation.*;
 import pjwstk.aidietgenerator.entity.Socials;
 import pjwstk.aidietgenerator.repository.SocialsRepository;
 import pjwstk.aidietgenerator.service.SocialsService;
-
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/account/socials")
