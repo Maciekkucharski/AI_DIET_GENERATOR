@@ -16,7 +16,6 @@ import java.util.List;
 public class UserController {
 
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder ();
-
     private UserRepository userRepository;
 
     public UserController(UserRepository userRepository) {
@@ -26,7 +25,7 @@ public class UserController {
     // get all users
     @GetMapping("/all")
     public List<User> getAllUsers(){
-        return this.userRepository.findAll();
+        return userRepository.findAll();
     }
 
     // get user by id
@@ -43,7 +42,7 @@ public class UserController {
         newUser.setEmail (user.getEmail ());
         newUser.setPassword (passwordEncoder.encode(user.getPassword ()));
         newUser.setCreatedAt();
-        return this.userRepository.save(newUser);
+        return userRepository.save(newUser);
     }
 
     // update user
@@ -55,7 +54,7 @@ public class UserController {
         if(user.getLastName () != null) existingUser.setLastName(user.getLastName());
         if(user.getEmail () != null) existingUser.setEmail (user.getEmail ());
         if(user.getPassword () != null) existingUser.setPassword (passwordEncoder.encode(user.getPassword ()));
-        return this.userRepository.save(existingUser);
+        return userRepository.save(existingUser);
     }
 
     // delete user by id

@@ -19,12 +19,12 @@ public class SocialsController {
 
     @GetMapping("/{id}")
     public Socials getUserSocials(@PathVariable(value = "id" ) long userId, HttpServletResponse response) {
-        return this.socialsService.getUserSocials(response, userId);
+        return socialsService.getUserSocials(response, userId);
     }
 
     @PostMapping
     @Transactional
     public Socials addUserSocials(@RequestBody Socials socials, HttpServletResponse response){
-        return this.socialsService.saveSocials(response, socials);
+        return socialsService.saveSocials(response, socials);
     }
 }

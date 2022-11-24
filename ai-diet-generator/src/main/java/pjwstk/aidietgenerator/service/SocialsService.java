@@ -41,28 +41,34 @@ public class SocialsService {
                 newSocials.setTwitter(socials.getTwitter());
                 newSocials.setYoutube(socials.getYoutube());
                 newSocials.setUser(currentUser);
-                this.socialsRepository.save(newSocials);
+                socialsRepository.save(newSocials);
                 response.setStatus(HttpStatus.CREATED.value());
                 return newSocials;
             } else {
-                if(socials.getDiscord() != null) existingSocials.setDiscord(socials.getDiscord());
-                if(socials.getFacebook() != null) existingSocials.setFacebook(socials.getFacebook());
-                if(socials.getInstagram() != null) existingSocials.setInstagram(socials.getInstagram());
-                if(socials.getTelegram() != null) existingSocials.setTelegram(socials.getTelegram());
-                if(socials.getTwitter() != null) existingSocials.setTwitter(socials.getTwitter());
-                if(socials.getYoutube() != null) existingSocials.setYoutube(socials.getYoutube());
-                return this.socialsRepository.save(existingSocials);
+                if(socials.getDiscord() != null)
+                    existingSocials.setDiscord(socials.getDiscord());
+                if(socials.getFacebook() != null)
+                    existingSocials.setFacebook(socials.getFacebook());
+                if(socials.getInstagram() != null)
+                    existingSocials.setInstagram(socials.getInstagram());
+                if(socials.getTelegram() != null)
+                    existingSocials.setTelegram(socials.getTelegram());
+                if(socials.getTwitter() != null)
+                    existingSocials.setTwitter(socials.getTwitter());
+                if(socials.getYoutube() != null)
+                    existingSocials.setYoutube(socials.getYoutube());
+                return socialsRepository.save(existingSocials);
             }
         }
     }
 
     public Socials getUserSocials(HttpServletResponse response, long userId) {
-        Optional<User> user = this.userRepository.findById(userId);
+        Optional<User> user = userRepository.findById(userId);
         if (user.isEmpty()) {
             response.setStatus(HttpStatus.NOT_FOUND.value());
             return null;
         } else {
-            Socials socials = this.socialsRepository.findByuser(user.get());
+            Socials socials = socialsRepository.findByuser(user.get());
             return socials;
         }
     }

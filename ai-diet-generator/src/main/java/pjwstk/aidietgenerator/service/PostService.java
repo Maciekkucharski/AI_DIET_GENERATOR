@@ -55,7 +55,7 @@ public class PostService {
     }
 
     public void create(PostRequest post, HttpServletResponse response) {
-        User currentUser = this.userService.findCurrentUser();
+        User currentUser = userService.findCurrentUser();
         if (currentUser == null) {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
         } else {
@@ -75,7 +75,7 @@ public class PostService {
     }
 
     public void delete(HttpServletResponse response, long postId) {
-        User currentUser = this.userService.findCurrentUser();
+        User currentUser = userService.findCurrentUser();
         Post existingPost = postRepository.getReferenceById(postId);
         if (existingPost == null) {
             response.setStatus(HttpStatus.NOT_FOUND.value());
@@ -91,7 +91,9 @@ public class PostService {
 
     public HashMap<Long, String> getComments(Post post) {
         HashMap<Long, String> comments = new HashMap<>();
-        List<Comment> commentValues = entityManager.createQuery("SELECT comments FROM Comment comments WHERE comments.post.id = :id", Comment.class).setParameter("id", post.getId()).getResultList();
+        List<Comment> commentValues = entityManager.createQuery(
+                "SELECT comments FROM Comment comments WHERE comments.post.id = :id", Comment.class)
+                .setParameter("id", post.getId()).getResultList();
         for (Comment comment : commentValues) {
             comments.put(comment.getId(), comment.getContent());
         }
@@ -101,19 +103,21 @@ public class PostService {
     public List<Post> getSelectedUserPosts(String username, HttpServletResponse response) {
         List<Post> userPosts = null;
         User user = userService.findUserByUsername(username);
-        userPosts = entityManager.createQuery("SELECT post FROM Post post WHERE post.user = :user", Post.class).setParameter("user", user).getResultList();
+        userPosts = entityManager.createQuery(
+                "SELECT post FROM Post post WHERE post.user = :user", Post.class)
+                .setParameter("user", user).getResultList();
         return userPosts;
     }
 
     public void edit(PostRequest post, HttpServletResponse response, long postId) {
-        Post existingPost = this.postRepository.findById(postId)
+        Post existingPost = postRepository.findById(postId)
                 .orElseThrow(() -> new ResourceNotFoundException("Post not found with id :" + postId));
-        User currentUser = this.userService.findCurrentUser();
+        User currentUser = userService.findCurrentUser();
         if(currentUser == existingPost.getUser()) {
             if (post.getTitle() != null) existingPost.setTitle(post.getTitle());
             if (post.getDescription() != null) existingPost.setDescription(post.getDescription());
             if (post.getImage_path() != null) existingPost.setImagePath(post.getImage_path());
-            this.postRepository.save(existingPost);
+            postRepository.save(existingPost);
             response.setStatus(HttpStatus.OK.value());
         } else {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());

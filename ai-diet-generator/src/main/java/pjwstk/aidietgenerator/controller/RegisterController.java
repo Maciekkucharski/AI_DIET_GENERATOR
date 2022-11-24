@@ -18,8 +18,11 @@ import javax.transaction.Transactional;
 @RequestMapping("/account/register")
 public class RegisterController {
 
-    @Autowired
     private UserService userService;
+
+    public RegisterController(UserService userService) {
+        this.userService = userService;
+    }
 
     @PostMapping
     @Transactional

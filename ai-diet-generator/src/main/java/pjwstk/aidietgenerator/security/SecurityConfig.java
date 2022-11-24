@@ -25,7 +25,7 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .oauth2Login()
-                .and().csrf().disable();
+                .and().cors().disable().csrf().disable();
         return http.build();
     }
 
