@@ -31,7 +31,7 @@ public class UserController {
     // get user by id
     @GetMapping("/{id}")
     public User getUserById(@PathVariable (value = "id" ) long userId){
-        return this.userRepository.findById(userId)
+        return userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id :" + userId));
     }
 
@@ -48,7 +48,7 @@ public class UserController {
     // update user
     @PutMapping("/{id}")
     public User updateUser(User user, @PathVariable("id") long userId){
-        User existingUser = this.userRepository.findById(userId)
+        User existingUser = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id :" + userId));
         if(user.getFirstName () != null) existingUser.setFirstName(user.getFirstName());
         if(user.getLastName () != null) existingUser.setLastName(user.getLastName());
@@ -60,9 +60,9 @@ public class UserController {
     // delete user by id
     @DeleteMapping("/{id}")
     public ResponseEntity<User> deleteUser(@PathVariable (value = "id" ) long userId){
-        User existingUser = this.userRepository.findById(userId)
+        User existingUser = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id :" + userId));
-        this.userRepository.delete(existingUser);
+        userRepository.delete(existingUser);
         return ResponseEntity.ok().build();
     }
 }
