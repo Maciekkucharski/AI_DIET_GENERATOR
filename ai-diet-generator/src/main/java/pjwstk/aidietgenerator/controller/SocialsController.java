@@ -29,4 +29,10 @@ public class SocialsController {
     public Socials addUserSocials(@RequestBody Socials socials, HttpServletResponse response){
         return socialsService.saveSocials(response, socials);
     }
+
+    @PutMapping
+    @Transactional
+    public Socials editUserSocials(@RequestBody Socials socials, HttpServletResponse response){
+        return socialsService.updateSocials(response, socials);
+    }
 }
