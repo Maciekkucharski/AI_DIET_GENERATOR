@@ -2,6 +2,7 @@ package pjwstk.aidietgenerator.request;
 
 
 public class RegisterRequest {
+
     private final String email;
     private final String password;
 

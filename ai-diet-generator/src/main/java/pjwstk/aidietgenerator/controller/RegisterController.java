@@ -20,6 +20,7 @@ public class RegisterController {
 
     private UserService userService;
 
+    @Autowired
     public RegisterController(UserService userService) {
         this.userService = userService;
     }

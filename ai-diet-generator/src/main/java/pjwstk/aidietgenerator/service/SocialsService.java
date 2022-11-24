@@ -1,5 +1,6 @@
 package pjwstk.aidietgenerator.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import pjwstk.aidietgenerator.entity.Socials;
@@ -17,6 +18,7 @@ public class SocialsService {
     private final SocialsRepository socialsRepository;
     private final UserRepository userRepository;
 
+    @Autowired
     public SocialsService(UserService userService, SocialsRepository socialsRepository, UserRepository userRepository) {
         this.userService = userService;
         this.socialsRepository = socialsRepository;

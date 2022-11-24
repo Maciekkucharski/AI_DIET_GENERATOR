@@ -1,5 +1,6 @@
 package pjwstk.aidietgenerator.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,6 +21,7 @@ public class LoginController {
     private final AuthenticationService authenticationService;
     private final UserService userService;
 
+    @Autowired
     public LoginController(AuthenticationService authenticationService, UserService userService) {
         this.authenticationService = authenticationService;
         this.userService = userService;

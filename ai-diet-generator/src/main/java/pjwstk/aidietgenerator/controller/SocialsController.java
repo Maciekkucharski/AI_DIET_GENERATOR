@@ -1,5 +1,6 @@
 package pjwstk.aidietgenerator.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import pjwstk.aidietgenerator.entity.Socials;
 import pjwstk.aidietgenerator.repository.SocialsRepository;
@@ -13,6 +14,7 @@ public class SocialsController {
 
     SocialsService socialsService;
 
+    @Autowired
     public SocialsController(SocialsService socialsService) {
         this.socialsService = socialsService;
     }

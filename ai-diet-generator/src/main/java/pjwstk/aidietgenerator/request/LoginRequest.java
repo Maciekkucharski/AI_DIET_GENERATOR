@@ -1,6 +1,7 @@
 package pjwstk.aidietgenerator.request;
 
 public class  LoginRequest {
+
     private final String email;
     private final String password;
 

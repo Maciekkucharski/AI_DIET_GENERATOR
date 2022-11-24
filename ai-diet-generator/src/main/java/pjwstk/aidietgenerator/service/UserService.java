@@ -19,6 +19,7 @@ public class UserService {
     private final EntityManager entityManager;
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
+    @Autowired
     public UserService (EntityManager entityManager) {
         this.entityManager = entityManager;
     }

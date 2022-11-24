@@ -18,6 +18,7 @@ public class UserController {
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder ();
     private UserRepository userRepository;
 
+    @Autowired
     public UserController(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
