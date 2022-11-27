@@ -59,6 +59,8 @@ def convert_to_implicit_dataset(df: pd.DataFrame = None, survey_path: str = './d
             }
             i += 1
     df = pd.DataFrame.from_dict(modified_dict).T
+    df = df[df['ocena'].notna()]
     if to_csv:
-        df.to_csv(destination, index=True)
+        df.to_csv(destination, index=False)
     return df
+

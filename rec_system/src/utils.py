@@ -1,8 +1,8 @@
 import pandas as pd
 
 
-def load_and_preprocess_data(df: pd.ratings = None,
-                             ratings_path: str = './ratings.csv', ):
+def load_and_preprocess_data(df: pd.DataFrame = None,
+                             ratings_path: str = './data/ratings.csv', ):
     if not df:
         df = pd.read_csv(
             ratings_path,

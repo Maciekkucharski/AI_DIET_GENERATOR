@@ -73,3 +73,7 @@ def add_taste_profiles(api_key: str, df: pd.DataFrame = None,
     if to_csv:
         df.to_csv(destination, index=False)
     return df
+
+
+def get_dish_ids(df: pd.DataFrame = None, ):
+    return df
