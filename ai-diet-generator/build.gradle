@@ -2,8 +2,10 @@ plugins {
 	id 'org.springframework.boot' version '2.7.5'
 	id 'io.spring.dependency-management' version '1.0.15.RELEASE'
 	id 'java'
-
+	id 'com.google.cloud.tools.appengine' version '2.4.4'
 }
+
+
 
 group = 'pjwstk'
 version = '0.0.1-SNAPSHOT'
@@ -21,6 +23,8 @@ repositories {
 
 dependencies {
 	implementation group: 'com.google.cloud', name: 'spring-cloud-gcp-starter', version: '3.4.0'
+	implementation 'com.google.appengine:appengine-api-1.0-sdk:2.0.10'
+
 
 	// https://mvnrepository.com/artifact/org.springframework.security/spring-security-web
 	implementation group: 'org.springframework.security', name: 'spring-security-web', version: '5.7.5'
@@ -47,10 +51,10 @@ dependencies {
 
 }
 
-
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
 
 
 
