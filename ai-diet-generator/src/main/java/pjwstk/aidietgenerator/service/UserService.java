@@ -1,18 +1,16 @@
 package pjwstk.aidietgenerator.service;
 
 
-import org.springframework.beans.factory.annotation.Autowired;
-import pjwstk.aidietgenerator.entity.User;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
+import pjwstk.aidietgenerator.entity.User;
+
 import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.transaction.Transactional;
 
 
-@Repository
+@Service
 public class UserService {
 
     private final EntityManager entityManager;
