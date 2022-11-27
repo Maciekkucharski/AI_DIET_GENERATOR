@@ -85,15 +85,15 @@ def compare_taste_with_taste_profile(dish_name_list, user_email, user_profiles_d
     if not user_profiles_df:
         user_profiles_df = pd.read_csv(user_profiles_path)
     user_profile = (user_profiles_df.loc[user_profiles_df['email'] == user_email][
-                        ["saltiness", "bitterness", 'spiciness', 'fattiness']].values * 10)[0]
+                        ["saltiness", "bitterness", 'spiciness', 'fattiness']
+                    ].values * 10)[0]
     if not recipes_df:
         recipes_df = pd.read_csv(recipes_path)
     cosine_similarity_list = list()
     for dish_name in dish_name_list:
-        dish = \
-            recipes_df.loc[recipes_df['title'] == dish_name][
-                ["saltiness", "bitterness", 'spiciness', 'fattiness']].values[
-                0]
+        dish = recipes_df.loc[recipes_df['title'] == dish_name][
+            ["saltiness", "bitterness", 'spiciness', 'fattiness']
+        ].values[0]
         cosine_similarity_list.append((1 - spatial.distance.cosine(user_profile, dish), dish_name))
     cosine_similarity_list.sort(key=lambda x: x[0], reverse=True)
     return cosine_similarity_list
