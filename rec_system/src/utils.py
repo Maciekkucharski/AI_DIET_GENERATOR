@@ -1,11 +1,13 @@
 import pandas as pd
 
 
-def load_and_preprocess_data():
-    df = pd.read_csv(
-        "C:/Users/mkuchars/PycharmProjects/AI_DIET_GENERATOR/rec_system/src/data/ratings.csv",
-        encoding="utf-8",
-    )
+def load_and_preprocess_data(df: pd.DataFrame = None,
+                             ratings_path: str = './data/ratings.csv', ):
+    if not df:
+        df = pd.read_csv(
+            ratings_path,
+            encoding="utf-8",
+        )
     # Remove nans values
     df = df.dropna()
 
@@ -13,9 +15,9 @@ def load_and_preprocess_data():
     users = df["Adres e-mail"].unique()
     products = df["pytanie"].unique()
 
+    # convert ratings to int type
     df['ocena'] = df['ocena'].astype(int)
 
-    df['ocena'] = df['ocena'].astype(int)
     # Create a categorical type for users and product. User ordered to ensure
     # reproducibility
     user_cat = pd.CategoricalDtype(categories=sorted(users), ordered=True)
@@ -29,4 +31,4 @@ def load_and_preprocess_data():
     df["Adres e-mail"] = user_idx
     df["pytanie"] = product_idx
 
-    return df, user_idx, product_idx
+    return df, user_idx, product_idx, user_cat.categories, product_cat.categories
