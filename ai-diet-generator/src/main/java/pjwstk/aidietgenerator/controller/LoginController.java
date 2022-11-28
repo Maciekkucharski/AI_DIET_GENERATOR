@@ -15,23 +15,28 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 import org.thymeleaf.util.StringUtils;
+
 import pjwstk.aidietgenerator.exception.UnauthorizedException;
 import pjwstk.aidietgenerator.request.LoginRequest;
 import pjwstk.aidietgenerator.security.AuthenticationService;
+import pjwstk.aidietgenerator.service.UserService;
 
 import java.util.Map;
 
 @RestController
-//@RequestMapping("/login")
+@RequestMapping("/account/login")
 public class LoginController {
 
     @Autowired
     private OAuth2AuthorizedClientService authorizedClientService;
 
     private final AuthenticationService authenticationService;
+    private final UserService userService;
 
-    public LoginController(AuthenticationService authenticationService){
-        this.authenticationService=authenticationService;
+    @Autowired
+    public LoginController(AuthenticationService authenticationService, UserService userService) {
+        this.authenticationService = authenticationService;
+        this.userService = userService;
     }
 
     @PostMapping("/login")
@@ -40,6 +45,7 @@ public class LoginController {
         if(!isLogged){
             throw new UnauthorizedException();
         }
+        return userService.findCurrentUser();
     }
 
     @GetMapping("/loginSuccess")
