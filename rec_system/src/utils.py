@@ -3,14 +3,17 @@ import pandas as pd
 
 def load_and_preprocess_data(df: pd.DataFrame = None,
                              ratings_path: str = './data/ratings.csv', ):
-    if not df:
+    if df is None:
         df = pd.read_csv(
             ratings_path,
             encoding="utf-8",
         )
+    if df.empty:
+        print("no data found")
+        return
     # Remove nans values
-    df = df.dropna()
 
+    df = df.dropna()
     # Get unique entries in the dataset of users and products
     users = df["Adres e-mail"].unique()
     products = df["pytanie"].unique()
