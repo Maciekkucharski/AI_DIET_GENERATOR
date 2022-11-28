@@ -1,19 +1,19 @@
 package pjwstk.aidietgenerator.service;
 
 
-import org.springframework.beans.factory.annotation.Autowired;
-import pjwstk.aidietgenerator.entity.User;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
+import pjwstk.aidietgenerator.entity.User;
+
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 
 
-@Repository
+@Service
 public class UserService {
 
     private final EntityManager entityManager;
@@ -53,7 +53,19 @@ public class UserService {
                 .getSingleResult ();
     }
 
-    public String getCurrentUserEmail() {
+    public User findByEmail(String email){
+        return entityManager.createQuery ("SELECT ue FROM User ue WHERE ue.email= :email", User.class)
+                .setParameter ("email", email)
+                .getSingleResult ();
+    }
+
+    public User findCurrentUser(){
+        return entityManager.createQuery ("SELECT ue FROM User ue WHERE ue.username= :username", User.class)
+                .setParameter ("username", getCurrentUsername())
+                .getSingleResult ();
+    }
+
+    public String getCurrentUsername() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (principal instanceof User) {
             String email = ((User) principal).getEmail();

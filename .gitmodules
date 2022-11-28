@@ -1,0 +1,3 @@
+[submodule "rec_system/AI_DIET_GENERATOR"]
+	path = rec_system/AI_DIET_GENERATOR
+	url = https://github.com/Maciekkucharski/AI_DIET_GENERATOR

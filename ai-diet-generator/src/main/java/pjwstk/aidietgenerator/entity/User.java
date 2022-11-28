@@ -3,12 +3,12 @@ package pjwstk.aidietgenerator.entity;
 import com.sun.istack.NotNull;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Entity
@@ -107,7 +107,6 @@ public class User {
     public void setCreatedAt(){
         this.timestamp = new Timestamp(System.currentTimeMillis());
     }
-
 
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Arrays
