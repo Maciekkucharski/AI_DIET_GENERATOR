@@ -8,7 +8,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import pjwstk.aidietgenerator.entity.User;
 import pjwstk.aidietgenerator.exception.ResourceNotFoundException;
 import pjwstk.aidietgenerator.repository.UserRepository;
-
 import java.util.List;
 
 @RestController

@@ -27,13 +27,13 @@ public class PostService {
 
     @PersistenceContext
     private final EntityManager entityManager;
-
     private final PostRepository postRepository;
-
     private final UserService userService;
 
     @Autowired
-    public PostService(EntityManager entityManager, PostRepository postRepository, UserService userService) {
+    public PostService(EntityManager entityManager,
+                       PostRepository postRepository,
+                       UserService userService) {
         this.userService = userService;
         this.entityManager = entityManager;
         this.postRepository = postRepository;
@@ -56,7 +56,7 @@ public class PostService {
         }
     }
 
-    public void create(PostRequest post, HttpServletResponse response) {
+    public Post create(PostRequest post, HttpServletResponse response) {
         User currentUser = userService.findCurrentUser();
         if (currentUser == null) {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
@@ -72,8 +72,10 @@ public class PostService {
                 newPost.setDescription(post.getDescription());
                 postRepository.save(newPost);
                 response.setStatus(HttpStatus.CREATED.value());
+                return newPost;
             }
         }
+        return null;
     }
 
     public void delete(HttpServletResponse response, long postId) {
@@ -111,7 +113,7 @@ public class PostService {
         return userPosts;
     }
 
-    public void edit(PostRequest post, HttpServletResponse response, long postId) {
+    public Post edit(PostRequest post, HttpServletResponse response, long postId) {
         Post existingPost = postRepository.findById(postId)
                 .orElseThrow(() -> new ResourceNotFoundException("Post not found with id :" + postId));
         User currentUser = userService.findCurrentUser();
@@ -121,8 +123,10 @@ public class PostService {
             if (post.getImage_path() != null) existingPost.setImagePath(post.getImage_path());
             postRepository.save(existingPost);
             response.setStatus(HttpStatus.OK.value());
+            return existingPost;
         } else {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            return null;
         }
     }
 }

@@ -24,10 +24,11 @@ public class PostController {
         this.postRepository = postRepository;
         this.postService = postService;
     }
+
     //Get all posts
     @GetMapping
     public List<Post> getAllPosts(){
-        return this.postRepository.findAll();
+        return postRepository.findAll();
     }
 
     @GetMapping("/{id}")

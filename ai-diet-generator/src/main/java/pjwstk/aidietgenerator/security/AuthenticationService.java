@@ -1,5 +1,6 @@
 package pjwstk.aidietgenerator.security;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -13,6 +14,7 @@ public class AuthenticationService {
     final UserSession userSession;
     final UserService userService;
 
+    @Autowired
     public AuthenticationService(UserSession userSession, UserService userService){
         this.userSession = userSession;
         this.userService = userService;

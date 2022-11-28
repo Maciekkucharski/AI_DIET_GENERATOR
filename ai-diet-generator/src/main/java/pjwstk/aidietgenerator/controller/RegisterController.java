@@ -27,18 +27,18 @@ public class RegisterController {
 
     @PostMapping
     @Transactional
-    public User register(@RequestBody RegisterRequest registerRequest, HttpServletResponse response){
+    public User register(@RequestBody RegisterRequest registerRequest, HttpServletResponse response) {
 
-        if(userService.doesUserExist (registerRequest.getEmail ())){
-            response.setStatus (HttpStatus.CONFLICT.value ()); //User already exists.
+        if (userService.doesUserExist(registerRequest.getEmail())) {
+            response.setStatus(HttpStatus.CONFLICT.value()); //User already exists.
             return null;
-        }else {
-            if(registerRequest.getPassword () == null || registerRequest.getPassword () == ""){
-                response.setStatus (HttpStatus.CONFLICT.value ()); //Invalid password.
+        } else {
+            if (registerRequest.getPassword() == null || registerRequest.getPassword() == "") {
+                response.setStatus(HttpStatus.CONFLICT.value()); //Invalid password.
                 return null;
-            }else {
-                User newUser = new User(registerRequest.getEmail() , registerRequest.getPassword()); //New user created.
-                if(userService.isEmpty ()){
+            } else {
+                User newUser = new User(registerRequest.getEmail(), registerRequest.getPassword()); //New user created.
+                if (userService.isEmpty()) {
                     GrantedAuthority adminAuthority = () -> "ROLE_ADMIN";
                     newUser.addAuthority(adminAuthority);
                 }

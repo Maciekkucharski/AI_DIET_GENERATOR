@@ -1,6 +1,7 @@
 package pjwstk.aidietgenerator.service;
 
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,12 +18,14 @@ import javax.transaction.Transactional;
 public class UserService {
 
     private final EntityManager entityManager;
-    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserService (EntityManager entityManager) {
+    public UserService(EntityManager entityManager) {
         this.entityManager = entityManager;
+        this.passwordEncoder = new BCryptPasswordEncoder();
     }
+
 
     public void saveUser(User user){
         var userEntity = new User();
@@ -59,13 +62,7 @@ public class UserService {
                 .getSingleResult ();
     }
 
-    public User findCurrentUser(){
-        return entityManager.createQuery ("SELECT ue FROM User ue WHERE ue.username= :username", User.class)
-                .setParameter ("username", getCurrentUsername())
-                .getSingleResult ();
-    }
-
-    public String getCurrentUsername() {
+    public String getCurrentUserEmail() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (principal instanceof User) {
             String email = ((User) principal).getEmail();
