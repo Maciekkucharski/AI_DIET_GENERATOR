@@ -1,27 +1,26 @@
 package pjwstk.aidietgenerator.service;
 
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import pjwstk.aidietgenerator.entity.User;
-
-import javax.persistence.EntityManager;
+import pjwstk.aidietgenerator.repository.UserRepository;
 import javax.persistence.NoResultException;
-import javax.persistence.PersistenceContext;
-import javax.transaction.Transactional;
+
 
 
 @Service
 public class UserService {
 
-    private final EntityManager entityManager;
+    private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @Autowired
-    public UserService (EntityManager entityManager) {
-        this.entityManager = entityManager;
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
     public void saveUser(User user){
@@ -32,40 +31,23 @@ public class UserService {
         userEntity.setPassword (passwordEncoder.encode(user.getPassword()));
         userEntity.setAuthority(String.join(",", user.getAuthority()));
         userEntity.setCreatedAt();
-        entityManager.persist(userEntity);
+        userRepository.save(userEntity);
     }
 
     public boolean doesUserExist (String email){
-        if (entityManager.createQuery ("SELECT ue FROM User ue WHERE ue.email= :email", User.class)
-                .setParameter ("email", email)
-                .getResultList ().isEmpty ()) return false;
+        if (userRepository.findByemail(email) == null) return false;
         else return true;
     }
     public boolean isEmpty(){
-        if (entityManager.createQuery ("SELECT ue FROM User ue ", User.class)
-                .getResultList ().isEmpty ()) return true;
+        if (userRepository.findAll().isEmpty()) return true;
         else return false;
     }
 
-    public User findUserByUsername(String email){
-            return entityManager.createQuery ("SELECT ue FROM User ue WHERE ue.email= :email", User.class)
-                .setParameter ("email", email)
-                .getSingleResult ();
-    }
-
     public User findByEmail(String email){
-        return entityManager.createQuery ("SELECT ue FROM User ue WHERE ue.email= :email", User.class)
-                .setParameter ("email", email)
-                .getSingleResult ();
+        return userRepository.findByemail(email);
     }
 
-    public User findCurrentUser(){
-        return entityManager.createQuery ("SELECT ue FROM User ue WHERE ue.username= :username", User.class)
-                .setParameter ("username", getCurrentUsername())
-                .getSingleResult ();
-    }
-
-    public String getCurrentUsername() {
+    public String getCurrentUserEmail() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (principal instanceof User) {
             String email = ((User) principal).getEmail();
@@ -78,9 +60,7 @@ public class UserService {
     public User findCurrentUser() {
         User currentUser = null;
         try {
-            currentUser = entityManager.createQuery("SELECT user FROM User user WHERE user.email= :email", User.class)
-                    .setParameter("email", getCurrentUserEmail())
-                    .getSingleResult();
+            currentUser = userRepository.findByemail(getCurrentUserEmail());
         } catch (NoResultException e) {
             System.out.println(e.getMessage());
         }

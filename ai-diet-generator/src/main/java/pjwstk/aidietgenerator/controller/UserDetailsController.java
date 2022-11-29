@@ -19,24 +19,31 @@ import java.util.List;
 @RequestMapping("/userDetails")
 public class UserDetailsController {
 
-    @Autowired
     private UserDetailsRepository userDetailsRepository;
-    @Autowired
     private UserService userService;
-    @Autowired
     private UserDetailsService userDetailsService;
+
+    @Autowired
+    public UserDetailsController(UserDetailsRepository userDetailsRepository,
+                                 UserService userService,
+                                 UserDetailsService userDetailsService) {
+        this.userDetailsRepository = userDetailsRepository;
+        this.userService = userService;
+        this.userDetailsService = userDetailsService;
+    }
 
     @GetMapping
     public List<UserDetails> getCurrentUserDetails() {
-        return this.userDetailsRepository.findByuser(userService.findCurrentUser());
+        return userDetailsRepository.findByuser(userService.findCurrentUser());
     }
 
     @PostMapping
     @Transactional
-    public void addUserDetails(@RequestBody UserDetails userDetails, HttpServletResponse response) {
+    public UserDetails addUserDetails(@RequestBody UserDetails userDetails, HttpServletResponse response) {
         User currentUser = userService.findCurrentUser();
         if (currentUser == null) {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            return null;
         } else {
             UserDetails newUserDetails = new UserDetails();
             if(userDetails.getWeight() != 0){
@@ -51,14 +58,15 @@ public class UserDetailsController {
             if(userDetails.getGender() != null){
                 newUserDetails.setGender(userDetails.getGender());
             }
-            response.setStatus(HttpStatus.CREATED.value());
             userDetailsService.saveUserDetails(newUserDetails);
+            response.setStatus(HttpStatus.CREATED.value());
+            return newUserDetails;
         }
     }
 
     @GetMapping("/{id}")
     public UserDetails getUserDetailsById(@PathVariable (value = "id") long userDetailsId) {
-        return this.userDetailsRepository.findById(userDetailsId).
+        return userDetailsRepository.findById(userDetailsId).
                 orElseThrow(() -> new ResourceNotFoundException("UserDetails not found with id :" + userDetailsId));
     }
 
@@ -66,7 +74,7 @@ public class UserDetailsController {
     public ResponseEntity<UserDetails> deleteUserDetails(@PathVariable (value = "id") long userDetailsId) {
         UserDetails existingUserDetails = userDetailsRepository.findById(userDetailsId).
                 orElseThrow(() -> new ResourceNotFoundException("UserDetails not found with id :" + userDetailsId));
-        this.userDetailsRepository.delete(existingUserDetails);
+        userDetailsRepository.delete(existingUserDetails);
         return ResponseEntity.ok().build();
     }
 }

@@ -3,18 +3,19 @@ package pjwstk.aidietgenerator.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pjwstk.aidietgenerator.entity.UserDetails;
-
-import javax.persistence.EntityManager;
+import pjwstk.aidietgenerator.repository.UserDetailsRepository;
 
 @Service
 public class UserDetailsService {
 
-    private final EntityManager entityManager;
+    private final UserService userService;
+    private final UserDetailsRepository userDetailsRepository;
 
     @Autowired
-    UserService userService;
-
-    public UserDetailsService(EntityManager entityManager) { this.entityManager = entityManager;}
+    public UserDetailsService(UserService userService, UserDetailsRepository userDetailsRepository) {
+        this.userService = userService;
+        this.userDetailsRepository = userDetailsRepository;
+    }
 
     public double calculateBmi(double weight, int height){
         double dHeight = height;
@@ -23,7 +24,7 @@ public class UserDetailsService {
         return (weight/Math.pow(heightInMeters, 2));
     }
 
-    public void saveUserDetails(UserDetails userDetails){
+    public UserDetails saveUserDetails(UserDetails userDetails){
         var userDetailsEntity = new UserDetails();
         userDetailsEntity.setWeight(userDetails.getWeight());
         userDetailsEntity.setHeight(userDetails.getHeight());
@@ -32,11 +33,8 @@ public class UserDetailsService {
         userDetailsEntity.setGender(userDetails.getGender());
         userDetailsEntity.setUpdatedAt();
         userDetailsEntity.setUser(userService.findCurrentUser());
-        entityManager.persist(userDetailsEntity);
+        return userDetailsRepository.save(userDetailsEntity);
     }
-
-
-
 
 
 }

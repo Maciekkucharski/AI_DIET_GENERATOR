@@ -9,8 +9,6 @@ import org.springframework.security.oauth2.client.web.HttpSessionOAuth2Authoriza
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.web.SecurityFilterChain;
 
-import static org.springframework.security.oauth2.jose.jws.SignatureAlgorithm.RS512;
-
 @Configuration
 public class SecurityConfig{
 
@@ -23,15 +21,19 @@ public class SecurityConfig{
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(authorize -> authorize
-                        .antMatchers(HttpMethod.POST, "/login", "/register").permitAll()
+                        .antMatchers(HttpMethod.POST, "/account/login", "/account/register").permitAll()
                         .antMatchers(HttpMethod.GET, "/api/**").hasRole("ADMIN")
+                        .antMatchers(HttpMethod.GET, "/account/socials/**").permitAll()
+                        .antMatchers(HttpMethod.PUT, "/account/socials/").hasRole("USER")
+                        .antMatchers("/account/subscription").permitAll()
+                        .antMatchers(HttpMethod.POST, "/account/socials/").hasRole("USER")
                         .antMatchers( "/userDetails").hasRole("USER")
                         .anyRequest().authenticated()
                 )
                 .csrf().disable()
                 .oauth2Login()
-                .defaultSuccessUrl("/loginSuccess")
-                .failureUrl("/loginFailure")
+                .defaultSuccessUrl("/account/loginSuccess")
+                .failureUrl("/account/loginFailure")
                 .authorizationEndpoint()
                 .baseUri("/oauth2/authorize-client")
                 .authorizationRequestRepository(authorizationRequestRepository());
