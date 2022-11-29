@@ -25,7 +25,8 @@ import java.util.Map;
 @RequestMapping("/account")
 public class LoginController {
 
-    private OAuth2AuthorizedClientService authorizedClientService;
+    private OAuth2AuthorizedClientService authorizedClientService; // Could not autowire. No beans of 'OAuth2AuthorizedClientService' type found.
+
     private final AuthenticationService authenticationService;
     private final UserService userService;
 
