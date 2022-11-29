@@ -20,14 +20,14 @@ public class AuthenticationService {
         this.userService = userService;
     }
 
-    public boolean login(String username, String password){
-        if(userService.doesUserExist(username)){
-            final User currentUser = userService.findUserByUsername(username);
+    public boolean login(String email, String password){
+        if(userService.doesUserExist(email)){
+            final User currentUser = userService.findByEmail(email);
             final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
             if(encoder.matches(password, currentUser.getPassword())){
                 userSession.logIn();
-                User user = new User(currentUser.getEmail(), currentUser.getPassword(), userService.findUserByUsername(username).getAuthority());
+                User user = new User(currentUser.getEmail(), currentUser.getPassword(), userService.findByEmail(email).getAuthority());
                 SecurityContextHolder.getContext().setAuthentication(new AppAuthentication(user));
                 return true;
             } else {
@@ -41,12 +41,10 @@ public class AuthenticationService {
     }
 
     public boolean oauth2Login(String email){
-        String username = userService.findByEmail(email).getUsername();
-        if(userService.doesUserExist(username)){
-            final User currentUser = userService.findUserByUsername(username);
-
+        if(userService.doesUserExist(email)){
+            final User currentUser = userService.findByEmail(email);
             userSession.logIn();
-            User user = new User(currentUser.getUsername(), currentUser.getPassword(), userService.findUserByUsername(username).getAuthority());
+            User user = new User(currentUser.getEmail(), currentUser.getPassword(), userService.findByEmail(email).getAuthority());
             SecurityContextHolder.getContext().setAuthentication(new AppAuthentication(user));
             return true;
         } else {

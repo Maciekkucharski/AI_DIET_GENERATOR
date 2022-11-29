@@ -36,9 +36,9 @@ public class PostController {
         return postService.view(postId, response);
     }
 
-    @GetMapping("/user/{username}")
-    public List<Post> getAllUserPosts(@PathVariable(value = "username") String username, HttpServletResponse response){
-        return postService.getSelectedUserPosts(username, response);
+    @GetMapping("/user/{userId}")
+    public List<Post> getAllUserPosts(@PathVariable(value = "userId") long userId , HttpServletResponse response){
+        return postService.getSelectedUserPosts(userId, response);
     }
 
     @PostMapping

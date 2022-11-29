@@ -50,12 +50,6 @@ public class UserService {
         else return false;
     }
 
-    public User findUserByUsername(String email){
-            return entityManager.createQuery ("SELECT ue FROM User ue WHERE ue.email= :email", User.class)
-                .setParameter ("email", email)
-                .getSingleResult ();
-    }
-
     public User findByEmail(String email){
         return entityManager.createQuery ("SELECT ue FROM User ue WHERE ue.email= :email", User.class)
                 .setParameter ("email", email)

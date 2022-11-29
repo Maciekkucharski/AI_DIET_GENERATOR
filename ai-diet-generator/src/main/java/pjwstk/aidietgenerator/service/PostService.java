@@ -21,6 +21,7 @@ import java.time.Instant;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PostService {
@@ -29,15 +30,21 @@ public class PostService {
     private final EntityManager entityManager;
     private final PostRepository postRepository;
     private final UserService userService;
+    private final UserRepository userRepository;
 
     @Autowired
-    public PostService(EntityManager entityManager,
-                       PostRepository postRepository,
-                       UserService userService) {
-        this.userService = userService;
-        this.entityManager = entityManager;
+    public PostService(PostRepository postRepository,
+                       UserService userService,
+                       UserRepository userRepository,
+                       EntityManager entityManager) {
         this.postRepository = postRepository;
+        this.userService = userService;
+        this.userRepository = userRepository;
+        this.entityManager = entityManager;
     }
+
+
+
 
     public PostView view(long postId, HttpServletResponse response) {
         Post post = entityManager.find(Post.class, postId);
@@ -104,9 +111,9 @@ public class PostService {
         return comments;
     }
 
-    public List<Post> getSelectedUserPosts(String username, HttpServletResponse response) {
+    public List<Post> getSelectedUserPosts(long id, HttpServletResponse response) {
         List<Post> userPosts = null;
-        User user = userService.findUserByUsername(username);
+        Optional<User> user = userRepository.findById(id);
         userPosts = entityManager.createQuery(
                 "SELECT post FROM Post post WHERE post.user = :user", Post.class)
                 .setParameter("user", user).getResultList();
