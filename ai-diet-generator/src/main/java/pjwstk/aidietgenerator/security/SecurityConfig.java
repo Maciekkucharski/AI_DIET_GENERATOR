@@ -20,23 +20,23 @@ public class SecurityConfig{
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .authorizeHttpRequests(authorize -> authorize
-                        .antMatchers(HttpMethod.POST, "/account/login", "/account/register").permitAll()
-                        .antMatchers(HttpMethod.GET, "/api/**").hasRole("ADMIN")
-                        .antMatchers(HttpMethod.GET, "/account/socials/**").permitAll()
-                        .antMatchers(HttpMethod.PUT, "/account/socials/").hasRole("USER")
-                        .antMatchers("/account/subscription").permitAll()
-                        .antMatchers(HttpMethod.POST, "/account/socials/").hasRole("USER")
-                        .antMatchers( "/userDetails").hasRole("USER")
-                        .anyRequest().authenticated()
-                )
-                .csrf().disable()
-                .oauth2Login()
-                .defaultSuccessUrl("/account/loginSuccess")
-                .failureUrl("/account/loginFailure")
-                .authorizationEndpoint()
-                .baseUri("/oauth2/authorize-client")
-                .authorizationRequestRepository(authorizationRequestRepository());
+//                .authorizeHttpRequests(authorize -> authorize
+//                        .antMatchers(HttpMethod.POST, "/account/login", "/account/register").permitAll()
+//                        .antMatchers(HttpMethod.GET, "/api/**").hasRole("ADMIN")
+//                        .antMatchers(HttpMethod.GET, "/account/socials/**").permitAll()
+//                        .antMatchers(HttpMethod.PUT, "/account/socials/").hasRole("USER")
+//                        .antMatchers("/account/subscription").permitAll()
+//                        .antMatchers(HttpMethod.POST, "/account/socials/").hasRole("USER")
+//                        .antMatchers( "/userDetails").hasRole("USER")
+//                        .anyRequest().authenticated()
+//                )
+                .csrf().disable();
+//                .oauth2Login()
+//                .defaultSuccessUrl("/account/loginSuccess")
+//                .failureUrl("/account/loginFailure")
+//                .authorizationEndpoint()
+//                .baseUri("/oauth2/authorize-client")
+//                .authorizationRequestRepository(authorizationRequestRepository());
         return http.build();
     }
 

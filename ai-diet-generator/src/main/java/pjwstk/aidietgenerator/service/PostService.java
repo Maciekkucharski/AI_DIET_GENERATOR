@@ -104,7 +104,7 @@ public class PostService {
 
     public HashMap<Long, String> getComments(Post post) {
         HashMap<Long, String> comments = new HashMap<>();
-        List<Comment> commentValues =  commentRepository.findBypost_id(post.getId());
+        List<Comment> commentValues =  commentRepository.findBypost(post);
         for (Comment comment : commentValues) {
             comments.put(comment.getId(), comment.getContent());
         }
@@ -112,10 +112,12 @@ public class PostService {
     }
 
     public List<Post> getSelectedUserPosts(long id, HttpServletResponse response) {
-        List<Post> userPosts = null;
         Optional<User> user = userRepository.findById(id);
-        userPosts = postRepository.findBycreator_id(id);
-        return userPosts;
+        if(!user.isEmpty()) {
+            return postRepository.findByuser(user.get());
+        }
+        response.setStatus(HttpStatus.NOT_FOUND.value());
+        return null;
     }
 
     public Post edit(PostRequest post, HttpServletResponse response, long postId) {

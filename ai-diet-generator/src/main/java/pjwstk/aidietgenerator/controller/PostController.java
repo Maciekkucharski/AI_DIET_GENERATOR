@@ -49,7 +49,7 @@ public class PostController {
 
     @PutMapping("/{id}")
     @Transactional
-    public void putPoem(@RequestBody PostRequest post, @PathVariable("id") long postId, HttpServletResponse response){
+    public void putPost(@RequestBody PostRequest post, @PathVariable("id") long postId, HttpServletResponse response){
         postService.edit(post, response, postId);
     }
 
