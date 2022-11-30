@@ -24,6 +24,8 @@ public class Post {
     @Column(name = "image_path")
     private String imagePath;
 
+    //kategoria
+
     @ManyToOne
     @JoinColumn(name = "creator_id")
     private User user;

@@ -33,7 +33,8 @@ public class RegisterController {
             response.setStatus(HttpStatus.CONFLICT.value()); //User already exists.
             return null;
         } else {
-            if (registerRequest.getPassword() == null || registerRequest.getPassword() == "") {
+            if (registerRequest.getPassword() == null || registerRequest.getPassword() == ""
+            || registerRequest.getEmail() == null || registerRequest.getPassword().length() < 6) {
                 response.setStatus(HttpStatus.CONFLICT.value()); //Invalid password.
                 return null;
             } else {
