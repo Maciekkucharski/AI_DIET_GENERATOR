@@ -2,7 +2,6 @@ package pjwstk.aidietgenerator.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import pjwstk.aidietgenerator.entity.Comment;
 import pjwstk.aidietgenerator.entity.Post;
@@ -14,12 +13,8 @@ import pjwstk.aidietgenerator.repository.UserRepository;
 import pjwstk.aidietgenerator.request.PostRequest;
 import pjwstk.aidietgenerator.view.PostView;
 
-import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
-import javax.persistence.PersistenceContext;
 import javax.servlet.http.HttpServletResponse;
-import java.time.Instant;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -28,17 +23,17 @@ import java.util.Optional;
 public class PostService {
 
     private final PostRepository postRepository;
-    private final UserService userService;
+    private final UserDetailsService userDetailsService;
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
 
     @Autowired
     public PostService(PostRepository postRepository,
-                       UserService userService,
+                       UserDetailsService userDetailsService,
                        UserRepository userRepository,
                        CommentRepository commentRepository) {
         this.postRepository = postRepository;
-        this.userService = userService;
+        this.userDetailsService = userDetailsService;
         this.userRepository = userRepository;
         this.commentRepository = commentRepository;
     }
@@ -66,7 +61,7 @@ public class PostService {
     }
 
     public Post create(PostRequest post, HttpServletResponse response) {
-        User currentUser = userService.findCurrentUser();
+        User currentUser = userDetailsService.findCurrentUser();
         if (currentUser == null) {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
         } else {
@@ -88,7 +83,7 @@ public class PostService {
     }
 
     public void delete(HttpServletResponse response, long postId) {
-        User currentUser = userService.findCurrentUser();
+        User currentUser = userDetailsService.findCurrentUser();
         Post existingPost = postRepository.getReferenceById(postId);
         if (existingPost == null) {
             response.setStatus(HttpStatus.NOT_FOUND.value());
@@ -123,7 +118,7 @@ public class PostService {
     public Post edit(PostRequest post, HttpServletResponse response, long postId) {
         Post existingPost = postRepository.findById(postId)
                 .orElseThrow(() -> new ResourceNotFoundException("Post not found with id :" + postId));
-        User currentUser = userService.findCurrentUser();
+        User currentUser = userDetailsService.findCurrentUser();
         if(currentUser == existingPost.getUser()) {
             if (post.getTitle() != null) existingPost.setTitle(post.getTitle());
             if (post.getDescription() != null) existingPost.setDescription(post.getDescription());

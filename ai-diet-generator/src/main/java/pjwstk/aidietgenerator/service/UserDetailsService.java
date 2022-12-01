@@ -1,40 +1,82 @@
 package pjwstk.aidietgenerator.service;
 
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import pjwstk.aidietgenerator.entity.UserDetails;
-import pjwstk.aidietgenerator.repository.UserDetailsRepository;
+import pjwstk.aidietgenerator.entity.User;
+import pjwstk.aidietgenerator.repository.UserRepository;
+import javax.persistence.NoResultException;
+import java.util.ArrayList;
+
 
 @Service
-public class UserDetailsService {
+public class UserDetailsService implements org.springframework.security.core.userdetails.UserDetailsService {
 
-    private final UserService userService;
-    private final UserDetailsRepository userDetailsRepository;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @Autowired
-    public UserDetailsService(UserService userService, UserDetailsRepository userDetailsRepository) {
-        this.userService = userService;
-        this.userDetailsRepository = userDetailsRepository;
+    public UserDetailsService(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
-    public double calculateBmi(double weight, int height){
-        double dHeight = height;
-        double heightInMeters = dHeight/100;
-
-        return (weight/Math.pow(heightInMeters, 2));
+    public void saveUser(User user){
+        var userEntity = new User();
+        userEntity.setFirstName(user.getFirstName());
+        userEntity.setLastName(user.getLastName());
+        userEntity.setEmail(user.getEmail());
+        userEntity.setPassword (passwordEncoder.encode(user.getPassword()));
+        userEntity.setAuthority(String.join(",", user.getAuthority()));
+        userEntity.setCreatedAt();
+        userRepository.save(userEntity);
     }
 
-    public UserDetails saveUserDetails(UserDetails userDetails){
-        var userDetailsEntity = new UserDetails();
-        userDetailsEntity.setWeight(userDetails.getWeight());
-        userDetailsEntity.setHeight(userDetails.getHeight());
-        userDetailsEntity.setAge(userDetails.getAge());
-        userDetailsEntity.setBmi(calculateBmi(userDetails.getWeight(), userDetails.getHeight()));
-        userDetailsEntity.setGender(userDetails.getGender());
-        userDetailsEntity.setUpdatedAt();
-        userDetailsEntity.setUser(userService.findCurrentUser());
-        return userDetailsRepository.save(userDetailsEntity);
+    public boolean doesUserExist (String email){
+        if (userRepository.findByemail(email) == null) return false;
+        else return true;
+    }
+    public boolean isEmpty(){
+        if (userRepository.findAll().isEmpty()) return true;
+        else return false;
     }
 
+    public User findByEmail(String email){
+        return userRepository.findByemail(email);
+    }
 
+    public String getCurrentUserEmail() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (principal instanceof User) {
+            String email = ((User) principal).getEmail();
+            return email;
+        } else {
+            return principal.toString();
+        }
+    }
+
+    public User findCurrentUser() {
+        User currentUser = null;
+        try {
+            currentUser = userRepository.findByemail(getCurrentUserEmail());
+        } catch (NoResultException e) {
+            System.out.println(e.getMessage());
+        }
+        return currentUser;
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+
+        User user = userRepository.findByemail(email);
+        if (user == null) {
+            throw new UsernameNotFoundException("User not found with email: " + email);
+        }
+        return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(),
+                new ArrayList<>());
+    }
 }

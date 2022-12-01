@@ -14,13 +14,13 @@ import java.util.Optional;
 @Service
 public class SocialsService {
 
-    private final UserService userService;
+    private final UserDetailsService userDetailsService;
     private final SocialsRepository socialsRepository;
     private final UserRepository userRepository;
 
     @Autowired
-    public SocialsService(UserService userService, SocialsRepository socialsRepository, UserRepository userRepository) {
-        this.userService = userService;
+    public SocialsService(UserDetailsService userDetailsService, SocialsRepository socialsRepository, UserRepository userRepository) {
+        this.userDetailsService = userDetailsService;
         this.socialsRepository = socialsRepository;
         this.userRepository = userRepository;
     }
@@ -28,7 +28,7 @@ public class SocialsService {
 
 
     public Socials saveSocials(HttpServletResponse response, Socials socials){
-        User currentUser = userService.findCurrentUser();
+        User currentUser = userDetailsService.findCurrentUser();
         if (currentUser == null) {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
         } else {
@@ -50,7 +50,7 @@ public class SocialsService {
     }
 
     public Socials updateSocials(HttpServletResponse response, Socials socials) {
-        User currentUser = userService.findCurrentUser();
+        User currentUser = userDetailsService.findCurrentUser();
         if (currentUser == null) {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             return null;
