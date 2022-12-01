@@ -3,11 +3,11 @@ package pjwstk.aidietgenerator.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import pjwstk.aidietgenerator.entity.User;
-import pjwstk.aidietgenerator.entity.UserDetails;
+import pjwstk.aidietgenerator.entity.UserStats;
 
 import java.util.List;
 
 @Repository
-public interface UserDetailsRepository extends JpaRepository<UserDetails, Long> {
-    List<UserDetails> findByuser(User user);
+public interface UserStatsRepository extends JpaRepository<UserStats, Long> {
+    List<UserStats> findByuser(User user);
 }

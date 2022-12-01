@@ -5,8 +5,8 @@ import javax.persistence.*;
 import java.sql.Timestamp;
 
 @Entity
-@Table(name="userDetails")
-public class UserDetails {
+@Table(name="userStats")
+public class UserStats {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,10 +34,10 @@ public class UserDetails {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    public UserDetails() {
+    public UserStats() {
     }
 
-    public UserDetails(double weight, int height, int age, double bmi, Gender gender) {
+    public UserStats(double weight, int height, int age, double bmi, Gender gender) {
         super();
         this.weight = weight;
         this.height = height;
@@ -46,7 +46,7 @@ public class UserDetails {
         this.gender = gender;
     }
 
-    public UserDetails(double weight, int height, int age, Gender gender) {
+    public UserStats(double weight, int height, int age, Gender gender) {
         super();
         this.weight = weight;
         this.height = height;
