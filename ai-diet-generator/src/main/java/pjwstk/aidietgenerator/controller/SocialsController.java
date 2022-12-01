@@ -5,6 +5,8 @@ import org.springframework.web.bind.annotation.*;
 import pjwstk.aidietgenerator.entity.Socials;
 import pjwstk.aidietgenerator.repository.SocialsRepository;
 import pjwstk.aidietgenerator.service.SocialsService;
+import pjwstk.aidietgenerator.service.UserDetailsService;
+
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
 
@@ -13,10 +15,21 @@ import javax.transaction.Transactional;
 public class SocialsController {
 
     SocialsService socialsService;
+    SocialsRepository socialsRepository;
+    UserDetailsService userDetailsService;
 
     @Autowired
-    public SocialsController(SocialsService socialsService) {
+    public SocialsController(SocialsService socialsService,
+                             SocialsRepository socialsRepository,
+                             UserDetailsService userDetailsService) {
         this.socialsService = socialsService;
+        this.socialsRepository = socialsRepository;
+        this.userDetailsService = userDetailsService;
+    }
+
+    @GetMapping
+    public Socials getCurrentUserSocials(){
+        return socialsRepository.findByuser(userDetailsService.findCurrentUser());
     }
 
     @GetMapping("/{id}")

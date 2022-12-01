@@ -16,7 +16,7 @@ import javax.transaction.Transactional;
 import java.util.List;
 
 @RestController
-@RequestMapping("/userStats")
+@RequestMapping("/account/stats")
 public class UserStatsController {
 
     private UserStatsRepository userStatsRepository;
