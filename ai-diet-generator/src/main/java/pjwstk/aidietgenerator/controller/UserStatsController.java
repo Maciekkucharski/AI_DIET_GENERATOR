@@ -9,7 +9,7 @@ import pjwstk.aidietgenerator.entity.UserStats;
 import pjwstk.aidietgenerator.exception.ResourceNotFoundException;
 import pjwstk.aidietgenerator.repository.UserStatsRepository;
 import pjwstk.aidietgenerator.service.UserStatsService;
-import pjwstk.aidietgenerator.service.UserService;
+import pjwstk.aidietgenerator.service.UserDetailsService;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
@@ -20,27 +20,27 @@ import java.util.List;
 public class UserStatsController {
 
     private UserStatsRepository userStatsRepository;
-    private UserService userService;
+    private UserDetailsService userDetailsService;
     private UserStatsService userStatsService;
 
     @Autowired
     public UserStatsController(UserStatsRepository userStatsRepository,
-                               UserService userService,
+                               UserDetailsService userDetailsService,
                                UserStatsService userStatsService) {
         this.userStatsRepository = userStatsRepository;
-        this.userService = userService;
+        this.userDetailsService = userDetailsService;
         this.userStatsService = userStatsService;
     }
 
     @GetMapping
     public List<UserStats> getCurrentUserDetails() {
-        return userStatsRepository.findByuser(userService.findCurrentUser());
+        return userStatsRepository.findByuser(userDetailsService.findCurrentUser());
     }
 
     @PostMapping
     @Transactional
     public UserStats addUserDetails(@RequestBody UserStats userStats, HttpServletResponse response) {
-        User currentUser = userService.findCurrentUser();
+        User currentUser = userDetailsService.findCurrentUser();
         if (currentUser == null) {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             return null;

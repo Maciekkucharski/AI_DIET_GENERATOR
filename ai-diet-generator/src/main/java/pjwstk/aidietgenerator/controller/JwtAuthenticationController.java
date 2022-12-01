@@ -6,12 +6,12 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
+import pjwstk.aidietgenerator.entity.User;
 import pjwstk.aidietgenerator.request.JwtRequest;
 import pjwstk.aidietgenerator.response.JwtResponse;
 import pjwstk.aidietgenerator.security.Utils.JwtTokenUtil;
+import pjwstk.aidietgenerator.service.UserDetailsService;
 
 import java.util.Objects;
 
@@ -19,7 +19,7 @@ import java.util.Objects;
 @CrossOrigin
 public class JwtAuthenticationController {
 
-    private AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;
     private final JwtTokenUtil jwtTokenUtil;
     private final UserDetailsService jwtInMemoryUserDetailsService;
 
@@ -32,6 +32,16 @@ public class JwtAuthenticationController {
         this.jwtInMemoryUserDetailsService = jwtInMemoryUserDetailsService;
     }
 
+    @PostMapping("/authenticate")
+    public ResponseEntity<?> generateAuthenticationToken(@RequestBody JwtRequest authenticationRequest) throws Exception {
+        authenticate(authenticationRequest.getEmail(), authenticationRequest.getPassword());
+
+        final User user = jwtInMemoryUserDetailsService.findByEmail(authenticationRequest.getEmail());
+        final String token = jwtTokenUtil.generateToken(user);
+
+        return ResponseEntity.ok(new JwtResponse(token));
+    }
+
     private void authenticate(String email, String password) throws Exception {
         Objects.requireNonNull(email);
         Objects.requireNonNull(password);
@@ -42,16 +52,5 @@ public class JwtAuthenticationController {
         } catch (BadCredentialsException e) {
             throw new Exception("INVALID_CREDENTIALS", e);
         }
-    }
-
-    @PostMapping("/authenticate")
-    public ResponseEntity<?> generateAuthenticationToken(@RequestBody JwtRequest authenticationRequest) throws Exception {
-        authenticate(authenticationRequest.getEmail(),
-        authenticationRequest.getPassword());
-
-        final UserDetails userDetails = jwtInMemoryUserDetailsService.loadUserByUsername(authenticationRequest.getEmail());
-        final String token = jwtTokenUtil.generateToken(userDetails);
-
-        return ResponseEntity.ok(new JwtResponse(token));
     }
 }

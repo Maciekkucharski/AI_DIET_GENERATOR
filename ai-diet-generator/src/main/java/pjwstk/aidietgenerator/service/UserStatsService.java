@@ -8,12 +8,12 @@ import pjwstk.aidietgenerator.repository.UserStatsRepository;
 @Service
 public class UserStatsService {
 
-    private final UserService userService;
+    private final UserDetailsService userDetailsService;
     private final UserStatsRepository userStatsRepository;
 
     @Autowired
-    public UserStatsService(UserService userService, UserStatsRepository userStatsRepository) {
-        this.userService = userService;
+    public UserStatsService(UserDetailsService userDetailsService, UserStatsRepository userStatsRepository) {
+        this.userDetailsService = userDetailsService;
         this.userStatsRepository = userStatsRepository;
     }
 
@@ -32,7 +32,7 @@ public class UserStatsService {
         userDetailsEntity.setBmi(calculateBmi(userStats.getWeight(), userStats.getHeight()));
         userDetailsEntity.setGender(userStats.getGender());
         userDetailsEntity.setUpdatedAt();
-        userDetailsEntity.setUser(userService.findCurrentUser());
+        userDetailsEntity.setUser(userDetailsService.findCurrentUser());
         return userStatsRepository.save(userDetailsEntity);
     }
 

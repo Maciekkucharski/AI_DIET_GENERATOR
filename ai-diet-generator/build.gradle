@@ -42,15 +42,19 @@ dependencies {
 
 //    JWT
     implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.5'
+    runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.5'
+    runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.5'
 
-//    // https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-gcp-starter
-    implementation group: 'org.springframework.cloud', name: 'spring-cloud-gcp-starter', version: '1.2.8.RELEASE'
-//
-//    // https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-gcp-starter-sql-mysql
-    implementation group: 'org.springframework.cloud', name: 'spring-cloud-gcp-starter-sql-mysql', version: '1.2.8.RELEASE'
-//
-//    // https://mvnrepository.com/artifact/com.google.cloud.tools/appengine-gradle-plugin
-    implementation group: 'com.google.cloud.tools', name: 'appengine-gradle-plugin', version: '2.4.5'
+
+
+////    // https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-gcp-starter
+//    implementation group: 'org.springframework.cloud', name: 'spring-cloud-gcp-starter', version: '1.2.8.RELEASE'
+////
+////    // https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-gcp-starter-sql-mysql
+//    implementation group: 'org.springframework.cloud', name: 'spring-cloud-gcp-starter-sql-mysql', version: '1.2.8.RELEASE'
+////
+////    // https://mvnrepository.com/artifact/com.google.cloud.tools/appengine-gradle-plugin
+//    implementation group: 'com.google.cloud.tools', name: 'appengine-gradle-plugin', version: '2.4.5'
 
 }
 
