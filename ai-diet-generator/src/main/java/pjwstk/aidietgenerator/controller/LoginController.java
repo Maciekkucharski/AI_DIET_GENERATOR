@@ -16,7 +16,6 @@ import org.thymeleaf.util.StringUtils;
 import pjwstk.aidietgenerator.entity.User;
 import pjwstk.aidietgenerator.exception.UnauthorizedException;
 import pjwstk.aidietgenerator.request.LoginRequest;
-import pjwstk.aidietgenerator.security.AuthenticationService;
 import pjwstk.aidietgenerator.service.UserService;
 
 import java.util.Map;
