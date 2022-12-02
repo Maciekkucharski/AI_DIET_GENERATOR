@@ -2,7 +2,6 @@ package pjwstk.aidietgenerator.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import pjwstk.aidietgenerator.entity.User;
@@ -14,11 +13,13 @@ import java.util.List;
 @RequestMapping("/api/users")
 public class UserController {
 
-    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder ();
-    private UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
 
     @Autowired
-    public UserController(UserRepository userRepository) {
+    public UserController(PasswordEncoder passwordEncoder,
+                          UserRepository userRepository) {
+        this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
     }
 

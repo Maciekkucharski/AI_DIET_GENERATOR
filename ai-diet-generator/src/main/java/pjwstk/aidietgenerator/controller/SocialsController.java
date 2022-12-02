@@ -14,9 +14,9 @@ import javax.transaction.Transactional;
 @RequestMapping("/account/socials")
 public class SocialsController {
 
-    SocialsService socialsService;
-    SocialsRepository socialsRepository;
-    UserDetailsService userDetailsService;
+    private final SocialsService socialsService;
+    private final SocialsRepository socialsRepository;
+    private final UserDetailsService userDetailsService;
 
     @Autowired
     public SocialsController(SocialsService socialsService,

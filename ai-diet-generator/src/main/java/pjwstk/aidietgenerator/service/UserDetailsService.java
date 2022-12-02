@@ -18,11 +18,13 @@ import java.util.ArrayList;
 public class UserDetailsService implements org.springframework.security.core.userdetails.UserDetailsService {
 
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserDetailsService(UserRepository userRepository) {
+    public UserDetailsService(UserRepository userRepository,
+                              PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public void saveUser(User user){

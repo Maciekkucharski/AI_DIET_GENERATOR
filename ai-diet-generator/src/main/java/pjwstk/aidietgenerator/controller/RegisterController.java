@@ -18,7 +18,7 @@ import javax.transaction.Transactional;
 @RequestMapping("/account/register")
 public class RegisterController {
 
-    private UserDetailsService userDetailsService;
+    private final UserDetailsService userDetailsService;
 
     @Autowired
     public RegisterController(UserDetailsService userDetailsService) {

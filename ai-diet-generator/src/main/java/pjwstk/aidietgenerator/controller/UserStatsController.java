@@ -19,9 +19,9 @@ import java.util.List;
 @RequestMapping("/account/stats")
 public class UserStatsController {
 
-    private UserStatsRepository userStatsRepository;
-    private UserDetailsService userDetailsService;
-    private UserStatsService userStatsService;
+    private final UserStatsRepository userStatsRepository;
+    private final UserDetailsService userDetailsService;
+    private final UserStatsService userStatsService;
 
     @Autowired
     public UserStatsController(UserStatsRepository userStatsRepository,
