@@ -5,68 +5,68 @@ import pandas as pd
 
 API_KEY = '947992fa499844bb9e8e4a026e65a037'
 
-
-@pytest.mark.parametrize("expected", [False])
-def test_get_filtered_recipes_no_parameters(expected):
-    df = get_filtered_recipes(to_csv=True, destination='./test.csv')
-    assert df.empty == expected
-
-
-@pytest.mark.parametrize("test_input,expected", [(pd.read_csv('./tests/unit/data/all_recipes.csv'), 8)])
-def test_get_filtered_recipes_no_ids_parameter(test_input, expected):
-    df = get_filtered_recipes(df=test_input)
-    assert len(df) == expected
+class TestRecipesNoApi:
+    @pytest.mark.parametrize("expected", [False])
+    def test_get_filtered_recipes_no_parameters(self, expected):
+        df = get_filtered_recipes(to_csv=True, destination='./test.csv')
+        assert df.empty == expected
 
 
-@pytest.mark.parametrize("test_input,expected", [((pd.DataFrame(
-    data={'id': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-          'titles': ['foo_1', 'foo_2', 'foo_3', 'foo_4', 'foo_5', 'foo_6', 'foo_7', 'foo_8', 'foo_9', 'foo_10', ]}),
-                                                   [1, 2, 3, 4, 5]), 5)])
-def test_get_filtered_recipes_from_df(test_input, expected):
-    df = get_filtered_recipes(df=test_input[0], ids=test_input[1])
-    assert len(df) == expected
+    @pytest.mark.parametrize("test_input,expected", [(pd.read_csv('./tests/unit/data/all_recipes.csv'), 8)])
+    def test_get_filtered_recipes_no_ids_parameter(self, test_input, expected):
+        df = get_filtered_recipes(df=test_input)
+        assert len(df) == expected
 
 
-@pytest.mark.parametrize("test_input,expected", [((pd.read_csv('./tests/unit/data/all_recipes.csv'),
-                                                   [715769, 715495, 4, 5]), 2)])
-def test_get_filtered_recipes_from_csv(test_input, expected):
-    df = get_filtered_recipes(df=test_input[0], ids=test_input[1])
-    assert len(df) == expected
+    @pytest.mark.parametrize("test_input,expected", [((pd.DataFrame(
+        data={'id': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+              'titles': ['foo_1', 'foo_2', 'foo_3', 'foo_4', 'foo_5', 'foo_6', 'foo_7', 'foo_8', 'foo_9', 'foo_10', ]}),
+                                                       [1, 2, 3, 4, 5]), 5)])
+    def test_get_filtered_recipes_from_df(self, test_input, expected):
+        df = get_filtered_recipes(df=test_input[0], ids=test_input[1])
+        assert len(df) == expected
 
 
-@pytest.mark.parametrize("test_input,expected", [((pd.read_csv('./tests/unit/data/all_recipes.csv'), []), 0)])
-def test_get_filtered_recipes_empty_list(test_input, expected):
-    df = get_filtered_recipes(df=test_input[0], ids=test_input[1])
-    assert len(df) == expected
+    @pytest.mark.parametrize("test_input,expected", [((pd.read_csv('./tests/unit/data/all_recipes.csv'),
+                                                       [715769, 715495, 4, 5]), 2)])
+    def test_get_filtered_recipes_from_csv(self, test_input, expected):
+        df = get_filtered_recipes(df=test_input[0], ids=test_input[1])
+        assert len(df) == expected
 
 
-@pytest.mark.parametrize("test_input,expected", [(pd.DataFrame(), None)])
-def test_get_filtered_recipes_empty_df(test_input, expected):
-    df = get_filtered_recipes(df=test_input)
-    assert df == expected
+    @pytest.mark.parametrize("test_input,expected", [((pd.read_csv('./tests/unit/data/all_recipes.csv'), []), 0)])
+    def test_get_filtered_recipes_empty_list(self, test_input, expected):
+        df = get_filtered_recipes(df=test_input[0], ids=test_input[1])
+        assert len(df) == expected
 
 
-@pytest.mark.parametrize("test_input,expected",
-                         [((pd.read_csv('tests/unit/data/recipes.csv'), 'Simple Skillet Lasagna'), [715573])])
-def test_get_dish_df(test_input, expected):
-    df = get_dish_id(df=test_input[0], dish_name=test_input[1])
-    assert df == expected
+    @pytest.mark.parametrize("test_input,expected", [(pd.DataFrame(), None)])
+    def test_get_filtered_recipes_empty_df(self, test_input, expected):
+        df = get_filtered_recipes(df=test_input)
+        assert df == expected
 
 
-@pytest.mark.parametrize("test_input,expected", [((pd.DataFrame(), 'foo_dish_name'), None)])
-def test_get_dish_empty_df(test_input, expected):
-    df = get_dish_id(df=test_input[0], dish_name=test_input[1])
-    assert df == expected
+    @pytest.mark.parametrize("test_input,expected",
+                             [((pd.read_csv('tests/unit/data/recipes.csv'), 'Simple Skillet Lasagna'), [715573])])
+    def test_get_dish_df(self, test_input, expected):
+        df = get_dish_id(df=test_input[0], dish_name=test_input[1])
+        assert df == expected
 
 
-@pytest.mark.parametrize("test_input,expected", [((pd.read_csv('tests/unit/data/recipes.csv'), 'foo_dish_name'), [])])
-def test_get_dish_wrong_name(test_input, expected):
-    df = get_dish_id(df=test_input[0], dish_name=test_input[1])
-    assert df == expected
+    @pytest.mark.parametrize("test_input,expected", [((pd.DataFrame(), 'foo_dish_name'), None)])
+    def test_get_dish_empty_df(self, test_input, expected):
+        df = get_dish_id(df=test_input[0], dish_name=test_input[1])
+        assert df == expected
+
+
+    @pytest.mark.parametrize("test_input,expected", [((pd.read_csv('tests/unit/data/recipes.csv'), 'foo_dish_name'), [])])
+    def test_get_dish_wrong_name(self, test_input, expected):
+        df = get_dish_id(df=test_input[0], dish_name=test_input[1])
+        assert df == expected
 
 
 @pytest.mark.skip(reason="tests requires api requests")
-class TestApi:
+class TestRecipesApi:
     """
     Tests that require api connection
     """

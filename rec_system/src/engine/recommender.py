@@ -5,10 +5,6 @@ from typing import Dict, Any
 import pandas as pd
 from scipy import spatial
 
-MODEL = {
-    "als": AlternatingLeastSquares,
-}
-
 
 def _get_sparse_matrix(values, user_idx, product_idx):
     return csr_matrix(
@@ -80,15 +76,21 @@ class Recommender:
 
 
 def compare_taste_with_taste_profile(dish_name_list, user_email, user_profiles_df: pd.DataFrame = None,
-                                     user_profiles_path: str = './data/user_profiles.csv',
-                                     recipes_df: pd.DataFrame = None, recipes_path: str = './data/recipes.csv'):
-    if not user_profiles_df:
+                                     user_profiles_path: str = './src/data/user_profiles.csv',
+                                     recipes_df: pd.DataFrame = None, recipes_path: str = './src/data/recipes.csv'):
+    if user_profiles_df is None:
         user_profiles_df = pd.read_csv(user_profiles_path)
+    if user_profiles_df.empty:
+        print("no user profiles found")
+        return None
     user_profile = (user_profiles_df.loc[user_profiles_df['email'] == user_email][
                         ["saltiness", "bitterness", 'spiciness', 'fattiness']
                     ].values * 10)[0]
-    if not recipes_df:
+    if recipes_df is None:
         recipes_df = pd.read_csv(recipes_path)
+    if recipes_df.empty:
+        print("no recipes data found")
+        return None
     cosine_similarity_list = list()
     for dish_name in dish_name_list:
         dish = recipes_df.loc[recipes_df['title'] == dish_name][
