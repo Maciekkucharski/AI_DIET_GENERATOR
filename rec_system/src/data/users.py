@@ -1,10 +1,13 @@
 import pandas as pd
 
 
-def get_user_profiles(df: pd.DataFrame = None, survey_path: str = './data/survey.csv', to_csv: bool = False,
-                      destination: str = "./data/user_profiles.csv"):
-    if not df:
+def get_user_profiles(df: pd.DataFrame = None, survey_path: str = './src/data/survey.csv', to_csv: bool = False,
+                      destination: str = "./src/data/user_profiles.csv"):
+    if df is None:
         df = pd.read_csv(survey_path)
+    if df.empty:
+        print("no data found")
+        return None
     df = df[
         ['Adres e-mail',
          'W skali od 1 do 10 jak bardzo lubisz słone jedzenie',

@@ -24,13 +24,16 @@ def get_all_recipes(api_key: str, to_csv: bool = False, destination: str = "./da
     return european_recipes
 
 
-def get_filtered_recipes(df: pd.DataFrame = None, unfiltered_recipes_path: str = './data/all_recipes.csv',
-                         ids: pd.DataFrame = None,
-                         ids_path: str = './ids.csv',
-                         to_csv: bool = False, destination: str = "./data/filtered_recipes.csv"):
-    if not df:
+def get_filtered_recipes(df: pd.DataFrame = None, unfiltered_recipes_path: str = './src/data/all_recipes.csv',
+                         ids: list = None,
+                         ids_path: str = './src/data/ids.csv',
+                         to_csv: bool = False, destination: str = "./src/data/filtered_recipes.csv"):
+    if df is None:
         df = pd.read_csv(unfiltered_recipes_path)
-    if not ids:
+    if df.empty:
+        print("no data found in dataframe")
+        return None
+    if ids is None:
         ids = list(map(int, pd.read_csv(ids_path)))
     df = df[df['id'].isin(ids)]
     if to_csv:
@@ -51,6 +54,9 @@ def get_taste(recipe_id: id, api_key: str):
 
 def update_taste(df: pd.DataFrame, recipe_id: int, api_key: str):
     taste_dict = get_taste(recipe_id, api_key)
+    if len(taste_dict) != 7:
+        print("no such recipe id")
+        return None
     df.loc[df['id'] == recipe_id, ['sweetness', 'saltiness', 'sourness', 'bitterness', 'savoriness', 'fattiness',
                                    'spiciness']] = (
         taste_dict['sweetness'], taste_dict['saltiness'], taste_dict['sourness'], taste_dict['bitterness'],
@@ -59,13 +65,14 @@ def update_taste(df: pd.DataFrame, recipe_id: int, api_key: str):
 
 
 def add_taste_profiles(api_key: str, df: pd.DataFrame = None,
-                       filtered_recipes_path: str = './data/filtered_recipes.csv', ids: pd.DataFrame = None,
-                       ids_path: str = './ids.csv', to_csv: bool = False, destination: str = "./data/recipes.csv"):
-    if not ids:
-        ids = list(map(int, pd.read_csv(ids_path)))
-    if not df:
+                       filtered_recipes_path: str = './src/data/filtered_recipes.csv', to_csv: bool = False,
+                       destination: str = "./src/data/recipes.csv"):
+    if df is None:
         df = pd.read_csv(filtered_recipes_path)
-    for id in ids:
+    if df.empty:
+        print("no data found")
+        return None
+    for id in df['id'].to_list():
         try:
             update_taste(df, id, api_key)
         except:
@@ -75,5 +82,11 @@ def add_taste_profiles(api_key: str, df: pd.DataFrame = None,
     return df
 
 
-def get_dish_ids(df: pd.DataFrame = None, ):
+def get_dish_id(dish_name: str, df: pd.DataFrame = None, recipes_path: str = './src/data/recipes.csv'):
+    if df is None:
+        df = pd.read_csv(recipes_path)
+    if df.empty:
+        print("no data found")
+        return None
+    df = df.loc[df['titles'] == dish_name]['id'].to_list()
     return df

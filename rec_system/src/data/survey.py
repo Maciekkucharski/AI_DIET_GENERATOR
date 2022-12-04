@@ -26,7 +26,7 @@ SHEET_IDS = ['1yUzQLGwdEn0zUZj7c_y5dnJi4hxk4wGQltBSxk3ZUOE', '1NxPcU-3V44ym9Slsh
              '1ChaPNihN0HsVQRLmiwuQ9GA_8DL7FmGumq0MYgRX7AA', '1FtIGUXp1H52Nc9tYPPAMu98zcW0za6s5hsGAyKC-RJc']
 
 
-def update_survey_answers_file(to_csv: bool = True, destination: str = "./data/survey.csv"):
+def update_survey_answers_file(to_csv: bool = True, destination: str = "./src/data/survey.csv"):
     sheet_ids = SHEET_IDS
     df = pd.DataFrame({})
     for sheet_id in sheet_ids:
@@ -38,10 +38,13 @@ def update_survey_answers_file(to_csv: bool = True, destination: str = "./data/s
     return df
 
 
-def convert_to_implicit_dataset(df: pd.DataFrame = None, survey_path: str = './data/survey.csv', to_csv: bool = False,
-                                destination: str = "./data/ratings.csv"):
-    if not df:
+def convert_to_implicit_dataset(df: pd.DataFrame = None, survey_path: str = './src/data/survey.csv', to_csv: bool = False,
+                                destination: str = "./src/data/ratings.csv"):
+    if df is None:
         df = pd.read_csv(survey_path)
+    if df.empty:
+        print("no data found")
+        return None
     df.dropna()
     df = df.drop(COLUMNS_TO_DROP, axis=1)
     df_dict = df.to_dict()

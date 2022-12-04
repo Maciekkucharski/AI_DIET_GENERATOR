@@ -3,15 +3,16 @@ import pytest
 import pandas as pd
 
 
-@pytest.mark.parametrize("test_input,expected", [(pd.DataFrame(), False)])
-def test_load_and_preprocess_data_with_no_arguments(test_input, expected):
-    data = load_and_preprocess_data(df=test_input)
+@pytest.mark.parametrize("expected", [False])
+def test_load_and_preprocess_data_no_arguments(expected):
+    data, email_order, dishes_order, sorted_users, sorted_dishes = load_and_preprocess_data()
     assert data.empty == expected
 
 
-@pytest.mark.parametrize("test_input,expected", [(pd.DataFrame(), ValueError)])
-def test_load_and_preprocess_data_with_no_arguments(test_input, expected):
-    load_and_preprocess_data(df=test_input)
+@pytest.mark.parametrize("test_input,expected", [(pd.DataFrame(), None)])
+def test_load_and_preprocess_data_with_empty_df(test_input, expected):
+    data, email_order, dishes_order, sorted_users, sorted_dishes = load_and_preprocess_data(df=test_input)
+    assert data == expected
 
 
 @pytest.mark.parametrize("test_input,expected", [("./tests/unit/data/empty_csv.csv", ValueError)])

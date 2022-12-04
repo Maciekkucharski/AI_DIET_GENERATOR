@@ -11,3 +11,5 @@ mlxtend
 plotly==5.9.0
 black
 tox
+requests-cache
+Flask
