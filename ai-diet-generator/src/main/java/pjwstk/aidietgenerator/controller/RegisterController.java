@@ -26,7 +26,7 @@ public class RegisterController {
     }
 
     @GetMapping
-    public User getLoggedUser(@RequestBody String jwt, HttpServletResponse response) {
+    public User getLoggedUser(HttpServletResponse response) {
         User loggedUser = userDetailsService.findCurrentUser();
         if(loggedUser == null){
             response.setStatus(HttpStatus.NOT_FOUND.value());

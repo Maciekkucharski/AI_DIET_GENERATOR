@@ -19,26 +19,25 @@ import pjwstk.aidietgenerator.service.UserDetailsService;
 @EnableWebSecurity
 public class SecurityConfig{
 
-    private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
-    private UserDetailsService jwtUserDetailsService;
-    private JwtRequestFilter jwtRequestFilter;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final UserDetailsService jwtUserDetailsService;
+    private final JwtRequestFilter jwtRequestFilter;
+    private final PasswordEncoder passwordEncoder;
+
     @Autowired
     public SecurityConfig(JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint,
                           UserDetailsService jwtUserDetailsService,
-                          JwtRequestFilter jwtRequestFilter){
+                          JwtRequestFilter jwtRequestFilter,
+                          PasswordEncoder passwordEncoder) {
         this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
         this.jwtUserDetailsService = jwtUserDetailsService;
         this.jwtRequestFilter = jwtRequestFilter;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder(){
-        return new BCryptPasswordEncoder();
     }
 
     @Bean
