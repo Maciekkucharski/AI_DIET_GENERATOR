@@ -1,19 +1,20 @@
 package pjwstk.aidietgenerator.request;
 
-public class  LoginRequest {
-    private final String username;
+public class LoginRequest {
+
+    private final String email;
     private final String password;
 
-    public LoginRequest (String username, String password) {
-        this.username = username;
+    public LoginRequest(String email, String password) {
+        this.email = email;
         this.password = password;
     }
 
-    public String getUsername () {
-        return username;
+    public String getEmail() {
+        return email;
     }
 
-    public String getPassword () {
+    public String getPassword() {
         return password;
     }
 }
