@@ -35,10 +35,12 @@ def update_survey_answers_file(to_csv: bool = True, destination: str = "./src/da
     df = df.drop(['Sygnatura czasowa'], axis=1)
     if to_csv:
         df.to_csv(destination, index=False)
+    df.reset_index(drop=True, inplace=True)
     return df
 
 
-def convert_to_implicit_dataset(df: pd.DataFrame = None, survey_path: str = './src/data/survey.csv', to_csv: bool = False,
+def convert_to_implicit_dataset(df: pd.DataFrame = None, survey_path: str = './src/data/survey.csv',
+                                to_csv: bool = False,
                                 destination: str = "./src/data/ratings.csv"):
     if df is None:
         df = pd.read_csv(survey_path)
@@ -65,5 +67,4 @@ def convert_to_implicit_dataset(df: pd.DataFrame = None, survey_path: str = './s
     df = df[df['ocena'].notna()]
     if to_csv:
         df.to_csv(destination, index=False)
-    return df
-
+    return df.reset_index(drop=True)

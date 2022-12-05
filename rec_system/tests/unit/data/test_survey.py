@@ -17,17 +17,16 @@ class TestSurvey:
 
     @pytest.mark.parametrize("test_input,expected",
                              [(pd.read_csv("./tests/unit/data/survey.csv"),
-                               pd.read_csv("./tests/unit/data/ratings.csv").columns.to_list())])
+                               ['Adres e-mail','pytanie','ocena'])])
     def test_convert_to_implicit_dataset_check_columns(self, test_input, expected):
         df = convert_to_implicit_dataset(df=test_input)
         assert df.columns.to_list() == expected
 
-    @pytest.mark.parametrize("test_input,expected",
-                             [(pd.read_csv("./tests/unit/data/survey.csv"),
-                               False)])
-    def test_convert_to_implicit_dataset_no_parameters(self, test_input, expected):
-        df = convert_to_implicit_dataset(df=test_input)
-        assert df.empty == expected
+    @pytest.mark.parametrize("expected",
+                             [['Adres e-mail','pytanie','ocena']])
+    def test_convert_to_implicit_dataset_no_parameters_shape(self, expected):
+        df = convert_to_implicit_dataset()
+        assert df.columns.to_list() == expected
 
     @pytest.mark.parametrize("test_input,expected",
                              [(pd.DataFrame(),
