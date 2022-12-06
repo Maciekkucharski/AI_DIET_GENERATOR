@@ -45,7 +45,8 @@ public class RegisterController {
             response.setStatus(HttpStatus.CONFLICT.value()); //User already exists.
         } else {
             if (registerRequest.getPassword() == null || registerRequest.getPassword() == ""
-                    || registerRequest.getEmail() == null || registerRequest.getPassword().length() < 6) {
+                    || registerRequest.getEmail() == null || registerRequest.getPassword().length() < 6
+                    || userDetailsService.patternMatches(registerRequest.getEmail())) {
                 response.setStatus(HttpStatus.CONFLICT.value()); //Invalid password.
             } else {
                 User newUser = new User(registerRequest.getEmail(), registerRequest.getPassword()); //New user created.
