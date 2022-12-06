@@ -52,10 +52,11 @@ public class SecurityConfig{
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
-                .cors(withDefaults())
+                .cors(withDefaults()) // by default uses a Bean by the name of corsConfigurationSource (line 80)
                 .csrf().disable()
                 .authorizeRequests().antMatchers("/authenticate", "/account/register").permitAll()
-                .anyRequest().authenticated().and()
+                .anyRequest().authenticated()
+                .and()
                 .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 //                        .antMatchers(HttpMethod.GET, "/api/**").hasRole("ADMIN")
