@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 public class JwtResponse implements Serializable{
 
-    private final String jwtToken;
+    private String jwtToken;
 
     public JwtResponse(String jwtToken){
         this.jwtToken = jwtToken;
