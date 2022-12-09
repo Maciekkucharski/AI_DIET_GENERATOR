@@ -7,7 +7,7 @@ DESCRIPTION = 'package for recommending dishes in out taste profile, part of eng
 
 # Setting up
 setup(
-    name="",
+    name="rec_system_trb",
     version=VERSION,
     author="Trb",
     author_email="<m.kucha@wp.pl>",
