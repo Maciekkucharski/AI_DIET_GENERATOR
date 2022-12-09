@@ -1,4 +1,4 @@
-from src.utils import load_and_preprocess_data
+from src.rec_system.utils import load_and_preprocess_data
 import pytest
 import pandas as pd
 

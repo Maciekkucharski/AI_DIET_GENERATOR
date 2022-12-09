@@ -1,4 +1,4 @@
-from src.data.survey import update_survey_answers_file, convert_to_implicit_dataset
+from src.rec_system.data.survey import update_survey_answers_file, convert_to_implicit_dataset
 import pytest
 import pandas as pd
 

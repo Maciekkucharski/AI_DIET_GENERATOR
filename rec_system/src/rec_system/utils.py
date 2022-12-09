@@ -2,7 +2,7 @@ import pandas as pd
 
 
 def load_and_preprocess_data(df: pd.DataFrame = None,
-                             ratings_path: str = './src/data/ratings.csv', ):
+                             ratings_path: str = './src/rec_system/data/ratings.csv', ):
     if df is None:
         df = pd.read_csv(
             ratings_path,

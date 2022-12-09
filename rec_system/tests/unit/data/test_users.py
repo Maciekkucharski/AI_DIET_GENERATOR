@@ -1,4 +1,4 @@
-from src.data.users import get_user_profiles
+from src.rec_system.data.users import get_user_profiles
 import pytest
 import pandas as pd
 

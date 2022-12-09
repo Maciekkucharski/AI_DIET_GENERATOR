@@ -76,8 +76,8 @@ class Recommender:
 
 
 def compare_taste_with_taste_profile(dish_name_list, user_email, user_profiles_df: pd.DataFrame = None,
-                                     user_profiles_path: str = './src/data/user_profiles.csv',
-                                     recipes_df: pd.DataFrame = None, recipes_path: str = './src/data/recipes.csv'):
+                                     user_profiles_path: str = './src/rec_system/data/user_profiles.csv',
+                                     recipes_df: pd.DataFrame = None, recipes_path: str = './src/rec_system/data/recipes.csv'):
     if user_profiles_df is None:
         user_profiles_df = pd.read_csv(user_profiles_path)
     if user_profiles_df.empty:

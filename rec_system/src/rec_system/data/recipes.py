@@ -3,7 +3,7 @@ import pandas as pd
 import traceback
 
 
-def get_all_recipes(api_key: str, to_csv: bool = False, destination: str = "./data/all_recipes.csv"):
+def get_all_recipes(api_key: str, to_csv: bool = False, destination: str = "./src/rec_system/data/all_recipes.csv"):
     URL_GET_ALL = "https://api.spoonacular.com/recipes/complexSearch/"
     european_recipes = pd.DataFrame()
     for i in range(5):
@@ -24,10 +24,10 @@ def get_all_recipes(api_key: str, to_csv: bool = False, destination: str = "./da
     return european_recipes
 
 
-def get_filtered_recipes(df: pd.DataFrame = None, unfiltered_recipes_path: str = './src/data/all_recipes.csv',
+def get_filtered_recipes(df: pd.DataFrame = None, unfiltered_recipes_path: str = './src/rec_system/data/all_recipes.csv',
                          ids: list = None,
-                         ids_path: str = './src/data/ids.csv',
-                         to_csv: bool = False, destination: str = "./src/data/filtered_recipes.csv"):
+                         ids_path: str = './src/rec_system/data/ids.csv',
+                         to_csv: bool = False, destination: str = "./src/rec_system/data/filtered_recipes.csv"):
     if df is None:
         df = pd.read_csv(unfiltered_recipes_path)
     if df.empty:
@@ -65,8 +65,8 @@ def update_taste(df: pd.DataFrame, recipe_id: int, api_key: str):
 
 
 def add_taste_profiles(api_key: str, df: pd.DataFrame = None,
-                       filtered_recipes_path: str = './src/data/filtered_recipes.csv', to_csv: bool = False,
-                       destination: str = "./src/data/recipes.csv"):
+                       filtered_recipes_path: str = './src/rec_system/data/filtered_recipes.csv', to_csv: bool = False,
+                       destination: str = "./src/rec_system/data/recipes.csv"):
     if df is None:
         df = pd.read_csv(filtered_recipes_path)
     if df.empty:
@@ -82,7 +82,7 @@ def add_taste_profiles(api_key: str, df: pd.DataFrame = None,
     return df
 
 
-def get_dish_id(dish_name: str, df: pd.DataFrame = None, recipes_path: str = './src/data/recipes.csv'):
+def get_dish_id(dish_name: str, df: pd.DataFrame = None, recipes_path: str = './src/rec_system/data/recipes.csv'):
     if df is None:
         df = pd.read_csv(recipes_path)
     if df.empty:

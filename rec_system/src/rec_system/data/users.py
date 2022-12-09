@@ -1,8 +1,8 @@
 import pandas as pd
 
 
-def get_user_profiles(df: pd.DataFrame = None, survey_path: str = './src/data/survey.csv', to_csv: bool = False,
-                      destination: str = "./src/data/user_profiles.csv"):
+def get_user_profiles(df: pd.DataFrame = None, survey_path: str = './src/rec_system/data/survey.csv', to_csv: bool = False,
+                      destination: str = "./src/rec_system/data/user_profiles.csv"):
     if df is None:
         df = pd.read_csv(survey_path)
     if df.empty:

@@ -1,4 +1,4 @@
-from src.data.recipes import get_all_recipes, get_filtered_recipes, get_taste, update_taste, add_taste_profiles, \
+from src.rec_system.data.recipes import get_all_recipes, get_filtered_recipes, get_taste, update_taste, add_taste_profiles, \
     get_dish_id
 import pytest
 import pandas as pd
@@ -8,7 +8,7 @@ API_KEY = '947992fa499844bb9e8e4a026e65a037'
 class TestRecipesNoApi:
     @pytest.mark.parametrize("expected", [False])
     def test_get_filtered_recipes_no_parameters(self, expected):
-        df = get_filtered_recipes(to_csv=True, destination='./test.csv')
+        df = get_filtered_recipes()
         assert df.empty == expected
 
 
