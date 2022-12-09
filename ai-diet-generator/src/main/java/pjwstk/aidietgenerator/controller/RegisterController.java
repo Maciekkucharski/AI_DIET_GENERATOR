@@ -3,40 +3,51 @@ package pjwstk.aidietgenerator.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import pjwstk.aidietgenerator.entity.User;
+import pjwstk.aidietgenerator.repository.UserRepository;
 import pjwstk.aidietgenerator.request.RegisterRequest;
 import pjwstk.aidietgenerator.service.UserDetailsService;
-
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
 
 @RestController
-@RequestMapping("/account/register")
+@RequestMapping("/account")
 public class RegisterController {
 
     private final UserDetailsService userDetailsService;
+    private final UserRepository userRepository;
 
     @Autowired
-    public RegisterController(UserDetailsService userDetailsService) {
+    public RegisterController(UserDetailsService userDetailsService,
+                              UserRepository userRepository) {
         this.userDetailsService = userDetailsService;
+        this.userRepository = userRepository;
     }
 
-    @PostMapping
+    @GetMapping
+    public User getLoggedUser(HttpServletResponse response) {
+        User loggedUser = userDetailsService.findCurrentUser();
+        if(loggedUser == null){
+            response.setStatus(HttpStatus.NOT_FOUND.value());
+            return null;
+        } else {
+            response.setStatus(HttpStatus.OK.value());
+            return loggedUser;
+        }
+    }
+
+    @PostMapping("/register")
     @Transactional
-    public User register(@RequestBody RegisterRequest registerRequest, HttpServletResponse response) {
+    public void register(@RequestBody RegisterRequest registerRequest, HttpServletResponse response) {
 
         if (userDetailsService.doesUserExist(registerRequest.getEmail())) {
             response.setStatus(HttpStatus.CONFLICT.value()); //User already exists.
-            return null;
         } else {
             if (registerRequest.getPassword() == null || registerRequest.getPassword() == ""
-            || registerRequest.getEmail() == null || registerRequest.getPassword().length() < 6) {
+                    || registerRequest.getEmail() == null || registerRequest.getPassword().length() < 6
+                    || !userDetailsService.patternMatches(registerRequest.getEmail())) {
                 response.setStatus(HttpStatus.CONFLICT.value()); //Invalid password.
-                return null;
             } else {
                 User newUser = new User(registerRequest.getEmail(), registerRequest.getPassword()); //New user created.
                 if (userDetailsService.isEmpty()) {
@@ -47,7 +58,6 @@ public class RegisterController {
                 newUser.addAuthority(defaultAuthority);
                 userDetailsService.saveUser(newUser);
                 response.setStatus(HttpStatus.CREATED.value());
-                return newUser;
             }
         }
     }

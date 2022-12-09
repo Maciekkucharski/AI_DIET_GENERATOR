@@ -3,13 +3,17 @@ package pjwstk.aidietgenerator.request;
 
 public class RegisterRequest {
 
-    private final String email;
-    private final String password;
+    private String email;
+    private String password;
+
+    public RegisterRequest() {
+    }
 
     public RegisterRequest(String email, String password) {
         this.email = email;
         this.password = password;
     }
+
 
 
     public String getEmail() {

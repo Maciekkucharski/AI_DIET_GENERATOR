@@ -12,6 +12,7 @@ import pjwstk.aidietgenerator.entity.User;
 import pjwstk.aidietgenerator.repository.UserRepository;
 import javax.persistence.NoResultException;
 import java.util.ArrayList;
+import java.util.regex.Pattern;
 
 
 @Service
@@ -80,5 +81,12 @@ public class UserDetailsService implements org.springframework.security.core.use
         }
         return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(),
                 new ArrayList<>());
+    }
+
+    public boolean patternMatches(String emailAddress) {
+        return Pattern.compile("^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@"
+                        + "[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$")
+                .matcher(emailAddress)
+                .matches();
     }
 }
