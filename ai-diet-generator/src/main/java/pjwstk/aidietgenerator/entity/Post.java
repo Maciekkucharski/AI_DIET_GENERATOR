@@ -30,7 +30,7 @@ public class Post {
     @JoinColumn(name = "creator_id")
     private User user;
 
-    public Post(String title, String description, String imagePath ){
+    public Post(String title, String description, String imagePath){
         super();
         this.title = title;
         this.description = description;
