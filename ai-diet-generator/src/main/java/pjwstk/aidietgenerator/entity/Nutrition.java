@@ -11,16 +11,16 @@ public class Nutrition {
     private long id;
 
     @Column(name = "calories")
-    private String calories;
+    private int calories;
 
     @Column(name = "carbs")
-    private String carbs;
+    private int carbs;
 
     @Column(name = "fat")
-    private String fat;
+    private int fat;
 
     @Column(name = "protein")
-    private String protein;
+    private int protein;
 
     @OneToOne
     @JoinColumn(name = "recipe_id", nullable = false)
@@ -29,7 +29,7 @@ public class Nutrition {
     public Nutrition(){
     }
 
-    public Nutrition(String calories, String carbs, String fat, String protein, Recipe recipe) {
+    public Nutrition(int calories, int carbs, int fat, int protein, Recipe recipe) {
         this.calories = calories;
         this.carbs = carbs;
         this.fat = fat;
@@ -45,35 +45,35 @@ public class Nutrition {
         this.id = id;
     }
 
-    public String getCalories() {
+    public int getCalories() {
         return calories;
     }
 
-    public void setCalories(String calories) {
+    public void setCalories(int calories) {
         this.calories = calories;
     }
 
-    public String getCarbs() {
+    public int getCarbs() {
         return carbs;
     }
 
-    public void setCarbs(String carbs) {
+    public void setCarbs(int carbs) {
         this.carbs = carbs;
     }
 
-    public String getFat() {
+    public int getFat() {
         return fat;
     }
 
-    public void setFat(String fat) {
+    public void setFat(int fat) {
         this.fat = fat;
     }
 
-    public String getProtein() {
+    public int getProtein() {
         return protein;
     }
 
-    public void setProtein(String protein) {
+    public void setProtein(int protein) {
         this.protein = protein;
     }
 

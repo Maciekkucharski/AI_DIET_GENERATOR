@@ -3,15 +3,22 @@ package pjwstk.aidietgenerator.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import pjwstk.aidietgenerator.entity.Recipe;
-import pjwstk.aidietgenerator.entity.User;
+import pjwstk.aidietgenerator.entity.*;
 import pjwstk.aidietgenerator.exception.ResourceNotFoundException;
 import pjwstk.aidietgenerator.repository.IngredientRepository;
 import pjwstk.aidietgenerator.repository.NutritionRepository;
 import pjwstk.aidietgenerator.repository.RecipeRepository;
 import pjwstk.aidietgenerator.repository.UserRepository;
+import pjwstk.aidietgenerator.request.RecipeRequest;
+import pjwstk.aidietgenerator.view.PostView;
+import pjwstk.aidietgenerator.view.RecipeView;
 
+import javax.persistence.NoResultException;
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class RecipeService {
@@ -19,7 +26,6 @@ public class RecipeService {
     private final RecipeRepository recipeRepository;
     private final NutritionRepository nutritionRepository;
     private final IngredientRepository ingredientRepository;
-
     private final UserDetailsService userDetailsService;
     private final UserRepository userRepository;
 
@@ -37,31 +43,100 @@ public class RecipeService {
     }
 
 
-    public Recipe addRecipe(Recipe recipe, HttpServletResponse response) {
+    public void addRecipe(RecipeRequest recipeRequest, HttpServletResponse response) {
         User currentUser = userDetailsService.findCurrentUser();
         if(currentUser == null){
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
         } else {
-            if(recipe.getTitle() == null || recipe.getInstructions() == null) {
+            if(recipeRequest.getTitle() == null || recipeRequest.getInstructions() == null || recipeRequest.getIngredients().isEmpty()) {
                 response.setStatus(HttpStatus.BAD_REQUEST.value());
             } else {
                 Recipe newRecipe = new Recipe();
-                newRecipe.setId(recipe.getId());
-                newRecipe.setTitle(recipe.getTitle());
-                newRecipe.setServings(recipe.getServings());
-                newRecipe.setReadyInMinutes(recipe.getReadyInMinutes());
-                newRecipe.setImage(recipe.getImage());
-                newRecipe.setInstructions(recipe.getInstructions());
-                newRecipe.setVegetarian(recipe.isVegetarian());
-                newRecipe.setVegan(recipe.isVegan());
-                newRecipe.setGlutenFree(recipe.isGlutenFree());
+                newRecipe.setTitle(recipeRequest.getTitle());
+                newRecipe.setServings(recipeRequest.getServings());
+                newRecipe.setReadyInMinutes(recipeRequest.getReadyInMinutes());
+                newRecipe.setImage(recipeRequest.getImage());
+                newRecipe.setInstructions(recipeRequest.getInstructions());
+                newRecipe.setVegetarian(recipeRequest.isVegetarian());
+                newRecipe.setVegan(recipeRequest.isVegan());
+                newRecipe.setGlutenFree(recipeRequest.isGlutenFree());
+                newRecipe.setGlutenFree(recipeRequest.isGlutenFree());
+                newRecipe.setDairyFree(recipeRequest.isDairyFree());
+                newRecipe.setVeryHealthy(recipeRequest.isVeryHealthy());
                 newRecipe.setCreatedAt();
                 newRecipe.setUser(currentUser);
+
+                if(currentUser.getAuthorities().contains("ROLE_DIETICIAN")){
+                    newRecipe.setVerified(true);
+                }
+                recipeRepository.save(newRecipe);
+
+                Nutrition newRecipeNutrition = new Nutrition();
+                newRecipeNutrition.setCalories(recipeRequest.getCalories());
+                newRecipeNutrition.setCarbs(recipeRequest.getCarbs());
+                newRecipeNutrition.setFat(recipeRequest.getFat());
+                newRecipeNutrition.setProtein(recipeRequest.getProtein());
+                newRecipeNutrition.setRecipe(newRecipe);
+
+                nutritionRepository.save(newRecipeNutrition);
+
+                List<Ingredient> newRecipeIngredients = recipeRequest.getIngredients();
+
+                for(Ingredient ingredient : newRecipeIngredients) {
+                    Ingredient newIngredient = new Ingredient();
+                    newIngredient.setName(ingredient.getName());
+                    newIngredient.setAmount(ingredient.getAmount());
+                    newIngredient.setUnit(ingredient.getUnit());
+                    newIngredient.setRecipe(newRecipe);
+
+                    ingredientRepository.save(newIngredient);
+                }
+
                 response.setStatus(HttpStatus.CREATED.value());
-                return recipeRepository.save(newRecipe);
             }
         }
-        return null;
+    }
+
+    public RecipeView view(long recipeId, HttpServletResponse response) {
+        Optional<Recipe> recipe = recipeRepository.findById(recipeId);
+        if (recipe.isEmpty()) {
+            response.setStatus(HttpStatus.NOT_FOUND.value());
+            return null;
+        } else {
+            List ingredients = new ArrayList<Ingredient>();
+            Nutrition nutrition = new Nutrition();
+            try {
+                ingredients = ingredientRepository.findByrecipe(recipe.get());
+            } catch (NoResultException e) {
+                e.printStackTrace();
+            }
+            try {
+                nutrition = nutritionRepository.findByrecipe(recipe.get());
+            } catch (NoResultException e) {
+                e.printStackTrace();
+            }
+
+            response.setStatus(HttpStatus.OK.value());
+            return new RecipeView(recipe.get().getId(),
+                    recipe.get().getTitle(),
+                    recipe.get().getServings(),
+                    recipe.get().getReadyInMinutes(),
+                    recipe.get().getImage(),
+                    recipe.get().getInstructions(),
+                    recipe.get().isVegetarian(),
+                    recipe.get().isVegan(),
+                    recipe.get().isGlutenFree(),
+                    recipe.get().isDairyFree(),
+                    recipe.get().isVeryHealthy(),
+                    recipe.get().isVerified(),
+                    recipe.get().getTimestamp(),
+                    recipe.get().getUser(),
+                    nutrition.getCalories(),
+                    nutrition.getCarbs(),
+                    nutrition.getFat(),
+                    nutrition.getProtein(),
+                    ingredients);
+        }
     }
 //
 //    public Recipe editRecipe(long recipeId, Recipe recipe, HttpServletResponse response) {

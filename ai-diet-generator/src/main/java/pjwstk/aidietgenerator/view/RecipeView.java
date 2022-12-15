@@ -1,60 +1,52 @@
-package pjwstk.aidietgenerator.entity;
+package pjwstk.aidietgenerator.view;
 
-import javax.persistence.*;
+import jnr.ffi.annotations.In;
+import pjwstk.aidietgenerator.entity.Ingredient;
+import pjwstk.aidietgenerator.entity.User;
+
 import java.sql.Timestamp;
+import java.util.HashMap;
+import java.util.List;
 
-@Entity
-@Table(name = "recipes")
-public class Recipe {
+public class RecipeView {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    Recipe
     private long id;
-
-    @Column(name = "title")
     private String title;
-
-    @Column(name = "servings")
     private int servings;
-
-    @Column(name = "readyInMinutes")
     private int readyInMinutes;
-
-    @Column(name = "image")
     private String image;
-
-    @Column(name = "instructions")
     private String instructions;
-
-    @Column(name = "vegetarian")
     private boolean vegetarian;
-
-    @Column(name = "vegan")
     private boolean vegan;
-
-    @Column(name = "glutenFree")
     private boolean glutenFree;
-
-    @Column(name = "dairyFree")
     private boolean dairyFree;
-
-    @Column(name = "veryHealthy")
     private boolean veryHealthy;
-
-    @Column(name = "verified")
     private boolean verified;
-
-    @Column(name = "created_at")
-    private Timestamp timestamp;
-
-    @ManyToOne
-    @JoinColumn(name = "user_id")
+    private Timestamp created_at;
     private User user;
+//    Nutrition
+    private int calories;
+    private int carbs;
+    private int fat;
+    private int protein;
+//    Ingredients
+    private List<Ingredient> ingredients;
 
-    public Recipe(){
-    }
-
-    public Recipe(String title, int servings, int readyInMinutes, String image, String instructions, boolean vegetarian, boolean vegan, boolean glutenFree, boolean dairyFree, boolean veryHealthy, boolean verified) {
+    public RecipeView(long id, String title,
+                      int servings,
+                      int readyInMinutes,
+                      String image,
+                      String instructions,
+                      boolean vegetarian, boolean vegan, boolean glutenFree, boolean dairyFree, boolean veryHealthy, boolean verified,
+                      Timestamp created_at,
+                      User user,
+                      int calories,
+                      int carbs,
+                      int fat,
+                      int protein,
+                      List<Ingredient> ingredients) {
+        this.id = id;
         this.title = title;
         this.servings = servings;
         this.readyInMinutes = readyInMinutes;
@@ -64,8 +56,15 @@ public class Recipe {
         this.vegan = vegan;
         this.glutenFree = glutenFree;
         this.dairyFree = dairyFree;
-        this.veryHealthy  = veryHealthy;
+        this.veryHealthy = veryHealthy;
         this.verified = verified;
+        this.created_at = created_at;
+        this.user = user;
+        this.calories = calories;
+        this.carbs = carbs;
+        this.fat = fat;
+        this.protein = protein;
+        this.ingredients = ingredients;
     }
 
     public long getId() {
@@ -164,6 +163,14 @@ public class Recipe {
         this.verified = verified;
     }
 
+    public Timestamp getCreated_at() {
+        return created_at;
+    }
+
+    public void setCreated_at(Timestamp created_at) {
+        this.created_at = created_at;
+    }
+
     public User getUser() {
         return user;
     }
@@ -172,11 +179,43 @@ public class Recipe {
         this.user = user;
     }
 
-    public Timestamp getTimestamp() {
-        return timestamp;
+    public int getCalories() {
+        return calories;
     }
 
-    public void setCreatedAt(){
-        this.timestamp = new Timestamp(System.currentTimeMillis());
+    public void setCalories(int calories) {
+        this.calories = calories;
+    }
+
+    public int getCarbs() {
+        return carbs;
+    }
+
+    public void setCarbs(int carbs) {
+        this.carbs = carbs;
+    }
+
+    public int getFat() {
+        return fat;
+    }
+
+    public void setFat(int fat) {
+        this.fat = fat;
+    }
+
+    public int getProtein() {
+        return protein;
+    }
+
+    public void setProtein(int protein) {
+        this.protein = protein;
+    }
+
+    public List<Ingredient> getIngredients() {
+        return ingredients;
+    }
+
+    public void setIngredients(List<Ingredient> ingredients) {
+        this.ingredients = ingredients;
     }
 }
