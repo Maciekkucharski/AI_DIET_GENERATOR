@@ -30,7 +30,7 @@ public class Survey {
     @NotNull
     Integer answer2;
 
-    @Column(name = "answe3")
+    @Column(name = "answer3")
     @NotNull
     Integer answer3;
 
