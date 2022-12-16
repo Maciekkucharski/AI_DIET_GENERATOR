@@ -49,7 +49,7 @@ class TestUtils:
     @pytest.mark.parametrize("test_input,expected", [(pd.DataFrame(
         data={'Adres e-mail': ['foo'], 'pytanie': ['foo'], 'ocena': [2]}), False)])
     def test_load_and_preprocess_data_with_df_check_if_product_idx_is_not_empty(self, test_input, expected):
-        data, email_order, dishes_order, sorted_users, sorted_dishes = load_and_preprocess_data(
+        _, _, dishes_order, _, _ = load_and_preprocess_data(
             df=test_input)
         assert dishes_order.empty is expected
 
@@ -57,7 +57,7 @@ class TestUtils:
     @pytest.mark.parametrize("test_input,expected", [(pd.DataFrame(
         data={'Adres e-mail': ['foo'], 'pytanie': ['foo'], 'ocena': [2]}), False)])
     def test_load_and_preprocess_data_with_df_check_if_user_cat_is_not_empty(self, test_input, expected):
-        data, email_order, dishes_order, sorted_users, sorted_dishes = load_and_preprocess_data(
+        _, _, _, sorted_users, _ = load_and_preprocess_data(
             df=test_input)
         assert sorted_users.empty is expected
 
@@ -65,6 +65,6 @@ class TestUtils:
     @pytest.mark.parametrize("test_input,expected", [(pd.DataFrame(
         data={'Adres e-mail': ['foo'], 'pytanie': ['foo'], 'ocena': [2]}), False)])
     def test_load_and_preprocess_data_with_df_check_if_product_cat_is_not_empty(self, test_input, expected):
-        data, email_order, dishes_order, sorted_users, sorted_dishes = load_and_preprocess_data(
+        _, _, _, _, sorted_dishes = load_and_preprocess_data(
             df=test_input)
         assert sorted_dishes.empty is expected

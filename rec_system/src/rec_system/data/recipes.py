@@ -88,5 +88,5 @@ def get_dish_id(dish_name: str, df: pd.DataFrame = None, recipes_path: str = './
     if df.empty:
         print("no data found")
         return None
-    df = df.loc[df['titles'] == dish_name]['id'].to_list()
+    df = df.loc[df['title'] == dish_name]['id'].to_list()
     return df
