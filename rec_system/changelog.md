@@ -10,8 +10,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Fixed
 - fixed labels related to recipe name
 
-- Explanation of the recommended reverse chronological release ordering.
-
 ## [0.0.1] - 2022-12-14
 ## Added
 ####Utils
