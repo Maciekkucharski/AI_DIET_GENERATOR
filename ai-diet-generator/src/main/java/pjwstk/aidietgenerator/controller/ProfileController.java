@@ -1,16 +1,13 @@
 package pjwstk.aidietgenerator.controller;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pjwstk.aidietgenerator.entity.Profile;
-import pjwstk.aidietgenerator.entity.User;
-import pjwstk.aidietgenerator.repository.SocialsRepository;
-import pjwstk.aidietgenerator.repository.UserRepository;
-import pjwstk.aidietgenerator.repository.UserStatsRepository;
-import pjwstk.aidietgenerator.service.UserDetailsService;
+import pjwstk.aidietgenerator.entity.MyProfile;
+import pjwstk.aidietgenerator.entity.UserProfile;
+import pjwstk.aidietgenerator.service.ProfileService;
+
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -18,36 +15,19 @@ import javax.servlet.http.HttpServletResponse;
 @RequestMapping("/account/profile")
 public class ProfileController {
 
-    private final UserRepository userRepository;
-    private final SocialsRepository socialsRepository;
-    private final UserStatsRepository userStatsRepository;
-    private final UserDetailsService userDetailsService;
+    private final ProfileService profileService;
 
-    public ProfileController(UserRepository userRepository,
-                             SocialsRepository socialsRepository,
-                             UserStatsRepository userStatsRepository,
-                             UserDetailsService userDetailsService) {
-        this.userRepository = userRepository;
-        this.socialsRepository = socialsRepository;
-        this.userStatsRepository = userStatsRepository;
-        this.userDetailsService = userDetailsService;
+    public ProfileController(ProfileService profileService) {
+        this.profileService = profileService;
     }
 
     @GetMapping
-    public Profile getCurrentUserProfile(HttpServletResponse response){
-        Profile currentUserProfile = new Profile();
-        User currentUser = userDetailsService.findCurrentUser();
-        if(currentUser != null){
-            currentUserProfile.setUser(currentUser);
-            currentUserProfile.setProfilePicturePath("TODO");
-            currentUserProfile.setUserStats(userStatsRepository.findByuser(currentUser));
-            currentUserProfile.setSocials(socialsRepository.findByuser(currentUser));
-            response.setStatus(HttpStatus.OK.value());
-            return currentUserProfile;
-        } else {
-            response.setStatus(HttpStatus.UNAUTHORIZED.value());
-            return null;
-        }
+    public MyProfile getCurrentUserProfile(HttpServletResponse response){
+        return profileService.getLoggedUserProfile(response);
+    }
 
+    @GetMapping("/{id}")
+    public UserProfile getSelectedUserProfile(@PathVariable (value = "id") Long id, HttpServletResponse response){
+        return profileService.getSelectedUserProfile(id, response);
     }
 }
