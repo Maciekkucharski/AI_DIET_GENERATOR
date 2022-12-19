@@ -40,7 +40,6 @@ public class UserStatsController {
 
     @PostMapping
     @Transactional
-
     public UserStats addUserDetails(@RequestBody UserStatsRequest userStats, HttpServletResponse response) {
 
         User currentUser = userDetailsService.findCurrentUser();

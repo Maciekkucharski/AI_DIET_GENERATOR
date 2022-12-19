@@ -31,7 +31,7 @@ public class RecipeRequest {
     //    Ingredients
     private List<Ingredient> ingredients;
 
-    public RecipeRequest(long id, String title,
+    public RecipeRequest(String title,
                       int servings,
                       int readyInMinutes,
                       String image,
@@ -43,7 +43,7 @@ public class RecipeRequest {
                       int carbs,
                       int fat,
                       int protein,
-                      Ingredient ... ingredients) {
+                      List<Ingredient> ingredients) {
         this.title = title;
         this.servings = servings;
         this.readyInMinutes = readyInMinutes;
@@ -61,13 +61,7 @@ public class RecipeRequest {
         this.carbs = carbs;
         this.fat = fat;
         this.protein = protein;
-
-        List<Ingredient> ingredientList = new ArrayList<>();
-        for (Ingredient ingredient : ingredients) {
-            ingredientList.add(ingredient);
-        }
-
-        this.ingredients = ingredientList;
+        this.ingredients = ingredients;
     }
 
     public String getTitle() {
@@ -141,4 +135,6 @@ public class RecipeRequest {
     public List<Ingredient> getIngredients() {
         return ingredients;
     }
+
+
 }
