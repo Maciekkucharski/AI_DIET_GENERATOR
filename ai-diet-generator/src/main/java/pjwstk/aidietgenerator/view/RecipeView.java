@@ -1,11 +1,9 @@
 package pjwstk.aidietgenerator.view;
 
-import jnr.ffi.annotations.In;
 import pjwstk.aidietgenerator.entity.Ingredient;
 import pjwstk.aidietgenerator.entity.User;
 
 import java.sql.Timestamp;
-import java.util.HashMap;
 import java.util.List;
 
 public class RecipeView {
