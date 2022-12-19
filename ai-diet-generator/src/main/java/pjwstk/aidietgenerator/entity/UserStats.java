@@ -1,5 +1,7 @@
 package pjwstk.aidietgenerator.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import javax.persistence.Entity;
 import javax.persistence.*;
 import java.sql.Timestamp;
@@ -32,6 +34,7 @@ public class UserStats {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnoreProperties({"firstName", "lastName", "password", "authorities", "username"})
     private User user;
 
     public UserStats() {

@@ -8,6 +8,7 @@ import pjwstk.aidietgenerator.entity.User;
 import pjwstk.aidietgenerator.entity.UserStats;
 import pjwstk.aidietgenerator.exception.ResourceNotFoundException;
 import pjwstk.aidietgenerator.repository.UserStatsRepository;
+import pjwstk.aidietgenerator.request.UserStatsRequest;
 import pjwstk.aidietgenerator.service.UserStatsService;
 import pjwstk.aidietgenerator.service.UserDetailsService;
 
@@ -39,7 +40,9 @@ public class UserStatsController {
 
     @PostMapping
     @Transactional
-    public UserStats addUserStats(@RequestBody UserStats userStats, HttpServletResponse response) {
+
+    public UserStats addUserDetails(@RequestBody UserStatsRequest userStats, HttpServletResponse response) {
+
         User currentUser = userDetailsService.findCurrentUser();
         if (currentUser == null) {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());

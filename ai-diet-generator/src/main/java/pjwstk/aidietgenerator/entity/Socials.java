@@ -1,6 +1,8 @@
 package pjwstk.aidietgenerator.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.sun.istack.NotNull;
 
 import javax.persistence.*;
 
@@ -10,6 +12,7 @@ import javax.persistence.*;
 public class Socials {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @NotNull
     private long id;
 
     @Column(name = "facebook")
@@ -31,7 +34,9 @@ public class Socials {
     private String discord;
 
     @ManyToOne
+    @NotNull
     @JoinColumn(name = "user_id")
+    @JsonIgnoreProperties({"firstName", "lastName", "password", "authorities", "username"})
     private User user;
 
     public Socials(String facebook, String twitter, String instagram, String telegram, String youtube, String discord, User user) {

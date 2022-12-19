@@ -1,5 +1,8 @@
 package pjwstk.aidietgenerator.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.sun.istack.NotNull;
+
 import javax.persistence.Entity;
 import javax.persistence.*;
 import java.sql.Timestamp;
@@ -9,16 +12,20 @@ import java.sql.Timestamp;
 public class Post {
 
     @Id
+    @NotNull
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     @Column(name = "title")
+    @NotNull
     private String title;
 
     @Column(name = "description")
+    @NotNull
     private String description;
 
     @Column(name = "created_at")
+    @NotNull
     private Timestamp timestamp;
 
     @Column(name = "image_path")
@@ -28,6 +35,7 @@ public class Post {
 
     @ManyToOne
     @JoinColumn(name = "creator_id")
+    @JsonIgnoreProperties({"firstName", "lastName", "password", "authorities", "username"})
     private User user;
 
     public Post(String title, String description, String imagePath){
