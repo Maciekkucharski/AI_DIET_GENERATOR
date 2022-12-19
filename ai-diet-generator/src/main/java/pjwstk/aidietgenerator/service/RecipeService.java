@@ -138,28 +138,26 @@ public class RecipeService {
                     ingredients);
         }
     }
-//
-//    public Recipe editRecipe(long recipeId, Recipe recipe, HttpServletResponse response) {
-//        User currentUser = userDetailsService.findCurrentUser();
-//        if(currentUser == null || !currentUser.getAuthorities().contains("ROLE_DIETICIAN") || !currentUser.getAuthorities().contains("ROLE_ADMIN")) {
-//            response.setStatus(HttpStatus.UNAUTHORIZED.value());
-//        } else {
-//            Recipe existingRecipe = recipeRepository.findById(recipeId)
-//                    .orElseThrow(() -> new ResourceNotFoundException("Recipe not found with id :" + recipeId));
-//            Recipe newRecipe = new Recipe();
-//            newRecipe.setId(recipe.getId());
-//            newRecipe.setTitle(recipe.getTitle());
-//            newRecipe.setServings(recipe.getServings());
-//            newRecipe.setReadyInMinutes(recipe.getReadyInMinutes());
-//            newRecipe.setImage(recipe.getImage());
-//            newRecipe.setInstructions(recipe.getInstructions());
-//            newRecipe.setVegetarian(recipe.isVegetarian());
-//            newRecipe.setVegan(recipe.isVegan());
-//            newRecipe.setGlutenFree(recipe.isGlutenFree());
-//            newRecipe.setCreatedAt();
-//            newRecipe.setUser(currentUser);
-//
-//    }
+
+    public Recipe editRecipe(long recipeId, Recipe editedRecipe, HttpServletResponse response) {
+        Recipe existingRecipe = recipeRepository.findById(recipeId)
+                .orElseThrow(() -> new ResourceNotFoundException("Recipe not found with id :" + recipeId));
+
+        User currentUser = userDetailsService.findCurrentUser();
+        if (currentUser == null
+                || !currentUser.getAuthorities().contains("ROLE_DIETICIAN")
+                || !currentUser.getAuthorities().contains("ROLE_ADMIN")
+                || currentUser != existingRecipe.getUser()) {
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            return null;
+
+        } else {
+            existingRecipe = editedRecipe;
+            recipeRepository.save(existingRecipe);
+            response.setStatus(HttpStatus.OK.value());
+            return existingRecipe;
+        }
+    }
 
     public Recipe verifyRecipe(Long recipeId, HttpServletResponse response) {
         User currentUser = userDetailsService.findCurrentUser();
