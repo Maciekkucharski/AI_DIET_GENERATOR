@@ -12,8 +12,10 @@ import pjwstk.aidietgenerator.repository.UserRepository;
 import pjwstk.aidietgenerator.repository.UserStatsRepository;
 import pjwstk.aidietgenerator.request.ProfileInfoRequest;
 import pjwstk.aidietgenerator.view.ProfileInfoView;
+import pjwstk.aidietgenerator.view.WeightView;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -122,14 +124,32 @@ public class ProfileService {
         }
     }
 
-    public void deleteLastUserStatsEntry(HttpServletResponse response){
+    public List<WeightView> getCurrentUsersWeightStory(HttpServletResponse response){
+        User currentUser = userDetailsService.findCurrentUser();
+        if(currentUser == null){
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            return null;
+        } else {
+            List<UserStats> allUserStats = userStatsRepository.findByuser(currentUser);
+            List<WeightView> weightHistory = new ArrayList<>();
+
+            for(UserStats userStat : allUserStats){
+                WeightView weightEntry = new WeightView(userStat.getId(),
+                        userStat.getWeight(),
+                        userStat.getTimestamp());
+
+                weightHistory.add(weightEntry);
+            }
+            return weightHistory;
+        }
+    }
+
+    public void deleteUserStatsEntry(long id, HttpServletResponse response){
         User currentUser = userDetailsService.findCurrentUser();
         if(currentUser == null){
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
         } else {
-            List<UserStats> currentUserStats = userStatsRepository.findByuser(currentUser);
-            int last_index = currentUserStats.size() - 1;
-            userStatsRepository.delete(currentUserStats.get(last_index));
+            userStatsRepository.deleteById(id);
             response.setStatus(HttpStatus.ACCEPTED.value());
         }
     }

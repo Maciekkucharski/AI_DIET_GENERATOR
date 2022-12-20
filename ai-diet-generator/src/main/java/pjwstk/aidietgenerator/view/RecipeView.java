@@ -9,7 +9,7 @@ import java.util.List;
 public class RecipeView {
 
 //    Recipe
-    private long id;
+    private Long id;
     private String title;
     private int servings;
     private int readyInMinutes;
@@ -31,7 +31,7 @@ public class RecipeView {
 //    Ingredients
     private List<Ingredient> ingredients;
 
-    public RecipeView(long id, String title,
+    public RecipeView(Long id, String title,
                       int servings,
                       int readyInMinutes,
                       String image,
@@ -65,11 +65,11 @@ public class RecipeView {
         this.ingredients = ingredients;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
