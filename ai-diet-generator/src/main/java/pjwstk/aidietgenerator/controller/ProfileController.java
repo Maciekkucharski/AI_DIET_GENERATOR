@@ -6,9 +6,11 @@ import pjwstk.aidietgenerator.entity.UserProfile;
 import pjwstk.aidietgenerator.request.ProfileInfoRequest;
 import pjwstk.aidietgenerator.service.ProfileService;
 import pjwstk.aidietgenerator.view.ProfileInfoView;
+import pjwstk.aidietgenerator.view.WeightView;
 
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 @RestController
 @RequestMapping("/account/profile")
@@ -35,13 +37,17 @@ public class ProfileController {
         return profileService.getLoggedUserProfileInfo(response);
     }
 
-    @PutMapping("/info")
+    @PostMapping("/info")
     public void updateCurrentUserProfileInfo(@RequestBody ProfileInfoRequest profileInfoRequest, HttpServletResponse response){
         profileService.updateLoggedUserProfileInfo(profileInfoRequest, response);
     }
 
-    @DeleteMapping("/info")
-    public void deleteLastUserStatsEntry(HttpServletResponse response){
-        profileService.deleteLastUserStatsEntry(response);
+    @GetMapping("/info/weights")
+    public List<WeightView> getCurrentUserWeightHistory(HttpServletResponse response){
+        return profileService.getCurrentUsersWeightStory(response);
+    }
+    @DeleteMapping("/info/weights/{id}")
+    public void deleteUserStatsEntry(@PathVariable(value = "id") Long id, HttpServletResponse response){
+        profileService.deleteUserStatsEntry(id, response);
     }
 }

@@ -3,7 +3,7 @@ package pjwstk.aidietgenerator.view;
 import pjwstk.aidietgenerator.entity.Gender;
 
 public class ProfileInfoView {
-    private long id;
+    private Long id;
     private String profilePicturePath;
     private String firstName;
     private String lastName;
@@ -14,7 +14,7 @@ public class ProfileInfoView {
     private double BMI;
     private int kCal;
 
-    public ProfileInfoView(long id,
+    public ProfileInfoView(Long id,
                            String profilePicturePath,
                            String firstName,
                            String lastName,
@@ -36,11 +36,11 @@ public class ProfileInfoView {
         this.kCal = kCal;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

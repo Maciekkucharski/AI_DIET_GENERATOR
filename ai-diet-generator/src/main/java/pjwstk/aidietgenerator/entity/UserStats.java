@@ -111,6 +111,10 @@ public class UserStats {
         this.timestamp = new Timestamp(System.currentTimeMillis());
     }
 
+    public Timestamp getTimestamp() {
+        return timestamp;
+    }
+
     public User getUser() {
         return user;
     }
