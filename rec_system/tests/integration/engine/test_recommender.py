@@ -6,7 +6,7 @@ from src.rec_system.utils import load_and_preprocess_data
 import pytest
 
 MODEL_PARAMETERS = dict(
-    factors=20,
+    factors=60,
     alpha=0.6,
     regularization=0.06,
 )

@@ -1,3 +1,4 @@
 fastapi
 uvicorn
 rec-system-trb
+mysql-connector-python

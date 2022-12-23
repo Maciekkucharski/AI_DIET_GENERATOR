@@ -99,3 +99,4 @@ def compare_taste_with_taste_profile(dish_name_list, user_email, user_profiles_d
         cosine_similarity_list.append((1 - spatial.distance.cosine(user_profile, dish), dish_name))
     cosine_similarity_list.sort(key=lambda x: x[0], reverse=True)
     return cosine_similarity_list
+# compare_taste_with_taste_profile([sorted_dishes[i] for i in suggestions_and_score[0].tolist()], sorted_users[20])
