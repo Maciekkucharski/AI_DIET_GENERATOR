@@ -55,8 +55,11 @@ class Recommender:
             items_to_recommend=5,
     ):
         """Finds the recommended items for the user.
-        Returns:
-            (items, scores) pair, of suggested item and score.
+            Parameters:
+                user_id: id of user that you want to recommend to
+                items_to_recommend: amount of items to recommend
+            Returns:
+                (items, scores) pair, of suggested item and score.
         """
 
         if not self.fitted:
@@ -84,7 +87,7 @@ def compare_taste_with_taste_profile(dish_name_list, user_email, user_profiles_d
         print("no user profiles found")
         return None
     user_profile = (user_profiles_df.loc[user_profiles_df['email'] == user_email][
-                        ["saltiness", "bitterness", 'spiciness', 'fattiness']
+                        ["saltiness", "bitterness", 'spiciness', 'fattiness', 'sweetness']
                     ].values * 10)[0]
     if recipes_df is None:
         recipes_df = pd.read_csv(recipes_path)
@@ -94,7 +97,7 @@ def compare_taste_with_taste_profile(dish_name_list, user_email, user_profiles_d
     cosine_similarity_list = list()
     for dish_name in dish_name_list:
         dish = recipes_df.loc[recipes_df['title'] == dish_name][
-            ["saltiness", "bitterness", 'spiciness', 'fattiness']
+            ["saltiness", "bitterness", 'spiciness', 'fattiness', 'sweetness']
         ].values[0]
         cosine_similarity_list.append((1 - spatial.distance.cosine(user_profile, dish), dish_name))
     cosine_similarity_list.sort(key=lambda x: x[0], reverse=True)

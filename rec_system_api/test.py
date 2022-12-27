@@ -3,6 +3,8 @@ import pandas as pd
 from src.rec_system.utils import load_and_preprocess_data
 from src.rec_system.engine.recommender import Recommender, compare_taste_with_taste_profile
 
+
+
 MODEL_PARAMETERS = dict(
     factors=60,
     alpha=0.6,
@@ -24,7 +26,22 @@ INNER JOIN recipes re
     ON re.id = ra.RecipeID;
 """
     result_dataFrame = pd.read_sql(query, mydb)
-    print(result_dataFrame.shape)
+    print(result_dataFrame)
+
+    query = """
+    SELECT
+        re.id,
+        re.recipeName as title,
+        re.saltiness,
+        re.sourness,
+        re.sweetness,
+        re.bitterness ,
+        re.spiciness,
+        re.fattiness
+    FROM recipes as re
+    """
+    result2_dataFrame = pd.read_sql(query, mydb)
+    print(result_dataFrame)
     mydb.close()  # close the connection
 except Exception as e:
     mydb.close()
@@ -47,5 +64,11 @@ recommender = Recommender(
 recommender.create_and_fit(
     model_params=MODEL_PARAMETERS,
 )
-suggestions_and_score = recommender.recommend_products(expected[0], items_to_recommend=expected[1])
+suggestions_and_score = recommender.recommend_products(2, items_to_recommend=20)
+compare_taste_with_taste_profile([sorted_dishes[i] for i in suggestions_and_score[0].tolist()], sorted_users[20], )
+
+
+
+
+
 
