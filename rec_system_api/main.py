@@ -90,11 +90,53 @@ async def generate(body_dict: dict = Body(..., example={
         suggestions_and_score = recommender.recommend_products(body_dict['user_id'],
                                                                items_to_recommend=body_dict['items_to_recommend'])
 
-        result = compare_taste_with_taste_profile([sorted_dishes[i] for i in suggestions_and_score[0].tolist()],
-                                                  sorted_users[body_dict['user_id']], user_profiles_df=survey_results,
-                                                  recipes_df=recipes_results)
-        return {
-            "result": result
-        }
+        results = compare_taste_with_taste_profile([sorted_dishes[i] for i in suggestions_and_score[0].tolist()],
+                                                   sorted_users[body_dict['user_id']], user_profiles_df=survey_results,
+                                                   recipes_df=recipes_results)
+        return [result[1] for result in results]
+    else:
+        return []
+
+
+@app.post("/replace")
+async def replace(body_dict: dict = Body(..., example={
+    "dish_id": 640134,
+    "items_to_recommend": 10,
+})):
+    ratings_result = None
+    try:
+        mydb = connection.connect(host="35.198.85.35", user="root", password="jajco123", database="DietGenerator",
+                                  use_pure=True)
+        query = """
+    SELECT
+        u.email AS 'Adres e-mail',
+        re.recipeName AS pytanie,
+        ra.score AS ocena
+    FROM ratings ra
+    INNER JOIN users u
+        ON u.id = ra.UserID
+    INNER JOIN recipes re
+        ON re.id = ra.RecipeID;
+    """
+        ratings_result = pd.read_sql(query, mydb)
+        mydb.close()  # close the connection
+    except Exception as e:
+        mydb.close()
+        print(str(e))
+    mydb.close()
+    if ratings_result is not None:
+        data, email_order, dishes_order, sorted_users, sorted_dishes = load_and_preprocess_data(ratings_result)
+        recommender = Recommender(
+            data['ocena'],
+            email_order,
+            dishes_order,
+        )
+        recommender.create_and_fit(
+            model_params=MODEL_PARAMETERS,
+        )
+        results = recommender.similar_dishes(body_dict['dish_id'],
+                                                 items_to_recommend=body_dict['items_to_recommend'])
+
+        return [result[1] for result in results]
     else:
         return []
