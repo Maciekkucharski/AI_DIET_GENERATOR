@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Body
+from fastapi import FastAPI, Body
 from src.rec_system.engine.recommender import Recommender, compare_taste_with_taste_profile
 from src.rec_system.utils import load_and_preprocess_data
 import mysql.connector as connection
@@ -135,8 +135,8 @@ async def replace(body_dict: dict = Body(..., example={
             model_params=MODEL_PARAMETERS,
         )
         results = recommender.similar_dishes(body_dict['dish_id'],
-                                                 items_to_recommend=body_dict['items_to_recommend'])
-
-        return [result[1] for result in results]
+                                                 items_to_recommend=body_dict['items_to_recommend'])[0]
+        print(results)
+        return [int(result) for result in results]
     else:
         return []
