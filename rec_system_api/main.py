@@ -70,7 +70,6 @@ async def generate(body_dict: dict = Body(..., example={
         FROM recipes as re   
                     """
         recipes_results = pd.read_sql(query, mydb)
-
         query = """
         select id, email from users;
         """
@@ -79,7 +78,6 @@ async def generate(body_dict: dict = Body(..., example={
     except Exception as e:
         mydb.close()
         print(str(e))
-    mydb.close()
     if ratings_result is not None and survey_results is not None and recipes_results is not None and users is not None:
         data, email_order, dishes_order, sorted_users, sorted_dishes = load_and_preprocess_data(ratings_result)
         recommender = Recommender(
@@ -96,7 +94,8 @@ async def generate(body_dict: dict = Body(..., example={
                                                                items_to_recommend=body_dict['items_to_recommend'])
 
         results = compare_taste_with_taste_profile([sorted_dishes[i] for i in suggestions_and_score[0].tolist()],
-                                                   sorted_users[2], user_profiles_df=survey_results,
+                                                   users.loc[users['email'] == sorted_users[user]]['email'].values[0],
+                                                   user_profiles_df=survey_results,
                                                    recipes_df=recipes_results)
         # convert number of dish to dish id
         return [int(recipes_results.loc[recipes_results['title'] == i[1]]['id'].values[0]) for i in results]
