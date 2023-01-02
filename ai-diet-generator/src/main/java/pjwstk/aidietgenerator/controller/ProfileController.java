@@ -4,8 +4,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pjwstk.aidietgenerator.entity.MyProfile;
-import pjwstk.aidietgenerator.entity.UserProfile;
+import pjwstk.aidietgenerator.view.MyProfile;
+import pjwstk.aidietgenerator.view.UserProfile;
 import pjwstk.aidietgenerator.service.ProfileService;
 
 

@@ -45,7 +45,8 @@ dependencies {
     runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.5'
     runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.5'
 
-
+// https://mvnrepository.com/artifact/com.google.cloud/google-cloud-storage
+    implementation group: 'com.google.cloud', name: 'google-cloud-storage', version: '2.14.0'
 
 ////    // https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-gcp-starter
 //    implementation group: 'org.springframework.cloud', name: 'spring-cloud-gcp-starter', version: '1.2.8.RELEASE'

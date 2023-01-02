@@ -8,7 +8,7 @@ import java.sql.Timestamp;
 
 @Entity
 @Table(name = "comments")
-public class Comment {
+public class PostComment {
 
     @Id
     @NotNull
@@ -32,12 +32,12 @@ public class Comment {
     @JoinColumn(name = "post_id")
     private Post post;
 
-    public Comment(String content){
+    public PostComment(String content){
         super();
         this.content = content;
     }
 
-    public Comment(){
+    public PostComment(){
 
     }
 

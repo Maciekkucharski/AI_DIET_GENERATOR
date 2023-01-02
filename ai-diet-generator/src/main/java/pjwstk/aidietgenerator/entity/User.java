@@ -1,10 +1,11 @@
 package pjwstk.aidietgenerator.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonView;
 import com.sun.istack.NotNull;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.Arrays;
@@ -21,6 +22,7 @@ public class User implements UserDetails {
     @Access(AccessType.PROPERTY)
     private Long id;
 
+//    @JsonView(UserProfile.class)
     @Column(name = "first_name")
     private String firstName;
 
@@ -32,6 +34,7 @@ public class User implements UserDetails {
     private String email;
 
     @Column(name = "login_password")
+    @JsonIgnore
     @NotNull
     private String password;
 

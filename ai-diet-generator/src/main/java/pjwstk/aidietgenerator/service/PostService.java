@@ -3,19 +3,21 @@ package pjwstk.aidietgenerator.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import pjwstk.aidietgenerator.entity.Comment;
+import pjwstk.aidietgenerator.entity.PostComment;
 import pjwstk.aidietgenerator.entity.Post;
+import pjwstk.aidietgenerator.entity.PostLike;
 import pjwstk.aidietgenerator.entity.User;
 import pjwstk.aidietgenerator.exception.ResourceNotFoundException;
 import pjwstk.aidietgenerator.repository.CommentRepository;
+import pjwstk.aidietgenerator.repository.PostLikesRepository;
 import pjwstk.aidietgenerator.repository.PostRepository;
 import pjwstk.aidietgenerator.repository.UserRepository;
+import pjwstk.aidietgenerator.request.CommentRequest;
 import pjwstk.aidietgenerator.request.PostRequest;
-import pjwstk.aidietgenerator.view.PostView;
+import pjwstk.aidietgenerator.view.PostDetailedView;
 
-import javax.persistence.NoResultException;
 import javax.servlet.http.HttpServletResponse;
-import java.util.HashMap;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,37 +28,37 @@ public class PostService {
     private final UserDetailsService userDetailsService;
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
+    private final PostLikesRepository postLikesRepository;
 
     @Autowired
     public PostService(PostRepository postRepository,
                        UserDetailsService userDetailsService,
                        UserRepository userRepository,
-                       CommentRepository commentRepository) {
+                       CommentRepository commentRepository,
+                       PostLikesRepository postLikesRepository) {
         this.postRepository = postRepository;
         this.userDetailsService = userDetailsService;
         this.userRepository = userRepository;
         this.commentRepository = commentRepository;
+        this.postLikesRepository = postLikesRepository;
     }
 
-    public PostView view(long postId, HttpServletResponse response) {
+    public PostDetailedView view(long postId, HttpServletResponse response) {
         Optional<Post> post = postRepository.findById(postId);
         if (post.isEmpty()) {
             response.setStatus(HttpStatus.NOT_FOUND.value());
             return null;
         } else {
-            HashMap<Long, String> postComments = new HashMap<>();
-            try {
-                postComments = getComments(post.get());
-            } catch (NoResultException e) {
-                e.printStackTrace();
-            }
+            List<PostComment> postComments = commentRepository.findBypost(post.get());
+            List<PostLike> likes = postLikesRepository.findBypost(post.get());
             response.setStatus(HttpStatus.OK.value());
-            return new PostView(post.get().getId(),
-                    post.get().getTitle()
-                    , post.get().getDescription()
-                    , post.get().getTimestamp()
-                    , post.get().getImagePath()
-                    , postComments);
+            return new PostDetailedView(post.get().getId(),
+                    post.get().getTitle(),
+                    post.get().getDescription(),
+                    post.get().getTimestamp(),
+                    post.get().getImagePath(),
+                    post.get().getUser(),
+                    postComments, likes);
         }
     }
 
@@ -97,18 +99,9 @@ public class PostService {
         }
     }
 
-    public HashMap<Long, String> getComments(Post post) {
-        HashMap<Long, String> comments = new HashMap<>();
-        List<Comment> commentValues =  commentRepository.findBypost(post);
-        for (Comment comment : commentValues) {
-            comments.put(comment.getId(), comment.getContent());
-        }
-        return comments;
-    }
-
     public List<Post> getSelectedUserPosts(long id, HttpServletResponse response) {
         Optional<User> user = userRepository.findById(id);
-        if(!user.isEmpty()) {
+        if (!user.isEmpty()) {
             return postRepository.findByuser(user.get());
         }
         response.setStatus(HttpStatus.NOT_FOUND.value());
@@ -119,7 +112,7 @@ public class PostService {
         Post existingPost = postRepository.findById(postId)
                 .orElseThrow(() -> new ResourceNotFoundException("Post not found with id :" + postId));
         User currentUser = userDetailsService.findCurrentUser();
-        if(currentUser == existingPost.getUser()) {
+        if (currentUser == existingPost.getUser()) {
             if (post.getTitle() != null) existingPost.setTitle(post.getTitle());
             if (post.getDescription() != null) existingPost.setDescription(post.getDescription());
             if (post.getImage_path() != null) existingPost.setImagePath(post.getImage_path());
@@ -129,6 +122,49 @@ public class PostService {
         } else {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             return null;
+        }
+    }
+
+    public void like(long postId, HttpServletResponse response) {
+        Post existingPost = postRepository.findById(postId)
+                .orElseThrow(() -> new ResourceNotFoundException("Post not found with id :" + postId));
+        User currentUser = userDetailsService.findCurrentUser();
+        if (currentUser != null) {
+            PostLike existingLike = postLikesRepository.findByUserAndPost(currentUser, existingPost);
+            if (existingLike != null) {
+                postLikesRepository.delete(existingLike);
+                response.setStatus(HttpStatus.OK.value());
+            } else {
+                PostLike newLike = new PostLike();
+                newLike.setPost(existingPost);
+                newLike.setUser(currentUser);
+                newLike.setTimestamp(new Timestamp(System.currentTimeMillis()));
+                postLikesRepository.save(newLike);
+                response.setStatus(HttpStatus.OK.value());
+            }
+        } else {
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+        }
+    }
+
+    public void addComment(long postId, CommentRequest request, HttpServletResponse response) {
+        Post existingPost = postRepository.findById(postId)
+                .orElseThrow(() -> new ResourceNotFoundException("Post not found with id :" + postId));
+        User currentUser = userDetailsService.findCurrentUser();
+        if (currentUser != null) {
+            if(request.getContent() != null || request.getContent().length()<5){
+                PostComment newComment = new PostComment();
+                newComment.setPost(existingPost);
+                newComment.setUser(currentUser);
+                newComment.setContent(request.getContent());
+                newComment.setTimestamp(new Timestamp(System.currentTimeMillis()));
+                commentRepository.save(newComment);
+                response.setStatus(HttpStatus.OK.value());
+            } else {
+                response.setStatus(HttpStatus.BAD_REQUEST.value());
+            }
+        } else {
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
         }
     }
 }

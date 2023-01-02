@@ -4,16 +4,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import pjwstk.aidietgenerator.entity.Post;
 import pjwstk.aidietgenerator.repository.PostRepository;
+import pjwstk.aidietgenerator.request.CommentRequest;
 import pjwstk.aidietgenerator.request.PostRequest;
 import pjwstk.aidietgenerator.service.PostService;
-import pjwstk.aidietgenerator.view.PostView;
+import pjwstk.aidietgenerator.view.PostDetailedView;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/posts")
+@RequestMapping("/forum/post")
 public class PostController {
 
     private final PostRepository postRepository;
@@ -25,19 +26,28 @@ public class PostController {
         this.postService = postService;
     }
 
-    //Get all posts
     @GetMapping
     public List<Post> getAllPosts(){
         return postRepository.findAll();
     }
 
-    @GetMapping("/{id}")
-    public PostView getPoemById(@PathVariable(value = "id" ) long postId, HttpServletResponse response){
+    @GetMapping("/like/{postID}")
+    public void likePost(@PathVariable(value = "postID" ) long postId, HttpServletResponse response){
+        postService.like(postId, response);
+    }
+
+    @PostMapping("/comment/{postID}")
+    public void commentPost(@PathVariable(value = "postID" ) long postId, @RequestBody CommentRequest request, HttpServletResponse response){
+        postService.addComment(postId, request, response);
+    }
+
+    @GetMapping("/{postID}")
+    public PostDetailedView getPostById(@PathVariable(value = "postID" ) long postId, HttpServletResponse response){
         return postService.view(postId, response);
     }
 
-    @GetMapping("/user/{userId}")
-    public List<Post> getAllUserPosts(@PathVariable(value = "userId") long userId , HttpServletResponse response){
+    @GetMapping("/user/{userID}")
+    public List<Post> getAllUserPosts(@PathVariable(value = "userID") long userId , HttpServletResponse response){
         return postService.getSelectedUserPosts(userId, response);
     }
 
@@ -47,15 +57,15 @@ public class PostController {
         postService.create(postRequest, response);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/{postID}")
     @Transactional
-    public void putPost(@RequestBody PostRequest post, @PathVariable("id") long postId, HttpServletResponse response){
+    public void putPost(@RequestBody PostRequest post, @PathVariable("postID") long postId, HttpServletResponse response){
         postService.edit(post, response, postId);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{postID}")
     @Transactional
-    public void deletePost(HttpServletResponse response, @PathVariable (value = "id") long postId){
+    public void deletePost(HttpServletResponse response, @PathVariable (value = "postID") long postId){
         postService.delete(response, postId);
     }
 }

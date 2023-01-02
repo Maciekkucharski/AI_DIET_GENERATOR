@@ -2,9 +2,9 @@ package pjwstk.aidietgenerator.service;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import pjwstk.aidietgenerator.entity.MyProfile;
+import pjwstk.aidietgenerator.view.MyProfile;
 import pjwstk.aidietgenerator.entity.User;
-import pjwstk.aidietgenerator.entity.UserProfile;
+import pjwstk.aidietgenerator.view.UserProfile;
 import pjwstk.aidietgenerator.repository.PostRepository;
 import pjwstk.aidietgenerator.repository.SocialsRepository;
 import pjwstk.aidietgenerator.repository.UserRepository;
@@ -39,7 +39,7 @@ public class ProfileService {
         User currentUser = userDetailsService.findCurrentUser();
         if(currentUser != null){
             currentUserProfile.setUser(currentUser);
-            currentUserProfile.setProfilePicturePath("TODO");
+            currentUserProfile.setProfilePicturePath("TODO"); // TODO
             currentUserProfile.setUserStats(userStatsRepository.findByuser(currentUser));
             currentUserProfile.setSocials(socialsRepository.findByuser(currentUser));
             currentUserProfile.setUserPosts(postRepository.findByuser(currentUser));
@@ -56,7 +56,7 @@ public class ProfileService {
         Optional<User> selectedUser = userRepository.findById(userID);
         if(!selectedUser.isEmpty()){
             selectedUserProfile.setUser(selectedUser.get());
-            selectedUserProfile.setProfilePicturePath("TODO");
+            selectedUserProfile.setProfilePicturePath("TODO"); // TODO
             selectedUserProfile.setSocials(socialsRepository.findByuser(selectedUser.get()));
             selectedUserProfile.setUserPosts(postRepository.findByuser(selectedUser.get()));
             response.setStatus(HttpStatus.OK.value());
