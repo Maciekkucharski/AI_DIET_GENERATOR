@@ -1,12 +1,12 @@
 import numpy
 import pandas as pd
 
-from src.engine.recommender import Recommender, compare_taste_with_taste_profile
-from src.utils import load_and_preprocess_data
+from src.rec_system.engine.recommender import Recommender, compare_taste_with_taste_profile
+from src.rec_system.utils import load_and_preprocess_data
 import pytest
 
 MODEL_PARAMETERS = dict(
-    factors=20,
+    factors=100,
     alpha=0.6,
     regularization=0.06,
 )

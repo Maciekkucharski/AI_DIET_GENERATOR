@@ -34,13 +34,14 @@ public class UserStatsController {
     }
 
     @GetMapping
-    public List<UserStats> getCurrentUserDetails() {
+    public List<UserStats> getCurrentUserStats() {
         return userStatsRepository.findByuser(userDetailsService.findCurrentUser());
     }
 
     @PostMapping
     @Transactional
     public UserStats addUserDetails(@RequestBody UserStatsRequest userStats, HttpServletResponse response) {
+
         User currentUser = userDetailsService.findCurrentUser();
         if (currentUser == null) {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
@@ -66,13 +67,13 @@ public class UserStatsController {
     }
 
     @GetMapping("/{id}")
-    public UserStats getUserDetailsById(@PathVariable (value = "id") long userDetailsId) {
+    public UserStats getUserStatsById(@PathVariable (value = "id") long userDetailsId) {
         return userStatsRepository.findById(userDetailsId).
                 orElseThrow(() -> new ResourceNotFoundException("UserDetails not found with id :" + userDetailsId));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<UserStats> deleteUserDetails(@PathVariable (value = "id") long userDetailsId) {
+    public ResponseEntity<UserStats> deleteUserStats(@PathVariable (value = "id") long userDetailsId) {
         UserStats existingUserStats = userStatsRepository.findById(userDetailsId).
                 orElseThrow(() -> new ResourceNotFoundException("UserDetails not found with id :" + userDetailsId));
         userStatsRepository.delete(existingUserStats);

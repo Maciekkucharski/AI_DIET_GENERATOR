@@ -1,4 +1,4 @@
-from src.data.recipes import get_all_recipes, get_filtered_recipes, get_taste, update_taste, add_taste_profiles, \
+from src.rec_system.data.recipes import get_all_recipes, get_filtered_recipes, get_taste, update_taste, add_taste_profiles, \
     get_dish_id
 import pytest
 import pandas as pd
@@ -8,7 +8,7 @@ API_KEY = '947992fa499844bb9e8e4a026e65a037'
 class TestRecipesNoApi:
     @pytest.mark.parametrize("expected", [False])
     def test_get_filtered_recipes_no_parameters(self, expected):
-        df = get_filtered_recipes(to_csv=True, destination='./test.csv')
+        df = get_filtered_recipes()
         assert df.empty == expected
 
 
@@ -20,7 +20,7 @@ class TestRecipesNoApi:
 
     @pytest.mark.parametrize("test_input,expected", [((pd.DataFrame(
         data={'id': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-              'titles': ['foo_1', 'foo_2', 'foo_3', 'foo_4', 'foo_5', 'foo_6', 'foo_7', 'foo_8', 'foo_9', 'foo_10', ]}),
+              'title': ['foo_1', 'foo_2', 'foo_3', 'foo_4', 'foo_5', 'foo_6', 'foo_7', 'foo_8', 'foo_9', 'foo_10', ]}),
                                                        [1, 2, 3, 4, 5]), 5)])
     def test_get_filtered_recipes_from_df(self, test_input, expected):
         df = get_filtered_recipes(df=test_input[0], ids=test_input[1])
@@ -103,7 +103,7 @@ class TestRecipesApi:
 
     @pytest.mark.parametrize("test_input, expected", [((pd.DataFrame(
         data={'id': [715769, 715495],
-              'titles': ['Broccolini Quinoa Pilaf', 'Turkey Tomato Cheese Pizza']}), 'foo_api_key'), True)])
+              'title': ['Broccolini Quinoa Pilaf', 'Turkey Tomato Cheese Pizza']}), 'foo_api_key'), True)])
     def test_add_taste_profiles_wrong_api_key(self, test_input, expected):
         df = add_taste_profiles(api_key=test_input[1], df=test_input[0])
         assert df.equals(test_input[0]) == expected
@@ -116,7 +116,7 @@ class TestRecipesApi:
 
     @pytest.mark.parametrize("test_input, expected", [(pd.DataFrame(
         data={'id': [715769, 715573],
-              'titles': ['Broccolini Quinoa Pilaf', 'Simple Skillet Lasagna']}),
+              'title': ['Broccolini Quinoa Pilaf', 'Simple Skillet Lasagna']}),
                                                        (pd.read_csv('tests/unit/data/recipes.csv'), True))])
     def test_add_taste_profiles_df(self, test_input, expected):
         df = add_taste_profiles(api_key=API_KEY, df=test_input)

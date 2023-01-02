@@ -13,3 +13,4 @@ black
 tox
 requests-cache
 Flask
+pytest

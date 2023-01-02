@@ -2,12 +2,12 @@ from setuptools import setup, find_packages
 
 
 
-VERSION = '0.0.1'
-DESCRIPTION = 'package for recommending dishes in out taste profile, part of engeneering thesis'
+VERSION = '0.0.2'
+DESCRIPTION = 'package for recommending dishes in out taste profile, part of engeneering thesis, link to repo https://github.com/Maciekkucharski/AI_DIET_GENERATOR'
 
 # Setting up
 setup(
-    name="",
+    name="rec_system_trb",
     version=VERSION,
     author="Trb",
     author_email="<m.kucha@wp.pl>",
