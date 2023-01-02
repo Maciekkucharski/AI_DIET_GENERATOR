@@ -32,16 +32,16 @@ async def generate(body_dict: dict = Body(..., example={
         mydb = connection.connect(host="35.198.85.35", user="root", password="jajco123", database="DietGenerator",
                                   use_pure=True)
         query = """
-    SELECT
-        u.email AS 'Adres e-mail',
-        re.recipeName AS pytanie,
-        ra.score AS ocena
-    FROM ratings ra
-    INNER JOIN users u
-        ON u.id = ra.UserID
-    INNER JOIN recipes re
-        ON re.id = ra.RecipeID;
-    """
+        SELECT
+            u.email AS 'Adres e-mail',
+            re.recipeName AS pytanie,
+            ra.score AS ocena
+        FROM ratings ra
+        INNER JOIN users u
+            ON u.id = ra.UserID
+        INNER JOIN recipes re
+            ON re.id = ra.RecipeID;
+        """
         ratings_result = pd.read_sql(query, mydb)
         query = """
             SELECT
@@ -94,7 +94,7 @@ async def generate(body_dict: dict = Body(..., example={
         # convert number of dish to dish id
         return [int(recipes_results.loc[recipes_results['title'] == i[1]]['id'].values[0]) for i in results]
     else:
-        return []
+        return "missing data from database"
 
 
 @app.post("/replace")
@@ -107,23 +107,36 @@ async def replace(body_dict: dict = Body(..., example={
         mydb = connection.connect(host="35.198.85.35", user="root", password="jajco123", database="DietGenerator",
                                   use_pure=True)
         query = """
-    SELECT
-        u.email AS 'Adres e-mail',
-        re.recipeName AS pytanie,
-        ra.score AS ocena
-    FROM ratings ra
-    INNER JOIN users u
-        ON u.id = ra.UserID
-    INNER JOIN recipes re
-        ON re.id = ra.RecipeID;
-    """
+        SELECT
+            u.email AS 'Adres e-mail',
+            re.recipeName AS pytanie,
+            ra.score AS ocena
+        FROM ratings ra
+        INNER JOIN users u
+            ON u.id = ra.UserID
+        INNER JOIN recipes re
+            ON re.id = ra.RecipeID;
+        """
         ratings_result = pd.read_sql(query, mydb)
+        query = """
+                SELECT
+                    re.id,
+                    re.recipeName as title,
+                    re.saltiness,
+                    re.sourness,
+                    re.sweetness,
+                    re.bitterness ,
+                    re.spiciness,
+                    re.fattiness
+                FROM recipes as re   
+                            """
+        recipes_results = pd.read_sql(query, mydb)
         mydb.close()  # close the connection
     except Exception as e:
         mydb.close()
         print(str(e))
     mydb.close()
-    if ratings_result is not None:
+    if ratings_result is not None and recipes_results is not None:
         data, email_order, dishes_order, sorted_users, sorted_dishes = load_and_preprocess_data(ratings_result)
         recommender = Recommender(
             data['ocena'],
@@ -141,4 +154,4 @@ async def replace(body_dict: dict = Body(..., example={
         # convert list of dish numbers to dish id
         return [int(recipes_results.loc[recipes_results['title'] == sorted_dishes[i]]['id'].values[0]) for i in results]
     else:
-        return []
+        return "missing data from database"
