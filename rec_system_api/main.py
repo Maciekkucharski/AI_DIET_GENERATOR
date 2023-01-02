@@ -89,10 +89,10 @@ async def generate(body_dict: dict = Body(..., example={
                                                                items_to_recommend=body_dict['items_to_recommend'])
 
         results = compare_taste_with_taste_profile([sorted_dishes[i] for i in suggestions_and_score[0].tolist()],
-                                                   sorted_users[body_dict['user_id']], user_profiles_df=survey_results,
+                                                   sorted_users[2], user_profiles_df=survey_results,
                                                    recipes_df=recipes_results)
         # convert number of dish to dish id
-        return [recipes_results.loc[recipes_results['recipeName'] == i[1]]['id'].values[0] for i in results]
+        return [int(recipes_results.loc[recipes_results['title'] == i[1]]['id'].values[0]) for i in results]
     else:
         return []
 
@@ -139,6 +139,6 @@ async def replace(body_dict: dict = Body(..., example={
                                              items_to_recommend=body_dict['items_to_recommend'])[0]
         results = [int(result) for result in results]
         # convert list of dish numbers to dish id
-        return [recipes_results.loc[recipes_results['title'] == sorted_dishes[i]]['id'].values[0] for i in results]
+        return [int(recipes_results.loc[recipes_results['title'] == sorted_dishes[i]]['id'].values[0]) for i in results]
     else:
         return []
