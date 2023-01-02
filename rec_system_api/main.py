@@ -89,12 +89,13 @@ async def generate(body_dict: dict = Body(..., example={
             model_params=MODEL_PARAMETERS,
         )
         # convert user number to user id
-        user = users.loc[users['email'] == sorted_users[body_dict['user_id']]]['id'].values[0]
-        suggestions_and_score = recommender.recommend_products(user,
+        user_email = users.loc[users['id'] == body_dict['user_id']]['email'].values[0]
+        user_number = list(sorted_users).index(user_email)
+        suggestions_and_score = recommender.recommend_products(user_number,
                                                                items_to_recommend=body_dict['items_to_recommend'])
 
         results = compare_taste_with_taste_profile([sorted_dishes[i] for i in suggestions_and_score[0].tolist()],
-                                                   users.loc[users['email'] == sorted_users[user]]['email'].values[0],
+                                                   user_email,
                                                    user_profiles_df=survey_results,
                                                    recipes_df=recipes_results)
         # convert number of dish to dish id
