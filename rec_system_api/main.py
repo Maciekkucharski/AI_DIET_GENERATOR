@@ -43,7 +43,6 @@ async def generate(body_dict: dict = Body(..., example={
         ON re.id = ra.RecipeID;
     """
         ratings_result = pd.read_sql(query, mydb)
-
         query = """
             SELECT
                 u.email AS 'email',
@@ -58,7 +57,6 @@ async def generate(body_dict: dict = Body(..., example={
                 ON u.id = su.user_id;
             """
         survey_results = pd.read_sql(query, mydb)
-
         query = """
         SELECT
             re.id,
@@ -93,7 +91,8 @@ async def generate(body_dict: dict = Body(..., example={
         results = compare_taste_with_taste_profile([sorted_dishes[i] for i in suggestions_and_score[0].tolist()],
                                                    sorted_users[body_dict['user_id']], user_profiles_df=survey_results,
                                                    recipes_df=recipes_results)
-        return [result[1] for result in results]
+        # convert number of dish to dish id
+        return [recipes_results.loc[recipes_results['recipeName'] == i[1]]['id'].values[0] for i in results]
     else:
         return []
 
@@ -134,9 +133,12 @@ async def replace(body_dict: dict = Body(..., example={
         recommender.create_and_fit(
             model_params=MODEL_PARAMETERS,
         )
-        results = recommender.similar_dishes(body_dict['dish_id'],
-                                                 items_to_recommend=body_dict['items_to_recommend'])[0]
-        print(results)
-        return [int(result) for result in results]
+        dish_name = recipes_results.loc[recipes_results['id'] == body_dict['dish_id']]['title'].values[0]
+        dish_number = list(sorted_dishes).index(dish_name)
+        results = recommender.similar_dishes(dish_number,
+                                             items_to_recommend=body_dict['items_to_recommend'])[0]
+        results = [int(result) for result in results]
+        # convert list of dish numbers to dish id
+        return [recipes_results.loc[recipes_results['title'] == sorted_dishes[i]]['id'].values[0] for i in results]
     else:
         return []
