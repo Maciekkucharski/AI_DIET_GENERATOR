@@ -80,7 +80,7 @@ async def generate(body_dict: dict = Body(..., example={
         mydb.close()
         print(str(e))
     mydb.close()
-    if ratings_result is not None and survey_results is not None and recipes_results is not None users is not None:
+    if ratings_result is not None and survey_results is not None and recipes_results is not None and users is not None:
         data, email_order, dishes_order, sorted_users, sorted_dishes = load_and_preprocess_data(ratings_result)
         recommender = Recommender(
             data['ocena'],
@@ -92,7 +92,7 @@ async def generate(body_dict: dict = Body(..., example={
         )
         # convert user number to user id
         user = users.loc[users['email'] == sorted_users[body_dict['user_id']]]['id'].values[0]
-        suggestions_and_score = recommender.recommend_products(body_dict['user_id'],
+        suggestions_and_score = recommender.recommend_products(user,
                                                                items_to_recommend=body_dict['items_to_recommend'])
 
         results = compare_taste_with_taste_profile([sorted_dishes[i] for i in suggestions_and_score[0].tolist()],
