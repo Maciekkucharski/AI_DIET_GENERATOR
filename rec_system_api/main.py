@@ -70,12 +70,17 @@ async def generate(body_dict: dict = Body(..., example={
         FROM recipes as re   
                     """
         recipes_results = pd.read_sql(query, mydb)
+
+        query = """
+        select id, email from users;
+        """
+        users = pd.read_sql(query, mydb)
         mydb.close()  # close the connection
     except Exception as e:
         mydb.close()
         print(str(e))
     mydb.close()
-    if ratings_result is not None and survey_results is not None and recipes_results is not None:
+    if ratings_result is not None and survey_results is not None and recipes_results is not None users is not None:
         data, email_order, dishes_order, sorted_users, sorted_dishes = load_and_preprocess_data(ratings_result)
         recommender = Recommender(
             data['ocena'],
@@ -85,6 +90,8 @@ async def generate(body_dict: dict = Body(..., example={
         recommender.create_and_fit(
             model_params=MODEL_PARAMETERS,
         )
+        # convert user number to user id
+        user = users.loc[users['email'] == sorted_users[body_dict['user_id']]]['id'].values[0]
         suggestions_and_score = recommender.recommend_products(body_dict['user_id'],
                                                                items_to_recommend=body_dict['items_to_recommend'])
 
