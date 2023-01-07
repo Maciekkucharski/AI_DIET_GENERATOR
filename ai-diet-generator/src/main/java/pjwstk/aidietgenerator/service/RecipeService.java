@@ -64,7 +64,7 @@ public class RecipeService {
                 newRecipe.setUser(currentUser);
                 newRecipe.setCreatedAt();
 
-                if(currentUser.getAuthorities().contains("ROLE_DIETICIAN")){
+                if(currentUser.getAuthorities().contains("ROLE_DIETITIAN")){
                     newRecipe.setVerified(true);
                 }
                 recipeRepository.save(newRecipe);
@@ -87,11 +87,16 @@ public class RecipeService {
 
     public RecipeView view(long recipeId, HttpServletResponse response) {
         Optional<Recipe> recipe = recipeRepository.findById(recipeId);
+
         if (recipe.isEmpty()) {
+
             response.setStatus(HttpStatus.NOT_FOUND.value());
             return null;
+
         } else {
+
             List ingredients = new ArrayList<Ingredient>();
+
             try {
                 ingredients = ingredientRepository.findByrecipe(recipe.get());
             } catch (NoResultException e) {
@@ -99,6 +104,7 @@ public class RecipeService {
             }
 
             response.setStatus(HttpStatus.OK.value());
+
             return new RecipeView(recipe.get().getId(),
                     recipe.get().getTitle(),
                     recipe.get().getServings(),

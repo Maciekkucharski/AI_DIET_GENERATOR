@@ -62,14 +62,14 @@ public class DietService {
         return kcalIntake;
     }
 
-    public void getRecommendedIds(Long UserId) throws IOException {
+    public String[] getRecommendedIds(Long UserId) throws IOException {
         URL url = new URL (ApiConstants.GENERATOR);
         HttpURLConnection con = (HttpURLConnection)url.openConnection();
         con.setRequestMethod("POST");
         con.setRequestProperty("Content-Type", "application/json");
         con.setRequestProperty("Accept", "application/json");
         con.setDoOutput(true);
-        String jsonInputString = "{\"user_id\":" + " 43," +
+        String jsonInputString = "{\"user_id\": " + UserId.toString() + ", " +
                 "\"items_to_recommend\": 50}";
 
 
@@ -85,11 +85,13 @@ public class DietService {
             while ((responseLine = br.readLine()) != null) {
                 response.append(responseLine.trim());
             }
-            System.out.println(response.toString());
+            String[] recommendedIds = response.substring(1, response.length() - 1).split(",");
+
+            return recommendedIds;
         }
     }
 
-    public void replaceRecommendedMeal(Long RecipeId) throws IOException {
+    public String[] replaceRecommendedMeal(Long RecipeId) throws IOException {
         URL url = new URL (ApiConstants.REPLACER);
         HttpURLConnection con = (HttpURLConnection)url.openConnection();
         con.setRequestMethod("POST");
@@ -112,7 +114,10 @@ public class DietService {
             while ((responseLine = br.readLine()) != null) {
                 response.append(responseLine.trim());
             }
-            System.out.println(response.toString());
+
+            String[] recommendedReplaceIds = response.substring(1, response.length() - 1).split(",");
+
+            return recommendedReplaceIds;
         }
     }
 }
