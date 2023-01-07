@@ -47,6 +47,18 @@ public class Recipe {
     @Column(name = "created_at")
     private Timestamp timestamp;
 
+    @Column(name = "calories")
+    private int calories;
+
+    @Column(name = "carbs")
+    private int carbs;
+
+    @Column(name = "fat")
+    private int fat;
+
+    @Column(name = "protein")
+    private int protein;
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
@@ -54,7 +66,9 @@ public class Recipe {
     public Recipe(){
     }
 
-    public Recipe(String title, int servings, int readyInMinutes, String image, String instructions, boolean vegetarian, boolean vegan, boolean glutenFree, boolean dairyFree, boolean veryHealthy, boolean verified) {
+    public Recipe(String title, int servings, int readyInMinutes, String image, String instructions,
+                  boolean vegetarian, boolean vegan, boolean glutenFree, boolean dairyFree, boolean veryHealthy, boolean verified,
+                  int calories, int carbs, int fat, int protein) {
         this.title = title;
         this.servings = servings;
         this.readyInMinutes = readyInMinutes;
@@ -66,6 +80,10 @@ public class Recipe {
         this.dairyFree = dairyFree;
         this.veryHealthy  = veryHealthy;
         this.verified = verified;
+        this.calories = calories;
+        this.carbs = carbs;
+        this.fat = fat;
+        this.protein = protein;
     }
 
     public long getId() {
@@ -178,5 +196,37 @@ public class Recipe {
 
     public void setCreatedAt(){
         this.timestamp = new Timestamp(System.currentTimeMillis());
+    }
+
+    public int getCalories() {
+        return calories;
+    }
+
+    public void setCalories(int calories) {
+        this.calories = calories;
+    }
+
+    public int getCarbs() {
+        return carbs;
+    }
+
+    public void setCarbs(int carbs) {
+        this.carbs = carbs;
+    }
+
+    public int getFat() {
+        return fat;
+    }
+
+    public void setFat(int fat) {
+        this.fat = fat;
+    }
+
+    public int getProtein() {
+        return protein;
+    }
+
+    public void setProtein(int protein) {
+        this.protein = protein;
     }
 }

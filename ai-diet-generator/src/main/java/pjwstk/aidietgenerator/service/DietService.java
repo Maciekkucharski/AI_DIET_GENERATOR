@@ -4,6 +4,16 @@ import org.springframework.stereotype.Service;
 import pjwstk.aidietgenerator.entity.Diet;
 import pjwstk.aidietgenerator.entity.Gender;
 import pjwstk.aidietgenerator.entity.PhysicalActivity;
+import pjwstk.aidietgenerator.service.Utils.ApiConstants;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.List;
 
 import static pjwstk.aidietgenerator.entity.Gender.FEMALE;
 import static pjwstk.aidietgenerator.entity.Gender.MALE;
@@ -52,4 +62,57 @@ public class DietService {
         return kcalIntake;
     }
 
+    public void getRecommendedIds(Long UserId) throws IOException {
+        URL url = new URL (ApiConstants.GENERATOR);
+        HttpURLConnection con = (HttpURLConnection)url.openConnection();
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type", "application/json");
+        con.setRequestProperty("Accept", "application/json");
+        con.setDoOutput(true);
+        String jsonInputString = "{\"user_id\":" + " 43," +
+                "\"items_to_recommend\": 50}";
+
+
+        try(OutputStream os = con.getOutputStream()) {
+            byte[] input = jsonInputString.getBytes("utf-8");
+            os.write(input, 0, input.length);
+        }
+
+        try(BufferedReader br = new BufferedReader(
+                new InputStreamReader(con.getInputStream(), "utf-8"))) {
+            StringBuilder response = new StringBuilder();
+            String responseLine = null;
+            while ((responseLine = br.readLine()) != null) {
+                response.append(responseLine.trim());
+            }
+            System.out.println(response.toString());
+        }
+    }
+
+    public void replaceRecommendedMeal(Long RecipeId) throws IOException {
+        URL url = new URL (ApiConstants.REPLACER);
+        HttpURLConnection con = (HttpURLConnection)url.openConnection();
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type", "application/json");
+        con.setRequestProperty("Accept", "application/json");
+        con.setDoOutput(true);
+        String jsonInputString = "{\"dish_id\": " + RecipeId + ", " +
+                "\"items_to_recommend\": 10}";
+
+
+        try(OutputStream os = con.getOutputStream()) {
+            byte[] input = jsonInputString.getBytes("utf-8");
+            os.write(input, 0, input.length);
+        }
+
+        try(BufferedReader br = new BufferedReader(
+                new InputStreamReader(con.getInputStream(), "utf-8"))) {
+            StringBuilder response = new StringBuilder();
+            String responseLine = null;
+            while ((responseLine = br.readLine()) != null) {
+                response.append(responseLine.trim());
+            }
+            System.out.println(response.toString());
+        }
+    }
 }

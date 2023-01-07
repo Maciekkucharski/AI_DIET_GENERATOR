@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import pjwstk.aidietgenerator.entity.*;
 import pjwstk.aidietgenerator.exception.ResourceNotFoundException;
 import pjwstk.aidietgenerator.repository.IngredientRepository;
-import pjwstk.aidietgenerator.repository.NutritionRepository;
 import pjwstk.aidietgenerator.repository.RecipeRepository;
 import pjwstk.aidietgenerator.repository.UserRepository;
 import pjwstk.aidietgenerator.request.RecipeRequest;
@@ -15,7 +14,6 @@ import pjwstk.aidietgenerator.view.RecipeView;
 import javax.persistence.NoResultException;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,19 +21,16 @@ import java.util.Optional;
 public class RecipeService {
 
     private final RecipeRepository recipeRepository;
-    private final NutritionRepository nutritionRepository;
     private final IngredientRepository ingredientRepository;
     private final UserDetailsService userDetailsService;
     private final UserRepository userRepository;
 
     @Autowired
     public RecipeService(RecipeRepository recipeRepository,
-                         NutritionRepository nutritionRepository,
                          IngredientRepository ingredientRepository,
                          UserDetailsService userDetailsService,
                          UserRepository userRepository){
         this.recipeRepository = recipeRepository;
-        this.nutritionRepository = nutritionRepository;
         this.ingredientRepository = ingredientRepository;
         this.userDetailsService = userDetailsService;
         this.userRepository = userRepository;
@@ -62,23 +57,17 @@ public class RecipeService {
                 newRecipe.setGlutenFree(recipeRequest.isGlutenFree());
                 newRecipe.setDairyFree(recipeRequest.isDairyFree());
                 newRecipe.setVeryHealthy(recipeRequest.isVeryHealthy());
-                newRecipe.setCreatedAt();
+                newRecipe.setCalories(recipeRequest.getCalories());
+                newRecipe.setCarbs(recipeRequest.getCarbs());
+                newRecipe.setFat(recipeRequest.getFat());
+                newRecipe.setProtein(recipeRequest.getProtein());
                 newRecipe.setUser(currentUser);
+                newRecipe.setCreatedAt();
 
                 if(currentUser.getAuthorities().contains("ROLE_DIETICIAN")){
                     newRecipe.setVerified(true);
                 }
                 recipeRepository.save(newRecipe);
-
-                Nutrition newRecipeNutrition = new Nutrition();
-                newRecipeNutrition.setCalories(recipeRequest.getCalories());
-                newRecipeNutrition.setCarbs(recipeRequest.getCarbs());
-                newRecipeNutrition.setFat(recipeRequest.getFat());
-                newRecipeNutrition.setProtein(recipeRequest.getProtein());
-                newRecipeNutrition.setRecipe(newRecipe);
-
-                nutritionRepository.save(newRecipeNutrition);
-
                 List<Ingredient> newRecipeIngredients = recipeRequest.getIngredients();
 
                 for(Ingredient ingredient : newRecipeIngredients) {
@@ -103,14 +92,8 @@ public class RecipeService {
             return null;
         } else {
             List ingredients = new ArrayList<Ingredient>();
-            Nutrition nutrition = new Nutrition();
             try {
                 ingredients = ingredientRepository.findByrecipe(recipe.get());
-            } catch (NoResultException e) {
-                e.printStackTrace();
-            }
-            try {
-                nutrition = nutritionRepository.findByrecipe(recipe.get());
             } catch (NoResultException e) {
                 e.printStackTrace();
             }
@@ -130,17 +113,18 @@ public class RecipeService {
                     recipe.get().isVerified(),
                     recipe.get().getTimestamp(),
                     recipe.get().getUser(),
-                    nutrition.getCalories(),
-                    nutrition.getCarbs(),
-                    nutrition.getFat(),
-                    nutrition.getProtein(),
+                    recipe.get().getCalories(),
+                    recipe.get().getCarbs(),
+                    recipe.get().getFat(),
+                    recipe.get().getProtein(),
                     ingredients);
         }
     }
 
-    public Recipe editRecipe(long recipeId, Recipe editedRecipe, HttpServletResponse response) {
+    public RecipeRequest editRecipe(long recipeId, RecipeRequest editedRecipe, HttpServletResponse response) {
         Recipe existingRecipe = recipeRepository.findById(recipeId)
                 .orElseThrow(() -> new ResourceNotFoundException("Recipe not found with id :" + recipeId));
+        List<Ingredient> existingRecipeIngredients = ingredientRepository.findByrecipe(existingRecipe);
 
         User currentUser = userDetailsService.findCurrentUser();
         if (currentUser == null
@@ -151,10 +135,37 @@ public class RecipeService {
             return null;
 
         } else {
-            existingRecipe = editedRecipe;
+            existingRecipe.setTitle(editedRecipe.getTitle());
+            existingRecipe.setServings(editedRecipe.getServings());
+            existingRecipe.setReadyInMinutes(editedRecipe.getReadyInMinutes());
+            existingRecipe.setImage(editedRecipe.getImage());
+            existingRecipe.setInstructions(editedRecipe.getInstructions());
+            existingRecipe.setVegetarian(editedRecipe.isVegetarian());
+            existingRecipe.setVegan(editedRecipe.isVegan());
+            existingRecipe.setGlutenFree(editedRecipe.isGlutenFree());
+            existingRecipe.setDairyFree(editedRecipe.isDairyFree());
+            existingRecipe.setVeryHealthy(editedRecipe.isVeryHealthy());
+            existingRecipe.setVerified(editedRecipe.isVerified());
+            existingRecipe.setCalories(editedRecipe.getCalories());
+            existingRecipe.setCarbs(editedRecipe.getCarbs());
+            existingRecipe.setFat(editedRecipe.getFat());
+            existingRecipe.setProtein(editedRecipe.getProtein());
+            existingRecipe.setCreatedAt();
             recipeRepository.save(existingRecipe);
+
+            List<Ingredient> newIngredients = editedRecipe.getIngredients();
+            List<Ingredient> oldIngredients = ingredientRepository.findByrecipe(existingRecipe);
+
+            for(Ingredient oldIngredient : oldIngredients){
+                ingredientRepository.delete(oldIngredient);
+            }
+
+            for(Ingredient newIngredient: newIngredients){
+                newIngredient.setRecipe(existingRecipe);
+                ingredientRepository.save(newIngredient);
+            }
             response.setStatus(HttpStatus.OK.value());
-            return existingRecipe;
+            return editedRecipe;
         }
     }
 
@@ -181,6 +192,10 @@ public class RecipeService {
             response.setStatus(HttpStatus.NOT_FOUND.value());
         } else {
             if (currentUser != null && (currentUser.getId() == existingRecipe.getUser().getId() || currentUser.getAuthorities().contains("ROLE_ADMIN"))) {
+                List<Ingredient> existingRecipesIngredients = ingredientRepository.findByrecipe(existingRecipe);
+                for(Ingredient ingredient : existingRecipesIngredients){
+                    ingredientRepository.delete(ingredient);
+                }
                 recipeRepository.delete(existingRecipe);
                 response.setStatus(HttpStatus.ACCEPTED.value());
             } else {
