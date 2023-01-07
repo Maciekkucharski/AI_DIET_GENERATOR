@@ -19,14 +19,12 @@ public class RecipeController {
 
     private final RecipeService recipeService;
     private final RecipeRepository recipeRepository;
-    private final NutritionRepository nutritionRepository;
     private final IngredientRepository ingredientRepository;
 
     @Autowired
-    public RecipeController(RecipeService recipeService, RecipeRepository recipeRepository, NutritionRepository nutritionRepository, IngredientRepository ingredientRepository){
+    public RecipeController(RecipeService recipeService, RecipeRepository recipeRepository, IngredientRepository ingredientRepository){
         this.recipeService = recipeService;
         this.recipeRepository = recipeRepository;
-        this.nutritionRepository = nutritionRepository;
         this.ingredientRepository = ingredientRepository;
     }
 
