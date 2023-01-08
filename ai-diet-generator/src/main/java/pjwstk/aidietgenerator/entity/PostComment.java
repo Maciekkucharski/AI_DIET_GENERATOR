@@ -7,7 +7,7 @@ import javax.persistence.*;
 import java.sql.Timestamp;
 
 @Entity
-@Table(name = "comments")
+@Table(name = "post_comments")
 public class PostComment {
 
     @Id
