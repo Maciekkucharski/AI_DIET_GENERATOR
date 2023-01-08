@@ -17,7 +17,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 @Service
-public class PostService {
+public class ForumService {
 
     private final PostRepository postRepository;
     private final UserDetailsService userDetailsService;
@@ -29,14 +29,14 @@ public class PostService {
     private final RecipeCommentsRepository recipeCommentsRepository;
 
     @Autowired
-    public PostService(PostRepository postRepository,
-                       UserDetailsService userDetailsService,
-                       UserRepository userRepository,
-                       PostCommentsRepository postCommentsRepository,
-                       PostLikesRepository postLikesRepository,
-                       RecipeRepository recipeRepository,
-                       RecipeLikesRepository recipeLikesRepository,
-                       RecipeCommentsRepository recipeCommentsRepository) {
+    public ForumService(PostRepository postRepository,
+                        UserDetailsService userDetailsService,
+                        UserRepository userRepository,
+                        PostCommentsRepository postCommentsRepository,
+                        PostLikesRepository postLikesRepository,
+                        RecipeRepository recipeRepository,
+                        RecipeLikesRepository recipeLikesRepository,
+                        RecipeCommentsRepository recipeCommentsRepository) {
         this.postRepository = postRepository;
         this.userDetailsService = userDetailsService;
         this.userRepository = userRepository;
