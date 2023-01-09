@@ -7,7 +7,7 @@ import javax.persistence.*;
 import java.sql.Timestamp;
 
 @Entity
-@Table(name="userStats")
+@Table(name="user_stats")
 public class UserStats {
 
     @Id
