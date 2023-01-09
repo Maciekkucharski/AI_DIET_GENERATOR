@@ -62,6 +62,7 @@ public class ForumService {
                 PostSimplifiedView postSimplifiedView = new PostSimplifiedView();
                 postSimplifiedView.setAuthor(post.getUser());
                 postSimplifiedView.setId(post.getId());
+                postSimplifiedView.setDescription(post.getDescription());
                 postSimplifiedView.setTimestamp(new Timestamp(System.currentTimeMillis()));
                 postSimplifiedView.setCommentsCount(postCommentsRepository.findBypost(post).size());
                 postSimplifiedView.setLikesCount(postLikesRepository.findBypost(post).size());
@@ -79,7 +80,17 @@ public class ForumService {
             response.setStatus(HttpStatus.NOT_FOUND.value());
             return null;
         } else {
-            List<PostComment> postComments = postCommentsRepository.findBypost(post.get());
+            List<CommentView> postCommentsView = new ArrayList<>();
+            for (PostComment comment : postCommentsRepository.findBypost(post.get())){
+                CommentView newCommentView = new CommentView(
+                        comment.getId(),
+                        comment.getContent(),
+                        comment.getTimestamp(),
+                        comment.getUser(),
+                        "TODO" // TODO
+                );
+                postCommentsView.add(newCommentView);
+            }
             List<PostLike> likes = postLikesRepository.findBypost(post.get());
             response.setStatus(HttpStatus.OK.value());
             return new PostDetailedView(post.get().getId(),
@@ -89,7 +100,7 @@ public class ForumService {
                     post.get().getImagePath(),
                     post.get().getUser(),
                     "ImagePath TODO",
-                    postComments,
+                    postCommentsView,
                     likes);
         }
     }
@@ -220,8 +231,9 @@ public class ForumService {
                 newRecipeSimplifiedView.setId(recipe.getId());
                 newRecipeSimplifiedView.setTitle(recipe.getTitle());
                 newRecipeSimplifiedView.setTimestamp(recipe.getTimestamp());
+                newRecipeSimplifiedView.setDescription(recipe.getInstructions());
                 newRecipeSimplifiedView.setAuthor(recipe.getUser());
-                newRecipeSimplifiedView.setUserProfilePicture("ImagePath TODO");
+                newRecipeSimplifiedView.setUserProfilePicture("ImagePath TODO"); // TODO
                 newRecipeSimplifiedView.setCommentsCount(recipeCommentsRepository.findByrecipe(recipe).size());
                 newRecipeSimplifiedView.setLikesCount(recipeLikesRepository.findByrecipe(recipe).size());
                 recipeSimplifiedViewList.add(newRecipeSimplifiedView);
@@ -240,11 +252,22 @@ public class ForumService {
             RecipeDetailedView detailedRecipe = new RecipeDetailedView();
             RecipeView view = recipeService.view(recipeID, response);
             detailedRecipe.setRecipeView(view);
-            detailedRecipe.setImagePath("ImagePath TODO");
+            detailedRecipe.setImagePath("ImagePath TODO"); // TODO
             detailedRecipe.setAuthor(recipe.get().getUser());
-            detailedRecipe.setUserProfilePicture("ImagePath TODO");
+            detailedRecipe.setUserProfilePicture("ImagePath TODO"); // TODO
             detailedRecipe.setRecipeLikes(recipeLikesRepository.findByrecipe(recipe.get()));
-            detailedRecipe.setRecipeComments(recipeCommentsRepository.findByrecipe(recipe.get()));
+            List<CommentView> recipeCommentsView = new ArrayList<>();
+            for (RecipeComment comment : recipeCommentsRepository.findByrecipe(recipe.get())){
+                CommentView newCommentView = new CommentView(
+                        comment.getId(),
+                        comment.getContent(),
+                        comment.getTimestamp(),
+                        comment.getUser(),
+                        "TODO" // TODO
+                );
+                recipeCommentsView.add(newCommentView);
+            }
+            detailedRecipe.setRecipeComments(recipeCommentsView);
             response.setStatus(HttpStatus.OK.value());
             return detailedRecipe;
         }

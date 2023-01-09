@@ -6,25 +6,18 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import pjwstk.aidietgenerator.entity.User;
-
 import java.sql.Timestamp;
 
-
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Setter
 @Getter
-public class PostSimplifiedView {
+public class CommentView {
     private Long id;
-    private String title;
-    private String description;
+    private String content;
     private Timestamp timestamp;
-    @JsonIgnoreProperties({"authorities", "username", "email", "authority"})
-    private User author;
-
+    @JsonIgnoreProperties({"password", "authorities", "username", "email", "authority"})
+    private User user;
     // TODO
-    private String userProfilePicture;
-
-    private int commentsCount;
-    private int likesCount;
+    private String userImagePath;
 }

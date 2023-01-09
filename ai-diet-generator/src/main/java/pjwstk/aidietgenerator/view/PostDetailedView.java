@@ -31,6 +31,6 @@ public class PostDetailedView {
     // TODO
     private String userProfilePicture;
 
-    private List<PostComment> postComments;
+    private List<CommentView> postComments;
     private List<PostLike> likes;
 }

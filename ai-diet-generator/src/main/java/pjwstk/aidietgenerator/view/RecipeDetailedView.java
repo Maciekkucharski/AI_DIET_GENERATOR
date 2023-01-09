@@ -25,6 +25,6 @@ public class RecipeDetailedView {
     // TODO
     private String userProfilePicture = "TODO";
 
-    private List<RecipeComment> recipeComments;
+    private List<CommentView> recipeComments;
     private List<RecipeLike> recipeLikes;
 }

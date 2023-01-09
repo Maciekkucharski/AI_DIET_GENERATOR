@@ -15,6 +15,7 @@ import java.sql.Timestamp;
 public class RecipeSimplifiedView {
     private Long id;
     private String title;
+    private String description;
     private Timestamp timestamp;
     @JsonIgnoreProperties({"authorities", "username", "email", "authority"})
     private User author;
