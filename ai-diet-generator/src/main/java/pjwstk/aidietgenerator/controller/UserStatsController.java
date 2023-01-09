@@ -9,8 +9,8 @@ import pjwstk.aidietgenerator.entity.UserStats;
 import pjwstk.aidietgenerator.exception.ResourceNotFoundException;
 import pjwstk.aidietgenerator.repository.UserStatsRepository;
 import pjwstk.aidietgenerator.request.UserStatsRequest;
-import pjwstk.aidietgenerator.service.UserStatsService;
 import pjwstk.aidietgenerator.service.UserDetailsService;
+import pjwstk.aidietgenerator.service.UserStatsService;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
@@ -19,7 +19,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/account/stats")
 public class UserStatsController {
-
     private final UserStatsRepository userStatsRepository;
     private final UserDetailsService userDetailsService;
     private final UserStatsService userStatsService;
