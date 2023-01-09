@@ -15,22 +15,22 @@ public class UserStats {
     private Long id;
 
     @Column(name = "weight")
-    private double weight;
+    private Double weight;
 
     @Column(name = "height")
-    private int height;
+    private Integer height;
 
     @Column(name = "age")
-    private int age;
+    private Integer age;
 
     @Column(name = "bmi")
-    private double bmi;
+    private Double bmi;
 
     @Column(name = "gender")
     private Gender gender;
 
     @Column(name = "cal")
-    private int cal;
+    private Integer cal;
 
     @Column(name = "updated_at")
     private Timestamp timestamp;

@@ -11,13 +11,13 @@ public class Ingredient {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @Column(name = "name")
     private String name;
 
     @Column(name = "amount")
-    private double amount;
+    private Double amount;
 
     @Column(name = "unit")
     private String unit;

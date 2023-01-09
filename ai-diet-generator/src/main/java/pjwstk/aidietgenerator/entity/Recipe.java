@@ -9,34 +9,34 @@ public class Recipe {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @Column(name = "title")
     private String title;
 
     @Column(name = "saltiness")
-    private float saltiness;
+    private Float saltiness;
 
     @Column(name = "sourness")
-    private float sourness;
+    private Float sourness;
 
     @Column(name = "sweetness")
-    private float sweetness;
+    private Float sweetness;
 
     @Column(name = "bitterness")
-    private float bitterness;
+    private Float bitterness;
 
     @Column(name = "spiciness")
-    private float spiciness;
+    private Float spiciness;
 
     @Column(name = "fattiness")
-    private float fattiness;
+    private Float fattiness;
 
     @Column(name = "servings")
-    private int servings;
+    private Integer servings;
 
     @Column(name = "ready_in_minutes")
-    private int readyInMinutes;
+    private Integer readyInMinutes;
 
     @Column(name = "image")
     private String image;
@@ -45,37 +45,37 @@ public class Recipe {
     private String instructions;
 
     @Column(name = "vegetarian")
-    private boolean vegetarian;
+    private Boolean vegetarian;
 
     @Column(name = "vegan")
-    private boolean vegan;
+    private Boolean vegan;
 
     @Column(name = "gluten_free")
-    private boolean glutenFree;
+    private Boolean glutenFree;
 
     @Column(name = "dairy_free")
-    private boolean dairyFree;
+    private Boolean dairyFree;
 
     @Column(name = "very_healthy")
-    private boolean veryHealthy;
+    private Boolean veryHealthy;
 
     @Column(name = "verified")
-    private boolean verified;
+    private Boolean verified;
 
     @Column(name = "created_at")
     private Timestamp timestamp;
 
     @Column(name = "calories")
-    private int calories;
+    private Integer calories;
 
     @Column(name = "carbs")
-    private int carbs;
+    private Integer carbs;
 
     @Column(name = "fat")
-    private int fat;
+    private Integer fat;
 
     @Column(name = "protein")
-    private int protein;
+    private Integer protein;
 
     @ManyToOne
     @JoinColumn(name = "user_id")

@@ -21,7 +21,7 @@ public class PostLike {
     @Id
     @NotNull
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @Column(name = "created_at")
     @NotNull
