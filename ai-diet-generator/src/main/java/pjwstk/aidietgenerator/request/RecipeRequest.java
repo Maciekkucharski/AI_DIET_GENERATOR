@@ -1,5 +1,6 @@
 package pjwstk.aidietgenerator.request;
 
+import lombok.NoArgsConstructor;
 import pjwstk.aidietgenerator.entity.Ingredient;
 import pjwstk.aidietgenerator.entity.User;
 
@@ -7,6 +8,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
+@NoArgsConstructor
 public class RecipeRequest {
 
     //    Recipe
