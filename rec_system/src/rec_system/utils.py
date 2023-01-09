@@ -3,6 +3,13 @@ import pandas as pd
 
 def load_and_preprocess_data(df: pd.DataFrame = None,
                              ratings_path: str = './src/rec_system/data/ratings.csv', ):
+    """loads prepared data and does last preprocessing before using it in the recommendation system
+                Parameters:
+                    df (pd.DataFrame): Dataframe with recipes
+                    ratings_path (str): if dataframe was not provided or is None this is a path with csv with recipes
+                Returns:
+                    (pd.DataFrame) returns dataframe with specified filtered recipes with taste profiles
+    """
     if df is None:
         df = pd.read_csv(
             ratings_path,
@@ -18,8 +25,7 @@ def load_and_preprocess_data(df: pd.DataFrame = None,
     products = df["pytanie"].unique()
     # convert ratings to int type
     df['ocena'] = df['ocena'].astype(int)
-    # Create a categorical type for users and product. User ordered to ensure
-    # reproducibility
+    # Create a categorical type for users and product. User ordered to ensure reproducibility
     user_cat = pd.CategoricalDtype(categories=sorted(users), ordered=True)
     product_cat = pd.CategoricalDtype(categories=sorted(products), ordered=True)
     # Transform and get the indexes of the columns

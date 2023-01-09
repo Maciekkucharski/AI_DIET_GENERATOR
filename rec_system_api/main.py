@@ -34,13 +34,13 @@ async def generate(body_dict: dict = Body(..., example={
         query = """
         SELECT
             u.email AS 'Adres e-mail',
-            re.recipeName AS pytanie,
+            re.recipe_name AS pytanie,
             ra.score AS ocena
         FROM ratings ra
         INNER JOIN users u
-            ON u.id = ra.UserID
+            ON u.id = ra.user_id
         INNER JOIN recipes re
-            ON re.id = ra.RecipeID;
+            ON re.id = ra.recipe_id;
         """
         ratings_result = pd.read_sql(query, mydb)
         query = """
@@ -60,7 +60,7 @@ async def generate(body_dict: dict = Body(..., example={
         query = """
         SELECT
             re.id,
-            re.recipeName as title,
+            re.recipe_name as title,
             re.saltiness,
             re.sourness,
             re.sweetness,
@@ -116,19 +116,19 @@ async def replace(body_dict: dict = Body(..., example={
         query = """
         SELECT
             u.email AS 'Adres e-mail',
-            re.recipeName AS pytanie,
+            re.recipe_name AS pytanie,
             ra.score AS ocena
         FROM ratings ra
         INNER JOIN users u
-            ON u.id = ra.UserID
+            ON u.id = ra.user_id
         INNER JOIN recipes re
-            ON re.id = ra.RecipeID;
+            ON re.id = ra.recipe_id;
         """
         ratings_result = pd.read_sql(query, mydb)
         query = """
                 SELECT
                     re.id,
-                    re.recipeName as title,
+                    re.recipe_name as title,
                     re.saltiness,
                     re.sourness,
                     re.sweetness,

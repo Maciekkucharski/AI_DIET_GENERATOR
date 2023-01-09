@@ -26,7 +26,15 @@ SHEET_IDS = ['1yUzQLGwdEn0zUZj7c_y5dnJi4hxk4wGQltBSxk3ZUOE', '1NxPcU-3V44ym9Slsh
              '1ChaPNihN0HsVQRLmiwuQ9GA_8DL7FmGumq0MYgRX7AA', '1FtIGUXp1H52Nc9tYPPAMu98zcW0za6s5hsGAyKC-RJc']
 
 
-def update_survey_answers_file(to_csv: bool = True, destination: str = "./src/rec_system/data/survey.csv"):
+def update_survey_answers_file(to_csv: bool = True,
+                               destination: str = "./src/rec_system/data/survey.csv") -> pd.DataFrame:
+    """Downloads results from online polls in order to create dataframe out of results.
+            Parameters:
+                to_csv (bool): this parameter specifies if the dataframe should be saved to a csv
+                destination (str): specifies path for csv to be saved in
+            Returns:
+                (pd.DataFrame) Dataframe with results form poll.
+    """
     sheet_ids = SHEET_IDS
     df = pd.DataFrame({})
     for sheet_id in sheet_ids:
@@ -41,7 +49,16 @@ def update_survey_answers_file(to_csv: bool = True, destination: str = "./src/re
 
 def convert_to_implicit_dataset(df: pd.DataFrame = None, survey_path: str = './src/rec_system/data/survey.csv',
                                 to_csv: bool = False,
-                                destination: str = "./src/rec_system/data/ratings.csv"):
+                                destination: str = "./src/rec_system/data/ratings.csv") -> pd.DataFrame:
+    """Converts results to be compatible with recommendation model.
+                Parameters:
+                    df (pd.DataFrame): dataframe with results from the poll
+                    survey_path (str): if dataframe was not provided or is None this is a path woth csv with poll responses
+                    to_csv (bool): this parameter specifies if the dataframe should be saved to a csv
+                    destination (str): specifies path for csv to be saved in
+                Returns:
+                    (pd.DataFrame) Dataframe with results modified results form poll.
+    """
     if df is None:
         df = pd.read_csv(survey_path)
     if df.empty:
