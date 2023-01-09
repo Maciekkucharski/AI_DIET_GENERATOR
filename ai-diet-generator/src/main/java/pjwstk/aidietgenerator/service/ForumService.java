@@ -8,10 +8,11 @@ import pjwstk.aidietgenerator.exception.ResourceNotFoundException;
 import pjwstk.aidietgenerator.repository.*;
 import pjwstk.aidietgenerator.request.CommentRequest;
 import pjwstk.aidietgenerator.request.PostRequest;
-import pjwstk.aidietgenerator.view.PostDetailedView;
+import pjwstk.aidietgenerator.view.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -27,6 +28,7 @@ public class ForumService {
     private final RecipeRepository recipeRepository;
     private final RecipeLikesRepository recipeLikesRepository;
     private final RecipeCommentsRepository recipeCommentsRepository;
+    private final RecipeService recipeService;
 
     @Autowired
     public ForumService(PostRepository postRepository,
@@ -36,7 +38,8 @@ public class ForumService {
                         PostLikesRepository postLikesRepository,
                         RecipeRepository recipeRepository,
                         RecipeLikesRepository recipeLikesRepository,
-                        RecipeCommentsRepository recipeCommentsRepository) {
+                        RecipeCommentsRepository recipeCommentsRepository,
+                        RecipeService recipeService) {
         this.postRepository = postRepository;
         this.userDetailsService = userDetailsService;
         this.userRepository = userRepository;
@@ -45,6 +48,29 @@ public class ForumService {
         this.recipeRepository = recipeRepository;
         this.recipeLikesRepository = recipeLikesRepository;
         this.recipeCommentsRepository = recipeCommentsRepository;
+        this.recipeService = recipeService;
+    }
+
+    public List<PostSimplifiedView> findAllSimplifiedPosts(HttpServletResponse response) {
+        List<PostSimplifiedView> postSimplifiedViewList = new ArrayList<>();
+        List<Post> allPosts = postRepository.findAll();
+        if (allPosts.isEmpty()) {
+            response.setStatus(HttpStatus.NOT_FOUND.value());
+            return null;
+        } else {
+            for (Post post : allPosts) {
+                PostSimplifiedView postSimplifiedView = new PostSimplifiedView();
+                postSimplifiedView.setAuthor(post.getUser());
+                postSimplifiedView.setId(post.getId());
+                postSimplifiedView.setTimestamp(new Timestamp(System.currentTimeMillis()));
+                postSimplifiedView.setCommentsCount(postCommentsRepository.findBypost(post).size());
+                postSimplifiedView.setLikesCount(postLikesRepository.findBypost(post).size());
+                postSimplifiedView.setTitle(post.getTitle());
+                postSimplifiedViewList.add(postSimplifiedView);
+            }
+            response.setStatus(HttpStatus.OK.value());
+            return postSimplifiedViewList;
+        }
     }
 
     public PostDetailedView viewPost(long postId, HttpServletResponse response) {
@@ -62,7 +88,9 @@ public class ForumService {
                     post.get().getTimestamp(),
                     post.get().getImagePath(),
                     post.get().getUser(),
-                    postComments, likes);
+                    "ImagePath TODO",
+                    postComments,
+                    likes);
         }
     }
 
@@ -153,7 +181,7 @@ public class ForumService {
                 .orElseThrow(() -> new ResourceNotFoundException("Post not found with id :" + postId));
         User currentUser = userDetailsService.findCurrentUser();
         if (currentUser != null) {
-            if(request.getContent() != null || request.getContent().length()<5){
+            if (request.getContent() != null || request.getContent().length() < 5) {
                 PostComment newComment = new PostComment();
                 newComment.setPost(existingPost);
                 newComment.setUser(currentUser);
@@ -180,7 +208,49 @@ public class ForumService {
         }
     }
 
-    public void likeRecipe(long recipeID, HttpServletResponse response) {
+    public List<RecipeSimplifiedView> findAllSimplifiedRecipes(HttpServletResponse response) {
+        List<RecipeSimplifiedView> recipeSimplifiedViewList = new ArrayList<>();
+        List<Recipe> allRecipes = recipeRepository.findAll();
+        if (allRecipes.isEmpty()) {
+            response.setStatus(HttpStatus.NOT_FOUND.value());
+            return null;
+        } else {
+            for (Recipe recipe : allRecipes) {
+                RecipeSimplifiedView newRecipeSimplifiedView = new RecipeSimplifiedView();
+                newRecipeSimplifiedView.setId(recipe.getId());
+                newRecipeSimplifiedView.setTitle(recipe.getTitle());
+                newRecipeSimplifiedView.setTimestamp(recipe.getTimestamp());
+                newRecipeSimplifiedView.setAuthor(recipe.getUser());
+                newRecipeSimplifiedView.setUserProfilePicture("ImagePath TODO");
+                newRecipeSimplifiedView.setCommentsCount(recipeCommentsRepository.findByrecipe(recipe).size());
+                newRecipeSimplifiedView.setLikesCount(recipeLikesRepository.findByrecipe(recipe).size());
+                recipeSimplifiedViewList.add(newRecipeSimplifiedView);
+            }
+            response.setStatus(HttpStatus.OK.value());
+            return recipeSimplifiedViewList;
+        }
+    }
+
+    public RecipeDetailedView viewRecipe(long recipeID, HttpServletResponse response) {
+        Optional<Recipe> recipe = recipeRepository.findById(recipeID);
+        if (recipe.isEmpty()) {
+            response.setStatus(HttpStatus.NOT_FOUND.value());
+            return null;
+        } else {
+            RecipeDetailedView detailedRecipe = new RecipeDetailedView();
+            RecipeView view = recipeService.view(recipeID, response);
+            detailedRecipe.setRecipeView(view);
+            detailedRecipe.setImagePath("ImagePath TODO");
+            detailedRecipe.setAuthor(recipe.get().getUser());
+            detailedRecipe.setUserProfilePicture("ImagePath TODO");
+            detailedRecipe.setRecipeLikes(recipeLikesRepository.findByrecipe(recipe.get()));
+            detailedRecipe.setRecipeComments(recipeCommentsRepository.findByrecipe(recipe.get()));
+            response.setStatus(HttpStatus.OK.value());
+            return detailedRecipe;
+        }
+    }
+
+    public void likeRecipe(HttpServletResponse response, long recipeID) {
         Recipe existingRecipe = recipeRepository.findById(recipeID)
                 .orElseThrow(() -> new ResourceNotFoundException("Post not found with id :" + recipeID));
         User currentUser = userDetailsService.findCurrentUser();
@@ -207,7 +277,7 @@ public class ForumService {
                 .orElseThrow(() -> new ResourceNotFoundException("Post not found with id :" + recipeID));
         User currentUser = userDetailsService.findCurrentUser();
         if (currentUser != null) {
-            if(request.getContent() != null || request.getContent().length()<5){
+            if (request.getContent() != null || request.getContent().length() < 5) {
                 RecipeComment newComment = new RecipeComment();
                 newComment.setRecipe(existingRecipe);
                 newComment.setUser(currentUser);
@@ -242,4 +312,5 @@ public class ForumService {
         response.setStatus(HttpStatus.NOT_FOUND.value());
         return null;
     }
+
 }

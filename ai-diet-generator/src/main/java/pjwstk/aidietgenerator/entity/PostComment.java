@@ -1,5 +1,6 @@
 package pjwstk.aidietgenerator.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.sun.istack.NotNull;
 
@@ -25,10 +26,11 @@ public class PostComment {
 
     @ManyToOne
     @JoinColumn(name = "creator_id")
-    @JsonIgnoreProperties({"firstName", "lastName", "password", "authorities", "username"})
+    @JsonIgnoreProperties({"password", "authorities", "username", "email", "authority"})
     private User user;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "post_id")
     private Post post;
 

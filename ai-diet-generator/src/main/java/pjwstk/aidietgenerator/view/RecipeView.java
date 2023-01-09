@@ -1,11 +1,13 @@
 package pjwstk.aidietgenerator.view;
 
+import lombok.NoArgsConstructor;
 import pjwstk.aidietgenerator.entity.Ingredient;
 import pjwstk.aidietgenerator.entity.User;
 
 import java.sql.Timestamp;
 import java.util.List;
 
+@NoArgsConstructor
 public class RecipeView {
 
 //    Recipe

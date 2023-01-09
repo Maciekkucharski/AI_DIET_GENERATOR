@@ -1,5 +1,6 @@
 package pjwstk.aidietgenerator.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.sun.istack.NotNull;
@@ -28,12 +29,13 @@ public class PostLike {
 
     @ManyToOne
     @NotNull
+    @JsonIgnore
     @JoinColumn(name = "post_id")
     private Post post;
 
     @ManyToOne
     @NotNull
     @JoinColumn(name = "creator_id")
-    @JsonIgnoreProperties({"firstName", "lastName", "password", "authorities", "username", "email", "enabled", "authority"})
+    @JsonIgnoreProperties({"password", "authorities", "username", "email", "authority"})
     private User user;
 }

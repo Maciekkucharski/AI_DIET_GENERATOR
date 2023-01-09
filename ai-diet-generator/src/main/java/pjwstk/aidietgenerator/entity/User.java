@@ -1,6 +1,7 @@
 package pjwstk.aidietgenerator.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.sun.istack.NotNull;
 import org.springframework.security.core.GrantedAuthority;
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Entity
+@JsonIgnoreProperties({"credentialsNonExpired", "accountNonExpired", "accountNonLocked", "enabled", "password"})
 @Table(name = "users")
 public class User implements UserDetails {
 

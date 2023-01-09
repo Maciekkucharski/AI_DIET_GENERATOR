@@ -1,5 +1,6 @@
 package pjwstk.aidietgenerator.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.sun.istack.NotNull;
 import lombok.Getter;
@@ -31,10 +32,11 @@ public class RecipeComment {
 
     @ManyToOne
     @JoinColumn(name = "creator_id")
-    @JsonIgnoreProperties({"firstName", "lastName", "password", "authorities", "username"})
+    @JsonIgnoreProperties({"password", "authorities", "username", "email", "authority"})
     private User user;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "recipe_id")
     private Recipe recipe;
 

@@ -1,5 +1,6 @@
 package pjwstk.aidietgenerator.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.sun.istack.NotNull;
 import lombok.AllArgsConstructor;
@@ -28,12 +29,14 @@ public class RecipeLike {
 
     @ManyToOne
     @NotNull
+    @JsonIgnore
     @JoinColumn(name = "recipe_id")
     private Recipe recipe;
 
     @ManyToOne
     @NotNull
     @JoinColumn(name = "creator_id")
-    @JsonIgnoreProperties({"firstName", "lastName", "password", "authorities", "username", "email", "enabled", "authority"})
+    @JsonIgnoreProperties({"password", "authorities", "username", "email", "enabled", "authority",
+            "credentialsNonExpired", "accountNonExpired", "accountNonLocked"})
     private User user;
 }

@@ -4,12 +4,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import pjwstk.aidietgenerator.entity.Post;
 import pjwstk.aidietgenerator.entity.Recipe;
-import pjwstk.aidietgenerator.repository.PostRepository;
-import pjwstk.aidietgenerator.repository.RecipeRepository;
 import pjwstk.aidietgenerator.request.CommentRequest;
 import pjwstk.aidietgenerator.request.PostRequest;
 import pjwstk.aidietgenerator.service.ForumService;
 import pjwstk.aidietgenerator.view.PostDetailedView;
+import pjwstk.aidietgenerator.view.PostSimplifiedView;
+import pjwstk.aidietgenerator.view.RecipeDetailedView;
+import pjwstk.aidietgenerator.view.RecipeSimplifiedView;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
@@ -19,22 +20,16 @@ import java.util.List;
 @RequestMapping("/forum")
 public class ForumController {
 
-    private final PostRepository postRepository;
-    private final RecipeRepository recipeRepository;
     private final ForumService forumService;
 
     @Autowired
-    public ForumController(PostRepository postRepository,
-                           ForumService forumService,
-                           RecipeRepository recipeRepository) {
-        this.postRepository = postRepository;
+    public ForumController(ForumService forumService) {
         this.forumService = forumService;
-        this.recipeRepository = recipeRepository;
     }
 
     @GetMapping("/post")
-    public List<Post> getAllPosts() {
-        return postRepository.findAll();
+    public List<PostSimplifiedView> viewAllSimplifiedPosts(HttpServletResponse response) {
+        return forumService.findAllSimplifiedPosts(response);
     }
 
     @GetMapping("/post/like/{postID}")
@@ -56,7 +51,7 @@ public class ForumController {
     }
 
     @GetMapping("/post/{postID}")
-    public PostDetailedView getPostById(@PathVariable(value = "postID") long postId, HttpServletResponse response) {
+    public PostDetailedView viewDetailedPost(@PathVariable(value = "postID") long postId, HttpServletResponse response) {
         return forumService.viewPost(postId, response);
     }
 
@@ -79,20 +74,25 @@ public class ForumController {
 
     @DeleteMapping("/post/{postID}")
     @Transactional
-    public void deletePost(HttpServletResponse response, @PathVariable(value = "postID") long postId) {
+    public void deletePost(@PathVariable(value = "postID") long postId, HttpServletResponse response) {
         forumService.deletePost(response, postId);
     }
 
     @GetMapping("/recipe")
-    public List<Recipe> getAllMeals(){
-        return recipeRepository.findAll();
+    public List<RecipeSimplifiedView> viewAllSimplifiedRecipes(HttpServletResponse response){
+        return forumService.findAllSimplifiedRecipes(response);
+    }
+
+    @GetMapping("/recipe/{recipeID}")
+    public RecipeDetailedView viewDetailedRecipe(@PathVariable(value = "recipeID") long recipeID, HttpServletResponse response) {
+        return forumService.viewRecipe(recipeID, response);
     }
 
 
     @GetMapping("/recipe/like/{recipeID}")
     @Transactional
     public void likeMeal(@PathVariable(value = "recipeID") long recipeID, HttpServletResponse response) {
-        forumService.likeRecipe(recipeID, response);
+        forumService.likeRecipe(response, recipeID);
     }
 
     @PostMapping("/recipe/comment/{recipeID}")
