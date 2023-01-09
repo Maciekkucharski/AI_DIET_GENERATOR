@@ -88,6 +88,7 @@ public class ProfileService {
             lastUserStats.setHeight(0);
             lastUserStats.setGender(null);
             lastUserStats.setBmi(0);
+            lastUserStats.setCal(0);
         }
         if(currentUser != null){
             response.setStatus(HttpStatus.OK.value());
@@ -101,8 +102,8 @@ public class ProfileService {
                     lastUserStats.getHeight(),
                     lastUserStats.getGender(),
                     lastUserStats.getBmi(),
-//                    TODO
-                    2200);
+                    lastUserStats.getCal()
+                  );
         }
         response.setStatus(HttpStatus.NOT_FOUND.value());
         return null;

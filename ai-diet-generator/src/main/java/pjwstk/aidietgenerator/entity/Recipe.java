@@ -14,10 +14,28 @@ public class Recipe {
     @Column(name = "title")
     private String title;
 
+    @Column(name = "saltiness")
+    private float saltiness;
+
+    @Column(name = "sourness")
+    private float sourness;
+
+    @Column(name = "sweetness")
+    private float sweetness;
+
+    @Column(name = "bitterness")
+    private float bitterness;
+
+    @Column(name = "spiciness")
+    private float spiciness;
+
+    @Column(name = "fattiness")
+    private float fattiness;
+
     @Column(name = "servings")
     private int servings;
 
-    @Column(name = "readyInMinutes")
+    @Column(name = "ready_in_minutes")
     private int readyInMinutes;
 
     @Column(name = "image")
@@ -32,13 +50,13 @@ public class Recipe {
     @Column(name = "vegan")
     private boolean vegan;
 
-    @Column(name = "glutenFree")
+    @Column(name = "gluten_free")
     private boolean glutenFree;
 
-    @Column(name = "dairyFree")
+    @Column(name = "dairy_free")
     private boolean dairyFree;
 
-    @Column(name = "veryHealthy")
+    @Column(name = "very_healthy")
     private boolean veryHealthy;
 
     @Column(name = "verified")
@@ -228,5 +246,53 @@ public class Recipe {
 
     public void setProtein(int protein) {
         this.protein = protein;
+    }
+
+    public float getSaltiness() {
+        return saltiness;
+    }
+
+    public void setSaltiness(float saltiness) {
+        this.saltiness = saltiness;
+    }
+
+    public float getSourness() {
+        return sourness;
+    }
+
+    public void setSourness(float sourness) {
+        this.sourness = sourness;
+    }
+
+    public float getSweetness() {
+        return sweetness;
+    }
+
+    public void setSweetness(float sweetness) {
+        this.sweetness = sweetness;
+    }
+
+    public float getBitterness() {
+        return bitterness;
+    }
+
+    public void setBitterness(float bitterness) {
+        this.bitterness = bitterness;
+    }
+
+    public float getSpiciness() {
+        return spiciness;
+    }
+
+    public void setSpiciness(float spiciness) {
+        this.spiciness = spiciness;
+    }
+
+    public float getFattiness() {
+        return fattiness;
+    }
+
+    public void setFattiness(float fattiness) {
+        this.fattiness = fattiness;
     }
 }

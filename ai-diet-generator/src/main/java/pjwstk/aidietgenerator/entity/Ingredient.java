@@ -1,5 +1,8 @@
 package pjwstk.aidietgenerator.entity;
 
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 
 @Entity
@@ -20,6 +23,7 @@ public class Ingredient {
     private String unit;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "recipe_id")
     private Recipe recipe;
 
