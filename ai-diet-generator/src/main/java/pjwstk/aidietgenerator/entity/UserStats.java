@@ -29,6 +29,9 @@ public class UserStats {
     @Column(name = "gender")
     private Gender gender;
 
+    @Column(name = "cal")
+    private int cal;
+
     @Column(name = "updated_at")
     private Timestamp timestamp;
 
@@ -40,12 +43,13 @@ public class UserStats {
     public UserStats() {
     }
 
-    public UserStats(double weight, int height, int age, double bmi, Gender gender) {
+    public UserStats(double weight, int height, int age, double bmi, int cal, Gender gender) {
         super();
         this.weight = weight;
         this.height = height;
         this.age = age;
         this.bmi = bmi;
+        this.cal = cal;
         this.gender = gender;
     }
 
@@ -113,6 +117,14 @@ public class UserStats {
 
     public Timestamp getTimestamp() {
         return timestamp;
+    }
+
+    public int getCal() {
+        return cal;
+    }
+
+    public void setCal(int cal) {
+        this.cal = cal;
     }
 
     public User getUser() {

@@ -33,7 +33,6 @@ public class RecipeController {
     @GetMapping("/{id}")
     public RecipeView findRecipeById(@PathVariable(value = "id") long recipeId, HttpServletResponse response){
         return recipeService.view(recipeId, response);
-//        return ingredientRepository.findById(recipeId).orElseThrow(() -> new ResourceNotFoundException("User not found with id :" + recipeId));
     }
 
     @PostMapping("/add")
