@@ -84,10 +84,10 @@ public class ProfileService {
         if(!currentUserStats.isEmpty()){
             lastUserStats = currentUserStats.get(currentUserStats.size() - 1);
         } else {
-            lastUserStats.setWeight(0);
+            lastUserStats.setWeight(0.0);
             lastUserStats.setHeight(0);
             lastUserStats.setGender(null);
-            lastUserStats.setBmi(0);
+            lastUserStats.setBmi(0.0);
             lastUserStats.setCal(0);
         }
         if(currentUser != null){

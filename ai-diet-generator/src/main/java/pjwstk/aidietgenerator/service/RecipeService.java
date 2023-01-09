@@ -111,12 +111,12 @@ public class RecipeService {
                     recipe.get().getReadyInMinutes(),
                     recipe.get().getImage(),
                     recipe.get().getInstructions(),
-                    recipe.get().isVegetarian(),
-                    recipe.get().isVegan(),
-                    recipe.get().isGlutenFree(),
-                    recipe.get().isDairyFree(),
-                    recipe.get().isVeryHealthy(),
-                    recipe.get().isVerified(),
+                    recipe.get().getVegetarian(),
+                    recipe.get().getVegan(),
+                    recipe.get().getGlutenFree(),
+                    recipe.get().getDairyFree(),
+                    recipe.get().getVeryHealthy(),
+                    recipe.get().getVerified(),
                     recipe.get().getTimestamp(),
                     recipe.get().getUser(),
                     recipe.get().getCalories(),
@@ -162,9 +162,7 @@ public class RecipeService {
             List<Ingredient> newIngredients = editedRecipe.getIngredients();
             List<Ingredient> oldIngredients = ingredientRepository.findByrecipe(existingRecipe);
 
-            for(Ingredient oldIngredient : oldIngredients){
-                ingredientRepository.delete(oldIngredient);
-            }
+            ingredientRepository.deleteAll(oldIngredients);
 
             for(Ingredient newIngredient: newIngredients){
                 newIngredient.setRecipe(existingRecipe);

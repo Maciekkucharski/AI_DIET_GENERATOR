@@ -1,6 +1,9 @@
 package pjwstk.aidietgenerator.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.Entity;
 import javax.persistence.*;
@@ -8,6 +11,9 @@ import java.sql.Timestamp;
 
 @Entity
 @Table(name="user_stats")
+@NoArgsConstructor
+@Setter
+@Getter
 public class UserStats {
 
     @Id
@@ -40,9 +46,6 @@ public class UserStats {
     @JsonIgnoreProperties({"firstName", "lastName", "password", "authorities", "username"})
     private User user;
 
-    public UserStats() {
-    }
-
     public UserStats(double weight, int height, int age, double bmi, int cal, Gender gender) {
         super();
         this.weight = weight;
@@ -61,77 +64,7 @@ public class UserStats {
         this.gender = gender;
     }
 
-
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public double getWeight() {
-        return weight;
-    }
-
-    public void setWeight(double weight) {
-        this.weight = weight;
-    }
-
-    public int getHeight() {
-        return height;
-    }
-
-    public void setHeight(int height) {
-        this.height = height;
-    }
-
-    public int getAge() {
-        return age;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
-    }
-
-    public double getBmi() {
-        return bmi;
-    }
-
-    public void setBmi(double bmi) {
-        this.bmi = bmi;
-    }
-
-    public Gender getGender() {
-        return gender;
-    }
-
-    public void setGender(Gender gender) {
-        this.gender = gender;
-    }
-
     public void setUpdatedAt() {
         this.timestamp = new Timestamp(System.currentTimeMillis());
-    }
-
-    public Timestamp getTimestamp() {
-        return timestamp;
-    }
-
-    public int getCal() {
-        return cal;
-    }
-
-    public void setCal(int cal) {
-        this.cal = cal;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
     }
 }

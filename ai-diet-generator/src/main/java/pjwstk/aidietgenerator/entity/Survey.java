@@ -3,6 +3,7 @@ package pjwstk.aidietgenerator.entity;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.sun.istack.NotNull;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
@@ -13,6 +14,7 @@ import java.util.List;
 @Table(name = "surveys")
 @Setter
 @Getter
+@NoArgsConstructor
 public class Survey {
     @Id
     @NotNull
@@ -84,24 +86,4 @@ public class Survey {
     @JsonIgnoreProperties({"firstName", "lastName", "password", "authorities", "username"})
     private User user;
 
-    public Survey(String exclusions, Integer answer1, Integer answer2, Integer answer3, Integer answer4, Integer answer5, Integer answer6, Integer answer7, Integer answer8, Integer answer9, Integer answer10, Integer answer11, Integer answer12, Integer answer13) {
-        super();
-        this.exclusions = exclusions;
-        this.answer1 = answer1;
-        this.answer2 = answer2;
-        this.answer3 = answer3;
-        this.answer4 = answer4;
-        this.answer5 = answer5;
-        this.answer6 = answer6;
-        this.answer7 = answer7;
-        this.answer8 = answer8;
-        this.answer9 = answer9;
-        this.answer10 = answer10;
-        this.answer11 = answer11;
-        this.answer12 = answer12;
-        this.answer13 = answer13;
-    }
-
-    public Survey() {
-    }
 }

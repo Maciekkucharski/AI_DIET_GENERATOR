@@ -42,5 +42,4 @@ public class RecipeComment {
     @JoinColumn(name = "recipe_id")
     private Recipe recipe;
 
-
 }
