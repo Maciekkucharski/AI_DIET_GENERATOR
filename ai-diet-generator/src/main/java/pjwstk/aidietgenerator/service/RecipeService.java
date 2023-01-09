@@ -10,7 +10,6 @@ import pjwstk.aidietgenerator.repository.RecipeRepository;
 import pjwstk.aidietgenerator.repository.UserRepository;
 import pjwstk.aidietgenerator.request.RecipeRequest;
 import pjwstk.aidietgenerator.view.RecipeView;
-
 import javax.persistence.NoResultException;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
@@ -53,6 +52,7 @@ public class RecipeService {
                 newRecipe.setInstructions(recipeRequest.getInstructions());
                 newRecipe.setVegetarian(recipeRequest.isVegetarian());
                 newRecipe.setVegan(recipeRequest.isVegan());
+                newRecipe.setVerified(false);
                 newRecipe.setGlutenFree(recipeRequest.isGlutenFree());
                 newRecipe.setGlutenFree(recipeRequest.isGlutenFree());
                 newRecipe.setDairyFree(recipeRequest.isDairyFree());
