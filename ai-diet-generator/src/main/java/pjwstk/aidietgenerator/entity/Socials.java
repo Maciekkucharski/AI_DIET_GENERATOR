@@ -1,12 +1,10 @@
 package pjwstk.aidietgenerator.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.sun.istack.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 import javax.persistence.*;
 
 @Entity
@@ -37,6 +35,16 @@ public class Socials {
 
     @Column(name = "discord")
     private String discord;
+
+    public Socials(String facebook, String twitter, String instagram, String telegram, String youtube, String discord, User user) {
+        this.facebook = facebook;
+        this.twitter = twitter;
+        this.instagram = instagram;
+        this.telegram = telegram;
+        this.youtube = youtube;
+        this.discord = discord;
+        this.user = user;
+    }
 
     @ManyToOne
     @NotNull

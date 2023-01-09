@@ -2,7 +2,6 @@ package pjwstk.aidietgenerator.entity;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -11,7 +10,6 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "ingredients")
-@AllArgsConstructor
 @NoArgsConstructor
 @Setter
 @Getter
@@ -34,4 +32,11 @@ public class Ingredient {
     @JsonIgnore
     @JoinColumn(name = "recipe_id")
     private Recipe recipe;
+
+    public Ingredient(String name, Double amount, String unit, Recipe recipe) {
+        this.name = name;
+        this.amount = amount;
+        this.unit = unit;
+        this.recipe = recipe;
+    }
 }

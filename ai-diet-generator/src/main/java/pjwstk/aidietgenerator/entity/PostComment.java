@@ -3,7 +3,6 @@ package pjwstk.aidietgenerator.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.sun.istack.NotNull;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,7 +13,6 @@ import java.sql.Timestamp;
 @Entity
 @Setter
 @Getter
-@AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "post_comments")
 public class PostComment {

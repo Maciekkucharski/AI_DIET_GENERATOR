@@ -221,7 +221,7 @@ public class ForumService {
 
     public List<RecipeSimplifiedView> findAllSimplifiedRecipes(HttpServletResponse response) {
         List<RecipeSimplifiedView> recipeSimplifiedViewList = new ArrayList<>();
-        List<Recipe> allRecipes = recipeRepository.findAll();
+        List<Recipe> allRecipes = recipeRepository.findByUserNotNull();
         if (allRecipes.isEmpty()) {
             response.setStatus(HttpStatus.NOT_FOUND.value());
             return null;

@@ -1,10 +1,8 @@
 package pjwstk.aidietgenerator.entity;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 import javax.persistence.*;
 import java.sql.Timestamp;
 
@@ -13,8 +11,6 @@ import java.sql.Timestamp;
 @Setter
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
-
 public class Recipe {
 
     @Id
@@ -90,6 +86,32 @@ public class Recipe {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
+
+    public Recipe(String title, Float saltiness, Float sourness, Float sweetness, Float bitterness, Float spiciness, Float fattiness, Integer servings, Integer readyInMinutes, String image, String instructions, Boolean vegetarian, Boolean vegan, Boolean glutenFree, Boolean dairyFree, Boolean veryHealthy, Boolean verified, Timestamp timestamp, Integer calories, Integer carbs, Integer fat, Integer protein, User user) {
+        this.title = title;
+        this.saltiness = saltiness;
+        this.sourness = sourness;
+        this.sweetness = sweetness;
+        this.bitterness = bitterness;
+        this.spiciness = spiciness;
+        this.fattiness = fattiness;
+        this.servings = servings;
+        this.readyInMinutes = readyInMinutes;
+        this.image = image;
+        this.instructions = instructions;
+        this.vegetarian = vegetarian;
+        this.vegan = vegan;
+        this.glutenFree = glutenFree;
+        this.dairyFree = dairyFree;
+        this.veryHealthy = veryHealthy;
+        this.verified = verified;
+        this.timestamp = timestamp;
+        this.calories = calories;
+        this.carbs = carbs;
+        this.fat = fat;
+        this.protein = protein;
+        this.user = user;
+    }
 
     public void setCreatedAt(){
         this.timestamp = new Timestamp(System.currentTimeMillis());
