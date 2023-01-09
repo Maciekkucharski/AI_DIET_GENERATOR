@@ -35,8 +35,6 @@ public class RecipeComment {
     @JsonIgnoreProperties({"password", "authorities", "username", "email", "authority"})
     private User user;
 
-    private String userImagePath;
-
     @ManyToOne
     @JsonIgnore
     @JoinColumn(name = "recipe_id")
