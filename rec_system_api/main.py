@@ -34,7 +34,7 @@ async def generate(body_dict: dict = Body(..., example={
         query = """
         SELECT
             u.email AS 'Adres e-mail',
-            re.recipe_name AS pytanie,
+            re.title AS pytanie,
             ra.score AS ocena
         FROM ratings ra
         INNER JOIN users u
@@ -60,7 +60,7 @@ async def generate(body_dict: dict = Body(..., example={
         query = """
         SELECT
             re.id,
-            re.recipe_name as title,
+            re.title as title,
             re.saltiness,
             re.sourness,
             re.sweetness,
@@ -116,7 +116,7 @@ async def replace(body_dict: dict = Body(..., example={
         query = """
         SELECT
             u.email AS 'Adres e-mail',
-            re.recipe_name AS pytanie,
+            re.title AS pytanie,
             ra.score AS ocena
         FROM ratings ra
         INNER JOIN users u
