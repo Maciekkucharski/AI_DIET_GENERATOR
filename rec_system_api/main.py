@@ -128,7 +128,7 @@ async def replace(body_dict: dict = Body(..., example={
         query = """
                 SELECT
                     re.id,
-                    re.recipe_name as title,
+                    re.title,
                     re.saltiness,
                     re.sourness,
                     re.sweetness,
