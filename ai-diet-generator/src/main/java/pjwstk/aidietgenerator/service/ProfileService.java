@@ -80,7 +80,15 @@ public class ProfileService {
     public ProfileInfoView getLoggedUserProfileInfo(HttpServletResponse response){
         User currentUser = userDetailsService.findCurrentUser();
         List<UserStats> currentUserStats = userStatsRepository.findByuser(currentUser);
-        UserStats lastUserStats = currentUserStats.get(currentUserStats.size() - 1);
+        UserStats lastUserStats = new UserStats();
+        if(!currentUserStats.isEmpty()){
+            lastUserStats = currentUserStats.get(currentUserStats.size() - 1);
+        } else {
+            lastUserStats.setWeight(0);
+            lastUserStats.setHeight(0);
+            lastUserStats.setGender(null);
+            lastUserStats.setBmi(0);
+        }
         if(currentUser != null){
             response.setStatus(HttpStatus.OK.value());
             return new ProfileInfoView(currentUser.getId(),

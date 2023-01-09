@@ -2,7 +2,9 @@ package pjwstk.aidietgenerator.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import pjwstk.aidietgenerator.entity.Ingredient;
 import pjwstk.aidietgenerator.entity.Recipe;
+import pjwstk.aidietgenerator.exception.ResourceNotFoundException;
 import pjwstk.aidietgenerator.repository.IngredientRepository;
 import pjwstk.aidietgenerator.repository.RecipeRepository;
 import pjwstk.aidietgenerator.request.RecipeRequest;
@@ -29,8 +31,9 @@ public class RecipeController {
     }
 
     @GetMapping("/{id}")
-    public RecipeView findRecipeById(@PathVariable(value = "id") long recipeId,  HttpServletResponse response){
+    public RecipeView findRecipeById(@PathVariable(value = "id") long recipeId, HttpServletResponse response){
         return recipeService.view(recipeId, response);
+//        return ingredientRepository.findById(recipeId).orElseThrow(() -> new ResourceNotFoundException("User not found with id :" + recipeId));
     }
 
     @PostMapping("/add")
