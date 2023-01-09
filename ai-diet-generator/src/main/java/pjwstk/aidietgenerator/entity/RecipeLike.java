@@ -1,8 +1,8 @@
 package pjwstk.aidietgenerator.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonView;
 import com.sun.istack.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,11 +12,11 @@ import java.sql.Timestamp;
 
 @Entity
 @NoArgsConstructor
-@Getter
+@AllArgsConstructor
 @Setter
-@Table(name = "post_likes")
-public class PostLike {
-
+@Getter
+@Table(name = "recipe_likes")
+public class RecipeLike {
     @Id
     @NotNull
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,8 +28,8 @@ public class PostLike {
 
     @ManyToOne
     @NotNull
-    @JoinColumn(name = "post_id")
-    private Post post;
+    @JoinColumn(name = "recipe_id")
+    private Recipe recipe;
 
     @ManyToOne
     @NotNull
