@@ -8,6 +8,7 @@ public class ProfileInfoView {
     private String firstName;
     private String lastName;
     private String email;
+    private int age;
     private double weight;
     private int height;
     private Gender gender;
@@ -19,6 +20,7 @@ public class ProfileInfoView {
                            String firstName,
                            String lastName,
                            String email,
+                           int age,
                            double weight,
                            int height,
                            Gender gender,
@@ -29,6 +31,7 @@ public class ProfileInfoView {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
+        this.age = age;
         this.weight = weight;
         this.height = height;
         this.gender = gender;
@@ -74,6 +77,14 @@ public class ProfileInfoView {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
     }
 
     public double getWeight() {

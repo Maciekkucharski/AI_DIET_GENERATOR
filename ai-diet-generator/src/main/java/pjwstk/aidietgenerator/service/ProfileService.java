@@ -84,6 +84,7 @@ public class ProfileService {
         if(!currentUserStats.isEmpty()){
             lastUserStats = currentUserStats.get(currentUserStats.size() - 1);
         } else {
+            lastUserStats.setAge(0);
             lastUserStats.setWeight(0.0);
             lastUserStats.setHeight(0);
             lastUserStats.setGender(null);
@@ -98,6 +99,7 @@ public class ProfileService {
                     currentUser.getFirstName(),
                     currentUser.getLastName(),
                     currentUser.getEmail(),
+                    lastUserStats.getAge(),
                     lastUserStats.getWeight(),
                     lastUserStats.getHeight(),
                     lastUserStats.getGender(),
