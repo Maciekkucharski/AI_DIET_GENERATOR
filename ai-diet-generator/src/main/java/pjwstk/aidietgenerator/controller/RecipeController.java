@@ -46,4 +46,9 @@ public class RecipeController {
         return recipeRepository.findAll();
     }
 
+    @GetMapping("/verify/{recipeID}")
+    public void verifyRecipe(@PathVariable(value = "recipeID") long recipeId, HttpServletResponse response){
+        recipeService.verifyRecipe(recipeId, response);
+    }
+
 }
