@@ -9,34 +9,34 @@ public class Recipe {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @Column(name = "title")
     private String title;
 
     @Column(name = "saltiness")
-    private float saltiness;
+    private Float saltiness;
 
     @Column(name = "sourness")
-    private float sourness;
+    private Float sourness;
 
     @Column(name = "sweetness")
-    private float sweetness;
+    private Float sweetness;
 
     @Column(name = "bitterness")
-    private float bitterness;
+    private Float bitterness;
 
     @Column(name = "spiciness")
-    private float spiciness;
+    private Float spiciness;
 
     @Column(name = "fattiness")
-    private float fattiness;
+    private Float fattiness;
 
     @Column(name = "servings")
-    private int servings;
+    private Integer servings;
 
     @Column(name = "ready_in_minutes")
-    private int readyInMinutes;
+    private Integer readyInMinutes;
 
     @Column(name = "image")
     private String image;
@@ -45,37 +45,37 @@ public class Recipe {
     private String instructions;
 
     @Column(name = "vegetarian")
-    private boolean vegetarian;
+    private Boolean vegetarian;
 
     @Column(name = "vegan")
-    private boolean vegan;
+    private Boolean vegan;
 
     @Column(name = "gluten_free")
-    private boolean glutenFree;
+    private Boolean glutenFree;
 
     @Column(name = "dairy_free")
-    private boolean dairyFree;
+    private Boolean dairyFree;
 
     @Column(name = "very_healthy")
-    private boolean veryHealthy;
+    private Boolean veryHealthy;
 
     @Column(name = "verified")
-    private boolean verified;
+    private Boolean verified;
 
     @Column(name = "created_at")
     private Timestamp timestamp;
 
     @Column(name = "calories")
-    private int calories;
+    private Integer calories;
 
     @Column(name = "carbs")
-    private int carbs;
+    private Integer carbs;
 
     @Column(name = "fat")
-    private int fat;
+    private Integer fat;
 
     @Column(name = "protein")
-    private int protein;
+    private Integer protein;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -104,11 +104,11 @@ public class Recipe {
         this.protein = protein;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -120,19 +120,67 @@ public class Recipe {
         this.title = title;
     }
 
-    public int getServings() {
+    public Float getSaltiness() {
+        return saltiness;
+    }
+
+    public void setSaltiness(Float saltiness) {
+        this.saltiness = saltiness;
+    }
+
+    public Float getSourness() {
+        return sourness;
+    }
+
+    public void setSourness(Float sourness) {
+        this.sourness = sourness;
+    }
+
+    public Float getSweetness() {
+        return sweetness;
+    }
+
+    public void setSweetness(Float sweetness) {
+        this.sweetness = sweetness;
+    }
+
+    public Float getBitterness() {
+        return bitterness;
+    }
+
+    public void setBitterness(Float bitterness) {
+        this.bitterness = bitterness;
+    }
+
+    public Float getSpiciness() {
+        return spiciness;
+    }
+
+    public void setSpiciness(Float spiciness) {
+        this.spiciness = spiciness;
+    }
+
+    public Float getFattiness() {
+        return fattiness;
+    }
+
+    public void setFattiness(Float fattiness) {
+        this.fattiness = fattiness;
+    }
+
+    public Integer getServings() {
         return servings;
     }
 
-    public void setServings(int servings) {
+    public void setServings(Integer servings) {
         this.servings = servings;
     }
 
-    public int getReadyInMinutes() {
+    public Integer getReadyInMinutes() {
         return readyInMinutes;
     }
 
-    public void setReadyInMinutes(int readyInMinutes) {
+    public void setReadyInMinutes(Integer readyInMinutes) {
         this.readyInMinutes = readyInMinutes;
     }
 
@@ -152,52 +200,88 @@ public class Recipe {
         this.instructions = instructions;
     }
 
-    public boolean isVegetarian() {
+    public Boolean getVegetarian() {
         return vegetarian;
     }
 
-    public void setVegetarian(boolean vegetarian) {
+    public void setVegetarian(Boolean vegetarian) {
         this.vegetarian = vegetarian;
     }
 
-    public boolean isVegan() {
+    public Boolean getVegan() {
         return vegan;
     }
 
-    public void setVegan(boolean vegan) {
+    public void setVegan(Boolean vegan) {
         this.vegan = vegan;
     }
 
-    public boolean isGlutenFree() {
+    public Boolean getGlutenFree() {
         return glutenFree;
     }
 
-    public void setGlutenFree(boolean glutenFree) {
+    public void setGlutenFree(Boolean glutenFree) {
         this.glutenFree = glutenFree;
     }
 
-    public boolean isDairyFree() {
+    public Boolean getDairyFree() {
         return dairyFree;
     }
 
-    public void setDairyFree(boolean dairyFree) {
+    public void setDairyFree(Boolean dairyFree) {
         this.dairyFree = dairyFree;
     }
 
-    public boolean isVeryHealthy() {
+    public Boolean getVeryHealthy() {
         return veryHealthy;
     }
 
-    public void setVeryHealthy(boolean veryHealthy) {
+    public void setVeryHealthy(Boolean veryHealthy) {
         this.veryHealthy = veryHealthy;
     }
 
-    public boolean isVerified() {
+    public Boolean getVerified() {
         return verified;
     }
 
-    public void setVerified(boolean verified) {
+    public void setVerified(Boolean verified) {
         this.verified = verified;
+    }
+
+    public void setTimestamp(Timestamp timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    public Integer getCalories() {
+        return calories;
+    }
+
+    public void setCalories(Integer calories) {
+        this.calories = calories;
+    }
+
+    public Integer getCarbs() {
+        return carbs;
+    }
+
+    public void setCarbs(Integer carbs) {
+        this.carbs = carbs;
+    }
+
+    public Integer getFat() {
+        return fat;
+    }
+
+    public void setFat(Integer fat) {
+        this.fat = fat;
+    }
+
+    public Integer getProtein() {
+        return protein;
+    }
+
+    public void setProtein(Integer protein) {
+        this.protein = protein;
     }
 
     public User getUser() {
@@ -216,83 +300,4 @@ public class Recipe {
         this.timestamp = new Timestamp(System.currentTimeMillis());
     }
 
-    public int getCalories() {
-        return calories;
-    }
-
-    public void setCalories(int calories) {
-        this.calories = calories;
-    }
-
-    public int getCarbs() {
-        return carbs;
-    }
-
-    public void setCarbs(int carbs) {
-        this.carbs = carbs;
-    }
-
-    public int getFat() {
-        return fat;
-    }
-
-    public void setFat(int fat) {
-        this.fat = fat;
-    }
-
-    public int getProtein() {
-        return protein;
-    }
-
-    public void setProtein(int protein) {
-        this.protein = protein;
-    }
-
-    public float getSaltiness() {
-        return saltiness;
-    }
-
-    public void setSaltiness(float saltiness) {
-        this.saltiness = saltiness;
-    }
-
-    public float getSourness() {
-        return sourness;
-    }
-
-    public void setSourness(float sourness) {
-        this.sourness = sourness;
-    }
-
-    public float getSweetness() {
-        return sweetness;
-    }
-
-    public void setSweetness(float sweetness) {
-        this.sweetness = sweetness;
-    }
-
-    public float getBitterness() {
-        return bitterness;
-    }
-
-    public void setBitterness(float bitterness) {
-        this.bitterness = bitterness;
-    }
-
-    public float getSpiciness() {
-        return spiciness;
-    }
-
-    public void setSpiciness(float spiciness) {
-        this.spiciness = spiciness;
-    }
-
-    public float getFattiness() {
-        return fattiness;
-    }
-
-    public void setFattiness(float fattiness) {
-        this.fattiness = fattiness;
-    }
 }
