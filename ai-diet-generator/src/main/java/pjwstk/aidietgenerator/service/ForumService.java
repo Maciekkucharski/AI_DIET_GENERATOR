@@ -222,12 +222,12 @@ public class ForumService {
     public List<RecipeSimplifiedView> findSimplifiedRecipes(HttpServletResponse response, String option) {
         List<RecipeSimplifiedView> recipeSimplifiedViewList = new ArrayList<>();
         List<Recipe> allRecipes = new ArrayList<>();
-        if(option == "all") {
-            recipeRepository.findByUserNotNull();
-        } else if(option == "verified"){
-            recipeRepository.findByVerifiedTrueAndUserNotNull();
-        } else if(option == "notVerified"){
-            recipeRepository.findByVerifiedFalseAndUserNotNull();
+        if(Objects.equals(option, "all")) {
+            allRecipes = recipeRepository.findByUserNotNull();
+        } else if(Objects.equals(option, "verified")){
+            allRecipes = recipeRepository.findByVerifiedTrueAndUserNotNull();
+        } else if(Objects.equals(option, "notVerified")){
+            allRecipes = recipeRepository.findByVerifiedFalseAndUserNotNull();
         }
         if (allRecipes.isEmpty()) {
             response.setStatus(HttpStatus.NOT_FOUND.value());
