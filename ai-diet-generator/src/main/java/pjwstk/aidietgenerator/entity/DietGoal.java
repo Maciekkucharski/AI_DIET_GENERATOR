@@ -1,5 +1,5 @@
 package pjwstk.aidietgenerator.entity;
 
-public enum Diet {
+public enum DietGoal {
     LOOSE, MAINTAIN, GAIN, MUSCLE
 }
