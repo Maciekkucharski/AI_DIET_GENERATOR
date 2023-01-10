@@ -10,6 +10,7 @@ import pjwstk.aidietgenerator.repository.RecipeRepository;
 import pjwstk.aidietgenerator.repository.UserRepository;
 import pjwstk.aidietgenerator.request.RecipeRequest;
 import pjwstk.aidietgenerator.view.RecipeView;
+
 import javax.persistence.NoResultException;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
@@ -28,7 +29,7 @@ public class RecipeService {
     public RecipeService(RecipeRepository recipeRepository,
                          IngredientRepository ingredientRepository,
                          UserDetailsService userDetailsService,
-                         UserRepository userRepository){
+                         UserRepository userRepository) {
         this.recipeRepository = recipeRepository;
         this.ingredientRepository = ingredientRepository;
         this.userDetailsService = userDetailsService;
@@ -38,10 +39,10 @@ public class RecipeService {
 
     public void addRecipe(RecipeRequest recipeRequest, HttpServletResponse response) {
         User currentUser = userDetailsService.findCurrentUser();
-        if(currentUser == null){
+        if (currentUser == null) {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
         } else {
-            if(recipeRequest.getTitle() == null || recipeRequest.getInstructions() == null || recipeRequest.getIngredients().isEmpty()) {
+            if (recipeRequest.getTitle() == null || recipeRequest.getInstructions() == null || recipeRequest.getIngredients().isEmpty()) {
                 response.setStatus(HttpStatus.BAD_REQUEST.value());
             } else {
                 Recipe newRecipe = new Recipe();
@@ -64,13 +65,13 @@ public class RecipeService {
                 newRecipe.setUser(currentUser);
                 newRecipe.setCreatedAt();
 
-                if(currentUser.getAuthorities().contains("ROLE_DIETITIAN")){
+                if (currentUser.getAuthorities().contains("ROLE_DIETITIAN")) {
                     newRecipe.setVerified(true);
                 }
                 recipeRepository.save(newRecipe);
                 List<Ingredient> newRecipeIngredients = recipeRequest.getIngredients();
 
-                for(Ingredient ingredient : newRecipeIngredients) {
+                for (Ingredient ingredient : newRecipeIngredients) {
                     Ingredient newIngredient = new Ingredient();
                     newIngredient.setName(ingredient.getName());
                     newIngredient.setAmount(ingredient.getAmount());
@@ -164,7 +165,7 @@ public class RecipeService {
 
             ingredientRepository.deleteAll(oldIngredients);
 
-            for(Ingredient newIngredient: newIngredients){
+            for (Ingredient newIngredient : newIngredients) {
                 newIngredient.setRecipe(existingRecipe);
                 ingredientRepository.save(newIngredient);
             }
@@ -175,7 +176,7 @@ public class RecipeService {
 
     public Recipe verifyRecipe(Long recipeId, HttpServletResponse response) {
         User currentUser = userDetailsService.findCurrentUser();
-        if(currentUser == null || !currentUser.getAuthorities().contains("ROLE_DIETICIAN") || !currentUser.getAuthorities().contains("ROLE_ADMIN")) {
+        if (currentUser == null || !currentUser.getAuthorities().contains("ROLE_DIETICIAN") || !currentUser.getAuthorities().contains("ROLE_ADMIN")) {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
         } else {
             Recipe existingRecipe = recipeRepository.findById(recipeId)
@@ -197,7 +198,7 @@ public class RecipeService {
         } else {
             if (currentUser != null && (currentUser.getId() == existingRecipe.getUser().getId() || currentUser.getAuthorities().contains("ROLE_ADMIN"))) {
                 List<Ingredient> existingRecipesIngredients = ingredientRepository.findByrecipe(existingRecipe);
-                for(Ingredient ingredient : existingRecipesIngredients){
+                for (Ingredient ingredient : existingRecipesIngredients) {
                     ingredientRepository.delete(ingredient);
                 }
                 recipeRepository.delete(existingRecipe);

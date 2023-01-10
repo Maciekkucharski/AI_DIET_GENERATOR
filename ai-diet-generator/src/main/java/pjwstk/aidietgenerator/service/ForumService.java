@@ -219,9 +219,16 @@ public class ForumService {
         }
     }
 
-    public List<RecipeSimplifiedView> findAllSimplifiedRecipes(HttpServletResponse response) {
+    public List<RecipeSimplifiedView> findSimplifiedRecipes(HttpServletResponse response, String option) {
         List<RecipeSimplifiedView> recipeSimplifiedViewList = new ArrayList<>();
-        List<Recipe> allRecipes = recipeRepository.findByUserNotNull();
+        List<Recipe> allRecipes = new ArrayList<>();
+        if(option == "all") {
+            recipeRepository.findByUserNotNull();
+        } else if(option == "verified"){
+            recipeRepository.findByVerifiedTrueAndUserNotNull();
+        } else if(option == "notVerified"){
+            recipeRepository.findByVerifiedFalseAndUserNotNull();
+        }
         if (allRecipes.isEmpty()) {
             response.setStatus(HttpStatus.NOT_FOUND.value());
             return null;

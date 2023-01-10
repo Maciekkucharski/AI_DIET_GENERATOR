@@ -11,4 +11,6 @@ import java.util.List;
 public interface RecipeRepository extends JpaRepository<Recipe, Long> {
     List<Recipe> findByuser(User user);
     List<Recipe> findByUserNotNull();
+    List<Recipe> findByVerifiedTrueAndUserNotNull();
+    List<Recipe> findByVerifiedFalseAndUserNotNull();
 }
