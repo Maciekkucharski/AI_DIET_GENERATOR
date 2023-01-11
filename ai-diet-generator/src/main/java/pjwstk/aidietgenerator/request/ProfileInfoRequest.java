@@ -9,7 +9,7 @@ public class ProfileInfoRequest {
     private String email;
     private double weight;
     private int height;
-    private Gender gender;
+    private String genderName;
 
     public ProfileInfoRequest(){
 
@@ -21,7 +21,7 @@ public class ProfileInfoRequest {
                               String email,
                               double weight,
                               int height,
-                              Gender gender) {
+                              String genderName) {
 
         this.profilePicturePath = profilePicturePath;
         this.firstName = firstName;
@@ -29,7 +29,7 @@ public class ProfileInfoRequest {
         this.email = email;
         this.weight = weight;
         this.height = height;
-        this.gender = gender;
+        this.genderName = genderName;
     }
 
     public String getProfilePicturePath() {
@@ -56,7 +56,7 @@ public class ProfileInfoRequest {
         return height;
     }
 
-    public Gender getGender() {
-        return gender;
+    public String getGender() {
+        return genderName;
     }
 }

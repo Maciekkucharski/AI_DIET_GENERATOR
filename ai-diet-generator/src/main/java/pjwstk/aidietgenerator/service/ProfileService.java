@@ -2,6 +2,7 @@ package pjwstk.aidietgenerator.service;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import pjwstk.aidietgenerator.entity.Gender;
 import pjwstk.aidietgenerator.view.MyProfile;
 import pjwstk.aidietgenerator.entity.User;
 import pjwstk.aidietgenerator.view.UserProfile;
@@ -102,7 +103,7 @@ public class ProfileService {
                     lastUserStats.getAge(),
                     lastUserStats.getWeight(),
                     lastUserStats.getHeight(),
-                    lastUserStats.getGender(),
+                    lastUserStats.getGender().name,
                     lastUserStats.getBmi(),
                     lastUserStats.getCal()
                   );
@@ -124,7 +125,7 @@ public class ProfileService {
 
             updatedUserStats.setWeight(profileInfoRequest.getWeight());
             updatedUserStats.setHeight(profileInfoRequest.getHeight());
-            updatedUserStats.setGender(profileInfoRequest.getGender());
+            updatedUserStats.setGender(profileInfoRequest.getGender() == "male" ? Gender.MALE : Gender.FEMALE);
             updatedUserStats.setBmi(userStatsService.calculateBmi(profileInfoRequest.getWeight(), profileInfoRequest.getHeight()));
             updatedUserStats.setUpdatedAt();
             updatedUserStats.setUser(currentUser);

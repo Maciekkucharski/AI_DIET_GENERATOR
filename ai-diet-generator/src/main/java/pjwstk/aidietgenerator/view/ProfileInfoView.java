@@ -11,7 +11,7 @@ public class ProfileInfoView {
     private int age;
     private double weight;
     private int height;
-    private Gender gender;
+    private String gender;
     private double BMI;
     private int kCal;
 
@@ -23,7 +23,7 @@ public class ProfileInfoView {
                            int age,
                            double weight,
                            int height,
-                           Gender gender,
+                           String gender,
                            double BMI,
                            int kCal) {
         this.id = id;
@@ -103,11 +103,11 @@ public class ProfileInfoView {
         this.height = height;
     }
 
-    public Gender getGender() {
+    public String getGender() {
         return gender;
     }
 
-    public void setGender(Gender gender) {
+    public void setGender(String gender) {
         this.gender = gender;
     }
 
