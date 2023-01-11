@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import pjwstk.aidietgenerator.entity.Gender;
 import pjwstk.aidietgenerator.entity.User;
 import pjwstk.aidietgenerator.entity.UserStats;
 import pjwstk.aidietgenerator.exception.ResourceNotFoundException;
@@ -57,7 +58,7 @@ public class UserStatsController {
                 newUserStats.setAge(userStats.getAge());
             }
             if(userStats.getGender() != null){
-                newUserStats.setGender(userStats.getGender());
+                newUserStats.setGender(userStats.getGender() == "male" ? Gender.MALE : Gender.FEMALE);
             }
             userStatsService.saveUserStats(newUserStats);
             response.setStatus(HttpStatus.CREATED.value());

@@ -15,5 +15,5 @@ public class UserStatsRequest {
     private double weight;
     private int height;
     private int age;
-    private Gender gender;
+    private String gender;
 }

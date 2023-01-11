@@ -1,7 +1,7 @@
 package pjwstk.aidietgenerator.service;
 
 import org.springframework.stereotype.Service;
-import pjwstk.aidietgenerator.entity.Diet;
+import pjwstk.aidietgenerator.entity.DietGoal;
 import pjwstk.aidietgenerator.entity.Gender;
 import pjwstk.aidietgenerator.entity.PhysicalActivity;
 import pjwstk.aidietgenerator.service.Utils.ApiConstants;
@@ -11,9 +11,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.List;
 
 import static pjwstk.aidietgenerator.entity.Gender.FEMALE;
 import static pjwstk.aidietgenerator.entity.Gender.MALE;
@@ -31,11 +29,11 @@ public class DietService {
 
     }
 
-    public double goalCalories(double bodyWeight, int bodyHeight, int age, Gender gender, PhysicalActivity physicalActivity, Diet diet){
+    public double goalCalories(double bodyWeight, int bodyHeight, int age, Gender gender, PhysicalActivity physicalActivity, DietGoal dietGoal){
         double bmr = dailyBMR(bodyWeight, bodyHeight, age, gender, physicalActivity);
         double kcalIntake = bmr;
 
-        switch(diet){
+        switch(dietGoal){
             case LOOSE:
                 kcalIntake = bmr - 500;
                 if(kcalIntake <= 1200 && gender == FEMALE){
@@ -91,7 +89,7 @@ public class DietService {
         }
     }
 
-    public String[] replaceRecommendedMeal(Long RecipeId) throws IOException {
+    public String[] getRecommendedReplacementIds(Long RecipeId) throws IOException {
         URL url = new URL (ApiConstants.REPLACER);
         HttpURLConnection con = (HttpURLConnection)url.openConnection();
         con.setRequestMethod("POST");
@@ -120,4 +118,6 @@ public class DietService {
             return recommendedReplaceIds;
         }
     }
+
+//    TODO
 }
