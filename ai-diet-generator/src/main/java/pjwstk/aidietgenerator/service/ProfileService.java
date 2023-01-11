@@ -123,6 +123,7 @@ public class ProfileService {
             currentUser.setLastName(profileInfoRequest.getLastName());
             currentUser.setEmail(profileInfoRequest.getEmail());
 
+            updatedUserStats.setAge(profileInfoRequest.getAge());
             updatedUserStats.setWeight(profileInfoRequest.getWeight());
             updatedUserStats.setHeight(profileInfoRequest.getHeight());
             updatedUserStats.setGender(profileInfoRequest.getGender() == "male" ? Gender.MALE : Gender.FEMALE);
