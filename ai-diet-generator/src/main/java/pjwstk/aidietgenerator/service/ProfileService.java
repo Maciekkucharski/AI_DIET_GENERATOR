@@ -28,7 +28,6 @@ public class ProfileService {
     private final UserStatsRepository userStatsRepository;
     private final UserDetailsService userDetailsService;
     private final PostRepository postRepository;
-
     private final UserStatsService userStatsService;
 
     public ProfileService(UserRepository userRepository,
@@ -103,9 +102,9 @@ public class ProfileService {
                     lastUserStats.getAge(),
                     lastUserStats.getWeight(),
                     lastUserStats.getHeight(),
-                    lastUserStats.getGender().name,
+                    lastUserStats.getGender(),
                     lastUserStats.getBmi(),
-                    lastUserStats.getCal()
+                    lastUserStats.getCal() == null ? 0 : lastUserStats.getCal()
                   );
         }
         response.setStatus(HttpStatus.NOT_FOUND.value());
@@ -118,16 +117,38 @@ public class ProfileService {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
         } else {
             UserStats updatedUserStats = new UserStats();
+            UserStats lastUserStats = userStatsRepository.findByuser(currentUser).get(userStatsRepository.findByuser(currentUser).size() - 1);
+            Integer latestHeight = lastUserStats.getHeight();
+            Double latestWeight = lastUserStats.getWeight();
 
-            currentUser.setFirstName(profileInfoRequest.getFirstName());
-            currentUser.setLastName(profileInfoRequest.getLastName());
-            currentUser.setEmail(profileInfoRequest.getEmail());
+            if(profileInfoRequest.getFirstName() != null) {currentUser.setFirstName(profileInfoRequest.getFirstName());}
+            if(profileInfoRequest.getLastName() != null) {currentUser.setLastName(profileInfoRequest.getLastName());}
+            if(profileInfoRequest.getEmail() != null) {currentUser.setEmail(profileInfoRequest.getEmail());}
 
-            updatedUserStats.setAge(profileInfoRequest.getAge());
-            updatedUserStats.setWeight(profileInfoRequest.getWeight());
-            updatedUserStats.setHeight(profileInfoRequest.getHeight());
-            updatedUserStats.setGender(profileInfoRequest.getGender() == "male" ? Gender.MALE : Gender.FEMALE);
-            updatedUserStats.setBmi(userStatsService.calculateBmi(profileInfoRequest.getWeight(), profileInfoRequest.getHeight()));
+            if(profileInfoRequest.getAge() != null) {updatedUserStats.setAge(profileInfoRequest.getAge());
+            } else {
+                updatedUserStats.setAge(lastUserStats.getAge());
+            }
+
+            if(profileInfoRequest.getWeight() != null) {
+                updatedUserStats.setWeight(profileInfoRequest.getWeight());
+                latestWeight = profileInfoRequest.getWeight();
+            } else {
+                updatedUserStats.setWeight(latestWeight);
+            }
+
+            if(profileInfoRequest.getHeight() != null) {
+                updatedUserStats.setHeight(profileInfoRequest.getHeight());
+                latestHeight = profileInfoRequest.getHeight();
+            } else {
+                updatedUserStats.setHeight(latestHeight);
+            }
+
+            if(profileInfoRequest.getGender() != null) {updatedUserStats.setGender(profileInfoRequest.getGender());
+            } else {
+                updatedUserStats.setGender(lastUserStats.getGender());
+            }
+            updatedUserStats.setBmi(userStatsService.calculateBmi(latestWeight, latestHeight));
             updatedUserStats.setUpdatedAt();
             updatedUserStats.setUser(currentUser);
 
