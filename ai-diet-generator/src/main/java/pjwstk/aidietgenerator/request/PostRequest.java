@@ -1,16 +1,16 @@
 package pjwstk.aidietgenerator.request;
 
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+
+@AllArgsConstructor
+@NoArgsConstructor
 public class PostRequest {
 
     private String title;
     private String description;
     private String image_path;
 
-    public PostRequest(String title, String description, String image_path) {
-        this.title = title;
-        this.description = description;
-        this.image_path = image_path;
-    }
 
     public String getTitle() {
         return title;
