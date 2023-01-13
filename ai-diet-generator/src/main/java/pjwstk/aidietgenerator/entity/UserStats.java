@@ -1,11 +1,18 @@
 package pjwstk.aidietgenerator.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import javax.persistence.Entity;
 import javax.persistence.*;
 import java.sql.Timestamp;
 
 @Entity
-@Table(name="userStats")
+@Table(name="user_stats")
+@NoArgsConstructor
+@Setter
+@Getter
 public class UserStats {
 
     @Id
@@ -13,36 +20,39 @@ public class UserStats {
     private Long id;
 
     @Column(name = "weight")
-    private double weight;
+    private Double weight;
 
     @Column(name = "height")
-    private int height;
+    private Integer height;
 
     @Column(name = "age")
-    private int age;
+    private Integer age;
 
     @Column(name = "bmi")
-    private double bmi;
+    private Double bmi;
 
     @Column(name = "gender")
+//    @Enumerated(EnumType.STRING)
     private Gender gender;
+
+    @Column(name = "cal")
+    private Integer cal;
 
     @Column(name = "updated_at")
     private Timestamp timestamp;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnoreProperties({"firstName", "lastName", "password", "authorities", "username"})
     private User user;
 
-    public UserStats() {
-    }
-
-    public UserStats(double weight, int height, int age, double bmi, Gender gender) {
+    public UserStats(double weight, int height, int age, double bmi, int cal, Gender gender) {
         super();
         this.weight = weight;
         this.height = height;
         this.age = age;
         this.bmi = bmi;
+        this.cal = cal;
         this.gender = gender;
     }
 
@@ -54,7 +64,9 @@ public class UserStats {
         this.gender = gender;
     }
 
-
+    public void setUpdatedAt() {
+        this.timestamp = new Timestamp(System.currentTimeMillis());
+    }
 
     public Long getId() {
         return id;
@@ -64,35 +76,35 @@ public class UserStats {
         this.id = id;
     }
 
-    public double getWeight() {
+    public Double getWeight() {
         return weight;
     }
 
-    public void setWeight(double weight) {
+    public void setWeight(Double weight) {
         this.weight = weight;
     }
 
-    public int getHeight() {
+    public Integer getHeight() {
         return height;
     }
 
-    public void setHeight(int height) {
+    public void setHeight(Integer height) {
         this.height = height;
     }
 
-    public int getAge() {
+    public Integer getAge() {
         return age;
     }
 
-    public void setAge(int age) {
+    public void setAge(Integer age) {
         this.age = age;
     }
 
-    public double getBmi() {
+    public Double getBmi() {
         return bmi;
     }
 
-    public void setBmi(double bmi) {
+    public void setBmi(Double bmi) {
         this.bmi = bmi;
     }
 
@@ -104,8 +116,20 @@ public class UserStats {
         this.gender = gender;
     }
 
-    public void setUpdatedAt() {
-        this.timestamp = new Timestamp(System.currentTimeMillis());
+    public Integer getCal() {
+        return cal;
+    }
+
+    public void setCal(Integer cal) {
+        this.cal = cal;
+    }
+
+    public Timestamp getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(Timestamp timestamp) {
+        this.timestamp = timestamp;
     }
 
     public User getUser() {

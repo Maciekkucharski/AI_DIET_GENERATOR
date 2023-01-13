@@ -25,15 +25,15 @@ public class UserStatsService {
     }
 
     public UserStats saveUserStats(UserStats userStats){
-        var userDetailsEntity = new UserStats();
-        userDetailsEntity.setWeight(userStats.getWeight());
-        userDetailsEntity.setHeight(userStats.getHeight());
-        userDetailsEntity.setAge(userStats.getAge());
-        userDetailsEntity.setBmi(calculateBmi(userStats.getWeight(), userStats.getHeight()));
-        userDetailsEntity.setGender(userStats.getGender());
-        userDetailsEntity.setUpdatedAt();
-        userDetailsEntity.setUser(userDetailsService.findCurrentUser());
-        return userStatsRepository.save(userDetailsEntity);
+        var userStatsEntity = new UserStats();
+        userStatsEntity.setWeight(userStats.getWeight());
+        userStatsEntity.setHeight(userStats.getHeight());
+        userStatsEntity.setAge(userStats.getAge());
+        userStatsEntity.setBmi(calculateBmi(userStats.getWeight(), userStats.getHeight()));
+        userStatsEntity.setGender(userStats.getGender());
+        userStatsEntity.setUpdatedAt();
+        userStatsEntity.setUser(userDetailsService.findCurrentUser());
+        return userStatsRepository.save(userStatsEntity);
     }
 
 

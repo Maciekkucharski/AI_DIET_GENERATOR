@@ -4,12 +4,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import pjwstk.aidietgenerator.entity.Gender;
 import pjwstk.aidietgenerator.entity.User;
 import pjwstk.aidietgenerator.entity.UserStats;
 import pjwstk.aidietgenerator.exception.ResourceNotFoundException;
 import pjwstk.aidietgenerator.repository.UserStatsRepository;
-import pjwstk.aidietgenerator.service.UserStatsService;
+import pjwstk.aidietgenerator.request.UserStatsRequest;
 import pjwstk.aidietgenerator.service.UserDetailsService;
+import pjwstk.aidietgenerator.service.UserStatsService;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
@@ -18,7 +20,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/account/stats")
 public class UserStatsController {
-
     private final UserStatsRepository userStatsRepository;
     private final UserDetailsService userDetailsService;
     private final UserStatsService userStatsService;
@@ -33,13 +34,14 @@ public class UserStatsController {
     }
 
     @GetMapping
-    public List<UserStats> getCurrentUserDetails() {
+    public List<UserStats> getCurrentUserStats() {
         return userStatsRepository.findByuser(userDetailsService.findCurrentUser());
     }
 
     @PostMapping
     @Transactional
-    public UserStats addUserDetails(@RequestBody UserStats userStats, HttpServletResponse response) {
+    public UserStats addUserDetails(@RequestBody UserStatsRequest userStats, HttpServletResponse response) {
+
         User currentUser = userDetailsService.findCurrentUser();
         if (currentUser == null) {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
@@ -56,7 +58,7 @@ public class UserStatsController {
                 newUserStats.setAge(userStats.getAge());
             }
             if(userStats.getGender() != null){
-                newUserStats.setGender(userStats.getGender());
+                newUserStats.setGender(userStats.getGender() == "male" ? Gender.MALE : Gender.FEMALE);
             }
             userStatsService.saveUserStats(newUserStats);
             response.setStatus(HttpStatus.CREATED.value());
@@ -65,13 +67,13 @@ public class UserStatsController {
     }
 
     @GetMapping("/{id}")
-    public UserStats getUserDetailsById(@PathVariable (value = "id") long userDetailsId) {
+    public UserStats getUserStatsById(@PathVariable (value = "id") long userDetailsId) {
         return userStatsRepository.findById(userDetailsId).
                 orElseThrow(() -> new ResourceNotFoundException("UserDetails not found with id :" + userDetailsId));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<UserStats> deleteUserDetails(@PathVariable (value = "id") long userDetailsId) {
+    public ResponseEntity<UserStats> deleteUserStats(@PathVariable (value = "id") long userDetailsId) {
         UserStats existingUserStats = userStatsRepository.findById(userDetailsId).
                 orElseThrow(() -> new ResourceNotFoundException("UserDetails not found with id :" + userDetailsId));
         userStatsRepository.delete(existingUserStats);

@@ -38,6 +38,12 @@ class Recommender:
             self,
             model_params: Dict[str, Any] = dict(),
     ):
+        """Creates and fits Alternating Least Squares recommendation system
+                    Parameters:
+                        model_params(dict): Dict with meta parameters that are used while training the system
+                    Returns:
+                        (Recommender) returnes fitted model of Alternating Least Squares Model
+                """
         data = bm25_weight(
             self.user_product_matrix,
             K1=1.2,

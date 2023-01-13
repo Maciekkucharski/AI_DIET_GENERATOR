@@ -1,25 +1,28 @@
 package pjwstk.aidietgenerator.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.sun.istack.NotNull;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 import java.util.stream.Collectors;
 
 @Entity
+@JsonIgnoreProperties({"credentialsNonExpired", "accountNonExpired", "accountNonLocked", "enabled", "password"})
 @Table(name = "users")
 public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Access(AccessType.PROPERTY)
     private Long id;
 
+//    @JsonView(UserProfile.class)
     @Column(name = "first_name")
     private String firstName;
 
@@ -31,6 +34,7 @@ public class User implements UserDetails {
     private String email;
 
     @Column(name = "login_password")
+    @JsonIgnore
     @NotNull
     private String password;
 
@@ -97,6 +101,7 @@ public class User implements UserDetails {
     public String getUsername() {
         return email;
     }
+
     @Override
     public boolean isAccountNonExpired() {
         return true;
