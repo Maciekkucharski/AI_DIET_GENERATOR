@@ -116,10 +116,25 @@ public class ProfileService {
         if(currentUser == null){
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
         } else {
+            List<UserStats> currentUserStats = userStatsRepository.findByuser(currentUser);
             UserStats updatedUserStats = new UserStats();
-            UserStats lastUserStats = userStatsRepository.findByuser(currentUser).get(userStatsRepository.findByuser(currentUser).size() - 1);
-            Integer latestHeight = lastUserStats.getHeight();
-            Double latestWeight = lastUserStats.getWeight();
+
+            Integer latestHeight = 0;
+            Double latestWeight = 0.0;
+            UserStats lastUserStats = new UserStats();
+
+            if(!currentUserStats.isEmpty()) {
+                lastUserStats = userStatsRepository.findByuser(currentUser).get(currentUserStats.size() - 1);
+                latestHeight = lastUserStats.getHeight();
+                latestWeight = lastUserStats.getWeight();
+            } else {
+                lastUserStats.setAge(0);
+                lastUserStats.setWeight(0.0);
+                lastUserStats.setHeight(0);
+                lastUserStats.setGender(null);
+                lastUserStats.setBmi(0.0);
+                lastUserStats.setCal(0);
+            }
 
             if(profileInfoRequest.getFirstName() != null) {currentUser.setFirstName(profileInfoRequest.getFirstName());}
             if(profileInfoRequest.getLastName() != null) {currentUser.setLastName(profileInfoRequest.getLastName());}
@@ -148,7 +163,12 @@ public class ProfileService {
             } else {
                 updatedUserStats.setGender(lastUserStats.getGender());
             }
-            updatedUserStats.setBmi(userStatsService.calculateBmi(latestWeight, latestHeight));
+
+            if(latestWeight!=0 && latestHeight!=0) {
+                updatedUserStats.setBmi(userStatsService.calculateBmi(latestWeight, latestHeight));
+            } else {
+                updatedUserStats.setBmi(0.0);
+            }
             updatedUserStats.setUpdatedAt();
             updatedUserStats.setUser(currentUser);
 

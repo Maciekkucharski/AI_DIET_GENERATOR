@@ -32,7 +32,6 @@ public class UserStats {
     private Double bmi;
 
     @Column(name = "gender")
-//    @Enumerated(EnumType.STRING)
     private Gender gender;
 
     @Column(name = "cal")
@@ -43,7 +42,7 @@ public class UserStats {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
-    @JsonIgnoreProperties({"firstName", "lastName", "password", "authorities", "username"})
+    @JsonIgnoreProperties({"firstName", "lastName", "password", "authorities", "email"})
     private User user;
 
     public UserStats(double weight, int height, int age, double bmi, int cal, Gender gender) {
