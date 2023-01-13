@@ -5,15 +5,19 @@ import javax.persistence.*;
 import java.util.List;
 
 @Entity
-@Table(name = "recipes_for_days")
+@Table(name = "recipes_for_day")
 public class DietDay {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @ManyToOne
+    @JoinColumn(name = "week_id")
+    private DietWeek dietWeek;
+
     @OneToMany
-    @Column(name = "day_recipes")
-    List<Recipe> recipesOneDay;
+    @JoinColumn(name = "day_id")
+    private List<Recipe> recipesOneDay;
 
 }
