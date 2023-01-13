@@ -128,19 +128,19 @@ def add_taste_profiles(api_key: str, df: pd.DataFrame = None,
 
 
 def get_dish_id(dish_name: str, df: pd.DataFrame = None,
-                recipes_path: str = './src/rec_system/data/recipes.csv') -> pd.DataFrame:
+                recipes_path: str = './src/rec_system/data/recipes.csv') -> int:
     """Gets dish id based on the dish name
                 Parameters:
                     dish_name (str): name if a dish to get id from
                     df (pd.DataFrame): Dataframe with recipes
                     recipes_path (str): if dataframe was not provided or is None this is a path with csv with recipes
                 Returns:
-                    (pd.DataFrame) returns dataframe with specified filtered recipes with taste profiles
+                    (int) returns id of desired dish
     """
     if df is None:
         df = pd.read_csv(recipes_path)
     if df.empty:
         print("no data found")
         return None
-    df = df.loc[df['title'] == dish_name]['id'].to_list()
-    return df
+    dish_id = df.loc[df['title'] == dish_name]['id'].to_list()[0]
+    return dish_id

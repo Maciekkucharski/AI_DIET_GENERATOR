@@ -2,36 +2,19 @@ import pandas as pd
 
 
 def load_and_preprocess_data(df: pd.DataFrame = None,
-                             ratings_path: str = './src/rec_system/data/ratings.csv', ):
-    """loads prepared data and does last preprocessing before using it in the recommendation system
+                             ratings_path: str = './src/rec_system/data/ratings.csv') -> pd.DataFrame:
+    """Converts results to be compatible with recommendation model.
                 Parameters:
-                    df (pd.DataFrame): Dataframe with recipes
-                    ratings_path (str): if dataframe was not provided or is None this is a path with csv with recipes
+                    df (pd.DataFrame): dataframe with results from the poll
+                    ratings_path (str): if dataframe was not provided or is None this is a path with csv with all ratings from the system
                 Returns:
-                    (pd.DataFrame) returns dataframe with specified filtered recipes with taste profiles
+                    (pd.DataFrame) Dataframe with results modified results form poll.
     """
     if df is None:
-        df = pd.read_csv(
-            ratings_path,
-            encoding="utf-8",
-        )
+        df = pd.read_csv(ratings_path)
     if df.empty:
         print("no data found")
-        return (None, None, None, None, None)
-    # Remove nans values
-    df = df.dropna()
-    # Get unique entries in the dataset of users and products
-    users = df["Adres e-mail"].unique()
-    products = df["pytanie"].unique()
-    # convert ratings to int type
-    df['ocena'] = df['ocena'].astype(int)
-    # Create a categorical type for users and product. User ordered to ensure reproducibility
-    user_cat = pd.CategoricalDtype(categories=sorted(users), ordered=True)
-    product_cat = pd.CategoricalDtype(categories=sorted(products), ordered=True)
-    # Transform and get the indexes of the columns
-    user_idx = df["Adres e-mail"].astype(user_cat).cat.codes
-    product_idx = df["pytanie"].astype(product_cat).cat.codes
-    # Add the categorical index to the starting dataframe
-    df["Adres e-mail"] = user_idx
-    df["pytanie"] = product_idx
-    return df, user_idx, product_idx, user_cat.categories, product_cat.categories
+        return None
+    ratings_matrix = df.pivot_table(values='ocena', index='Adres e-mail', columns='pytanie', fill_value=0)
+    X = ratings_matrix.T
+    return X

@@ -1,20 +1,8 @@
-from implicit.als import AlternatingLeastSquares
-from implicit.nearest_neighbours import bm25_weight
-from scipy.sparse import csr_matrix
-from typing import Dict, Any
+from sklearn.decomposition import TruncatedSVD
 import pandas as pd
 from scipy import spatial
-
-
-def _get_sparse_matrix(values, user_idx, product_idx):
-    return csr_matrix(
-        (values, (user_idx, product_idx)),
-        shape=(len(user_idx.unique()), len(product_idx.unique())),
-    )
-
-
-def _get_model(**params):
-    return AlternatingLeastSquares(**params)
+import numpy as np
+from src.rec_system.data.recipes import get_dish_id
 
 
 class InternalStatusError(Exception):
@@ -24,64 +12,76 @@ class InternalStatusError(Exception):
 class Recommender:
     def __init__(
             self,
-            values,
-            user_idx,
-            product_idx,
+            data: pd.DataFrame
     ):
-        self.user_product_matrix = _get_sparse_matrix(values, user_idx, product_idx)
-        self.user_idx = user_idx
-        self.product_idx = product_idx
         self.model = None
-        self.fitted = False
+        self.data = data
+        self.decomposed_matrix = None
 
     def create_and_fit(
             self,
-            model_params: Dict[str, Any] = dict(),
+            n_components: int = 50,
     ):
-        """Creates and fits Alternating Least Squares recommendation system
+        """Creates and SVD model
                     Parameters:
-                        model_params(dict): Dict with meta parameters that are used while training the system
+                        n_components(int): value of hidden features
                     Returns:
-                        (Recommender) returnes fitted model of Alternating Least Squares Model
+                        (Recommender) returns decomposition matrix
                 """
-        data = bm25_weight(
-            self.user_product_matrix,
-            K1=1.2,
-            B=0.75,
-        )
-        self.model = _get_model(**model_params)
-        self.fitted = True
-        self.model.fit(data)
-        return self
+        self.model = TruncatedSVD(n_components=n_components)
+        self.decomposed_matrix = self.model.fit_transform(self.data)
 
     def recommend_products(
             self,
-            user_id,
-            items_to_recommend=5,
+            user_email: int,
+            correlation_threshold: float = 0.7,
+            user_profiles_df: pd.DataFrame = pd.DataFrame,
+            recipes_df: pd.DataFrame = pd.DataFrame,
+
     ):
         """Finds the recommended items for the user.
             Parameters:
                 user_id: id of user that you want to recommend to
-                items_to_recommend: amount of items to recommend
+                correlation_threshold: threshold that satisfies the level of correlation
             Returns:
-                (items, scores) pair, of suggested item and score.
+                (items) list of items recommended for the user.
         """
-        if not self.fitted:
+        if self.decomposed_matrix is None:
             raise InternalStatusError(
                 "Fit the model before trying to recommend"
             )
-        return self.model.recommend(
-            user_id,
-            self.user_product_matrix[user_id],
-            filter_already_liked_items=False,
-            N=items_to_recommend,
-        )
+        user_ratings = self.data[[user_email]]
+        ratings_set = set()
+        for index, row in user_ratings.iterrows():
+            if row[0] == 0:
+                continue
+            similar_dishes = self.similar_dishes(index, correlation_threshold)
+            similar_dishes.append(get_dish_id(index, df=recipes_df))
+            compared_similar_dishes = compare_taste_with_taste_profile(dish_name_list=similar_dishes,
+                                                                       user_email=user_email,
+                                                                       user_profiles_df=user_profiles_df,
+                                                                       recipes_df=recipes_df)
+            for item in compared_similar_dishes:
+                ratings_set.add((item[1], item[0] * int(row[0])))
+        ratings_list = sorted(list(ratings_set), key=lambda x: x[1], reverse=True)
+        return [i[0] for i in ratings_list]
 
-    def similar_users(self, user_id):
-        return self.model.similar_users(user_id)
-
-    def similar_dishes(self, dish_id: int, items_to_recommend: int = 10):
-        return self.model.similar_items(dish_id, items_to_recommend)
+    def similar_dishes(self, dish_id: int, correlation_threshold: float = 0.85,
+                       recipes_df: pd.DataFrame = None) -> list:
+        if self.decomposed_matrix is None:
+            raise InternalStatusError(
+                "Fit the model before trying to recommend"
+            )
+        # creating correlation matrix
+        correlation_matrix = np.corrcoef(self.decomposed_matrix)
+        product_names = list(self.data.index)
+        product_ID = product_names.index(dish_id)
+        # get correlation array for specific product
+        correlation_product_ID = correlation_matrix[product_ID]
+        # get only items which correlate on a satisfying level
+        recommended_items = list(self.data.index[correlation_product_ID > correlation_threshold])
+        recommended_items.remove(dish_id)
+        return [get_dish_id(i, df=recipes_df) for i in recommended_items]
 
 
 def compare_taste_with_taste_profile(dish_name_list, user_email, user_profiles_df: pd.DataFrame = None,
@@ -103,7 +103,7 @@ def compare_taste_with_taste_profile(dish_name_list, user_email, user_profiles_d
         return None
     cosine_similarity_list = list()
     for dish_name in dish_name_list:
-        dish = recipes_df.loc[recipes_df['title'] == dish_name][
+        dish = recipes_df.loc[recipes_df['id'] == dish_name][
             ["saltiness", "bitterness", 'spiciness', 'fattiness', 'sweetness']
         ].values[0]
         cosine_similarity_list.append((1 - spatial.distance.cosine(user_profile, dish), dish_name))
