@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import pjwstk.aidietgenerator.entity.*;
+import pjwstk.aidietgenerator.repository.ExcludedProductsListRepository;
+import pjwstk.aidietgenerator.repository.ProductRepository;
 import pjwstk.aidietgenerator.service.Utils.ApiConstants;
 
 import javax.servlet.http.HttpServletResponse;
@@ -22,10 +24,15 @@ import static pjwstk.aidietgenerator.entity.Gender.MALE;
 public class DietService {
 
     private final UserDetailsService userDetailsService;
+    private final ProductRepository productRepository;
+
+    private final ExcludedProductsListRepository excludedProductsListRepository;
 
     @Autowired
-    public DietService(UserDetailsService userDetailsService){
+    public DietService(UserDetailsService userDetailsService, ProductRepository productRepository, ExcludedProductsListRepository excludedProductsListRepository){
         this.userDetailsService = userDetailsService;
+        this.productRepository = productRepository;
+        this.excludedProductsListRepository = excludedProductsListRepository;
     }
 
 //    Harris-Benedict Formula
@@ -134,7 +141,17 @@ public class DietService {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             return null;
         } else {
-            ExcludedProductsList excludedProductsList = new ExcludedProductsList();
+            ExcludedProductsList excludedProductsList = excludedProductsListRepository.findByuser(currentUser);
+            List<Product> listOfProducts = productRepository.findAllById(productIds);
+
+            if(excludedProductsList == null) {
+                excludedProductsList = new ExcludedProductsList(listOfProducts, currentUser);
+            } else {
+                excludedProductsList.setListOfExcludedProducts(listOfProducts);
+            }
+
+            excludedProductsListRepository.save(excludedProductsList);
+            response.setStatus(HttpStatus.CREATED.value());
 
             return excludedProductsList;
         }

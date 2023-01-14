@@ -14,10 +14,6 @@ public class Product {
     @Column(name = "name")
     private String name;
 
-    @ManyToOne
-    @JoinColumn(name = "excluded_products_list_id")
-    private ExcludedProductsList excludedProductsList;
-
     public Product(){
     }
 
@@ -39,13 +35,5 @@ public class Product {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public ExcludedProductsList getExcludedProductsList() {
-        return excludedProductsList;
-    }
-
-    public void setExcludedProductsList(ExcludedProductsList excludedProductsList) {
-        this.excludedProductsList = excludedProductsList;
     }
 }

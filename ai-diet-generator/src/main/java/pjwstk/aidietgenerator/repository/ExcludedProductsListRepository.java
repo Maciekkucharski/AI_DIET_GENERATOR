@@ -7,7 +7,7 @@ import pjwstk.aidietgenerator.entity.User;
 
 import java.util.List;
 
-public interface ExcludedProductListRepository extends JpaRepository<ExcludedProductsList, Long> {
+public interface ExcludedProductsListRepository extends JpaRepository<ExcludedProductsList, Long> {
 
-    List<Product> findByuser(User user);
+    ExcludedProductsList findByuser(User user);
 }
