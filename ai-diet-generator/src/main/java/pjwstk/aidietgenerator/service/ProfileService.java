@@ -138,7 +138,6 @@ public class ProfileService {
 
             if(profileInfoRequest.getFirstName() != null) {currentUser.setFirstName(profileInfoRequest.getFirstName());}
             if(profileInfoRequest.getLastName() != null) {currentUser.setLastName(profileInfoRequest.getLastName());}
-            if(profileInfoRequest.getEmail() != null) {currentUser.setEmail(profileInfoRequest.getEmail());}
 
             if(profileInfoRequest.getAge() != null) {updatedUserStats.setAge(profileInfoRequest.getAge());
             } else {
@@ -169,12 +168,24 @@ public class ProfileService {
             } else {
                 updatedUserStats.setBmi(0.0);
             }
+
             updatedUserStats.setUpdatedAt();
             updatedUserStats.setUser(currentUser);
 
-            response.setStatus(HttpStatus.OK.value());
-            userRepository.save(currentUser);
-            userStatsRepository.save(updatedUserStats);
+            if(profileInfoRequest.getEmail() != null) {
+                if(userRepository.findByemail(profileInfoRequest.getEmail()) == null) {
+                    currentUser.setEmail(profileInfoRequest.getEmail());
+                    userRepository.save(currentUser);
+                    userStatsRepository.save(updatedUserStats);
+                    response.setStatus(HttpStatus.OK.value());
+                } else {
+                    response.setStatus(HttpServletResponse.SC_CONFLICT);
+                }
+            } else {
+                userRepository.save(currentUser);
+                userStatsRepository.save(updatedUserStats);
+                response.setStatus(HttpStatus.OK.value());
+            }
         }
     }
 

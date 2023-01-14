@@ -15,6 +15,8 @@ public class ProfileInfoView {
     private double BMI;
     private int kCal;
 
+//    AUTHORITY DODAC
+
     public ProfileInfoView(){
 
     }
