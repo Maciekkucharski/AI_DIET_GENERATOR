@@ -142,5 +142,8 @@ def get_dish_id(dish_name: str, df: pd.DataFrame = None,
     if df.empty:
         print("no data found")
         return None
-    dish_id = df.loc[df['title'] == dish_name]['id'].to_list()[0]
-    return dish_id
+    dish_id = df.loc[df['title'] == dish_name]['id'].to_list()
+    if dish_id:
+        return dish_id[0]
+    else:
+        return
