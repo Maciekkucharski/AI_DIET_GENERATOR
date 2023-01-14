@@ -1,6 +1,7 @@
 package pjwstk.aidietgenerator.service;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 import pjwstk.aidietgenerator.entity.Gender;
 import pjwstk.aidietgenerator.view.MyProfile;
@@ -18,7 +19,9 @@ import pjwstk.aidietgenerator.view.WeightView;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ProfileService {
@@ -104,7 +107,12 @@ public class ProfileService {
                     lastUserStats.getHeight(),
                     lastUserStats.getGender(),
                     lastUserStats.getBmi(),
-                    lastUserStats.getCal() == null ? 0 : lastUserStats.getCal()
+                    lastUserStats.getCal() == null ? 0 : lastUserStats.getCal(),
+                    currentUser.getAuthorities().stream()
+                            .map(authorities -> authorities.toString())
+                            .map(String::trim)
+                            .filter(authority -> !authority.equals(""))
+                            .collect(Collectors.toList())
                   );
         }
         response.setStatus(HttpStatus.NOT_FOUND.value());
