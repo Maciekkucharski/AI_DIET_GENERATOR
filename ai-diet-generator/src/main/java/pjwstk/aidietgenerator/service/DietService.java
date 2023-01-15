@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import pjwstk.aidietgenerator.entity.*;
+import pjwstk.aidietgenerator.repository.*;
+import pjwstk.aidietgenerator.request.DietRequest;
 import pjwstk.aidietgenerator.service.Utils.ApiConstants;
 
 import javax.servlet.http.HttpServletResponse;
@@ -13,7 +15,9 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static pjwstk.aidietgenerator.entity.Gender.FEMALE;
 import static pjwstk.aidietgenerator.entity.Gender.MALE;
@@ -22,10 +26,23 @@ import static pjwstk.aidietgenerator.entity.Gender.MALE;
 public class DietService {
 
     private final UserDetailsService userDetailsService;
+    private final ProductRepository productRepository;
+    private final ExcludedProductsListRepository excludedProductsListRepository;
+    private final DayDietRepository dayDietRepository;
+    private final WeekDietRepository weekDietRepository;
+    private final UserStatsRepository userStatsRepository;
+    private final RecipeRepository recipeRepository;
 
     @Autowired
-    public DietService(UserDetailsService userDetailsService){
+    public DietService(UserDetailsService userDetailsService, ProductRepository productRepository, ExcludedProductsListRepository excludedProductsListRepository,
+                       DayDietRepository dayDietRepository, WeekDietRepository weekDietRepository, UserStatsRepository userStatsRepository, RecipeRepository recipeRepository){
         this.userDetailsService = userDetailsService;
+        this.productRepository = productRepository;
+        this.excludedProductsListRepository = excludedProductsListRepository;
+        this.dayDietRepository = dayDietRepository;
+        this.weekDietRepository = weekDietRepository;
+        this.userStatsRepository = userStatsRepository;
+        this.recipeRepository = recipeRepository;
     }
 
 //    Harris-Benedict Formula
@@ -69,7 +86,7 @@ public class DietService {
         return kcalIntake;
     }
 
-    public String[] getRecommendedIds(Long UserId) throws IOException {
+    public List<Long> getRecommendedIds(Long UserId) throws IOException {
         URL url = new URL (ApiConstants.GENERATOR);
         HttpURLConnection con = (HttpURLConnection)url.openConnection();
         con.setRequestMethod("POST");
@@ -77,7 +94,9 @@ public class DietService {
         con.setRequestProperty("Accept", "application/json");
         con.setDoOutput(true);
         String jsonInputString = "{\"user_id\": " + UserId.toString() + ", " +
-                "\"items_to_recommend\": 50}";
+                "\"correlation_threshold\": 0.8}";
+
+        List<Long> recommendedIds = new ArrayList<>();
 
 
         try(OutputStream os = con.getOutputStream()) {
@@ -92,13 +111,17 @@ public class DietService {
             while ((responseLine = br.readLine()) != null) {
                 response.append(responseLine.trim());
             }
-            String[] recommendedIds = response.substring(1, response.length() - 1).split(",");
+            String[] idList = response.substring(1, response.length() - 1).split(",");
+
+            for(String id : idList){
+                recommendedIds.add(Long.valueOf(id));
+            }
 
             return recommendedIds;
         }
     }
 
-    public String[] getRecommendedReplacementIds(Long RecipeId) throws IOException {
+    public List<Long> getRecommendedReplacementIds(Long RecipeId) throws IOException {
         URL url = new URL (ApiConstants.REPLACER);
         HttpURLConnection con = (HttpURLConnection)url.openConnection();
         con.setRequestMethod("POST");
@@ -106,8 +129,9 @@ public class DietService {
         con.setRequestProperty("Accept", "application/json");
         con.setDoOutput(true);
         String jsonInputString = "{\"dish_id\": " + RecipeId + ", " +
-                "\"items_to_recommend\": 10}";
+                "\"correlation_threshold\": 0.7}";
 
+        List<Long> replacementsIds = new ArrayList<>();
 
         try(OutputStream os = con.getOutputStream()) {
             byte[] input = jsonInputString.getBytes("utf-8");
@@ -122,9 +146,13 @@ public class DietService {
                 response.append(responseLine.trim());
             }
 
-            String[] recommendedReplaceIds = response.substring(1, response.length() - 1).split(",");
+            String[] idList = response.substring(1, response.length() - 1).split(",");
 
-            return recommendedReplaceIds;
+            for(String id : idList){
+                replacementsIds.add(Long.valueOf(id));
+            }
+
+            return replacementsIds;
         }
     }
 
@@ -134,9 +162,104 @@ public class DietService {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             return null;
         } else {
-            ExcludedProductsList excludedProductsList = new ExcludedProductsList();
+            ExcludedProductsList excludedProductsList = excludedProductsListRepository.findByuser(currentUser);
+            List<Product> listOfProducts = productRepository.findAllById(productIds);
+
+            if(excludedProductsList == null) {
+                excludedProductsList = new ExcludedProductsList(listOfProducts, currentUser);
+            } else {
+                excludedProductsList.setListOfExcludedProducts(listOfProducts);
+            }
+
+            excludedProductsListRepository.save(excludedProductsList);
+            response.setStatus(HttpStatus.CREATED.value());
 
             return excludedProductsList;
         }
+    }
+
+    public DietWeek generateDiet(DietRequest dietRequest, HttpServletResponse response) throws IOException {
+        User currentUser = userDetailsService.findCurrentUser();
+        DietWeek newDiet = new DietWeek();
+
+        PhysicalActivity physicalActivity = dietRequest.getPhysicalActivity();
+        DietGoal dietGoal = dietRequest.getDietGoal();
+        ExcludedProductsList excludedProductsList = dietRequest.getExcludedProductsList();
+        int mealsPerDay = dietRequest.getMealsPerDay();
+
+        if(currentUser != null) {
+            List<UserStats> currentUserStatsHistory = userStatsRepository.findByuser(currentUser);
+
+            if(!currentUserStatsHistory.isEmpty()) {
+                UserStats lastUserStats = currentUserStatsHistory.get(currentUserStatsHistory.size() - 1);
+
+                double currentUserWeight = lastUserStats.getWeight();
+                int currentUserHeight = lastUserStats.getHeight();
+                int currentUserAge = lastUserStats.getAge();
+                Gender currentUserGender = lastUserStats.getGender();
+
+                if(currentUserWeight !=0 && currentUserHeight !=0 && currentUserAge !=0 && currentUserGender != null) {
+                    double caloriesPerDay = goalCalories(currentUserWeight, currentUserHeight, currentUserAge, currentUserGender, physicalActivity, dietGoal);
+                    lastUserStats.setCal((int) caloriesPerDay);
+
+                    List<Long> recommendedRecipesIds = getRecommendedIds(currentUser.getId());
+
+                    if(recommendedRecipesIds.isEmpty()){
+                        response.setStatus(HttpStatus.NO_CONTENT.value());
+                        return null;
+                    }
+
+                    List<DietDay> dietWeek = new ArrayList<>();
+                    List<Long> usedRecipesIds = new ArrayList<>();
+
+                    for(int i=0; i<7; i++){
+                        DietDay dietDay = new DietDay();
+                        double remainingCalories = caloriesPerDay;
+                        List<Recipe> recipesToday = new ArrayList<>();
+                        int addedMealsForToday = 0;
+
+
+                        for (Long id : recommendedRecipesIds) {
+                            Optional<Recipe> currentRecipe = recipeRepository.findById(id);
+                            if (currentRecipe.get().getCalories() < remainingCalories) {
+                                recipesToday.add(currentRecipe.get());
+                                remainingCalories = remainingCalories - currentRecipe.get().getCalories();
+                                usedRecipesIds.add(id);
+                                addedMealsForToday++;
+
+                                if(addedMealsForToday == mealsPerDay){
+                                    recommendedRecipesIds.removeAll(usedRecipesIds);
+                                    break;
+                                }
+                            }
+                        }
+
+                        dietDay.setRecipesForToday(recipesToday);
+                        dietDay.setDietWeek(newDiet);
+//                           dayDietRepository.save(dietDay);
+
+                        dietWeek.add(dietDay);
+                    }
+                    newDiet.setDaysForWeekDiet(dietWeek);
+                    newDiet.setUser(currentUser);
+
+                } else {
+                    response.setStatus(HttpStatus.BAD_REQUEST.value());
+                    System.out.println("Jeblo ze statami");
+                    return null;
+                }
+            } else {
+                response.setStatus(HttpStatus.BAD_REQUEST.value());
+                System.out.println("Jeblo z historia stat");
+                return null;
+            }
+        } else {
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            return null;
+        }
+
+        response.setStatus(HttpStatus.CREATED.value());
+        return newDiet;
+//        return weekDietRepository.save(newDiet);
     }
 }

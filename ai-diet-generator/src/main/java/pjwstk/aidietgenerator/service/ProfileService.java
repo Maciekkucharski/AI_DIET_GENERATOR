@@ -173,7 +173,11 @@ public class ProfileService {
                 updatedUserStats.setBmi(0.0);
             }
 
-            updatedUserStats.setUpdatedAt();
+            if(profileInfoRequest.getTimestamp() != null){
+                updatedUserStats.setTimestamp(profileInfoRequest.getTimestamp());
+            } else {
+                updatedUserStats.setUpdatedAt();
+            }
             updatedUserStats.setUser(currentUser);
 
             if(profileInfoRequest.getEmail() != null) {
@@ -213,13 +217,19 @@ public class ProfileService {
         }
     }
 
-    public void deleteUserStatsEntry(long id, HttpServletResponse response){
+    public void deleteUserStatsWeightEntry(long id, HttpServletResponse response){
         User currentUser = userDetailsService.findCurrentUser();
         if(currentUser == null){
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
         } else {
-            userStatsRepository.deleteById(id);
-            response.setStatus(HttpStatus.ACCEPTED.value());
+            Optional<UserStats> stats = userStatsRepository.findById(id);
+            if(stats.isPresent()){
+                stats.get().setWeight(0.0);
+                userStatsRepository.save(stats.get());
+                response.setStatus(HttpStatus.ACCEPTED.value());
+            } else {
+                response.setStatus(HttpStatus.NOT_FOUND.value());
+            }
         }
     }
 }

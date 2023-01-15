@@ -1,6 +1,10 @@
 package pjwstk.aidietgenerator.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import javax.persistence.*;
 import java.util.List;
 
@@ -13,8 +17,21 @@ public class DietDay {
     private Long id;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "week_id")
     private DietWeek dietWeek;
+
+    @OneToMany
+    @JsonIgnoreProperties({"saltiness", "sourness", "sweetness", "bitterness", "fattiness", "spiciness", "instructions", "verified", "vegetarian", "vegan", "glutenFree", "dairyFree", "veryHealthy", "timestamp", "user"})
+    private List<Recipe> recipesForToday;
+
+    public DietDay(){}
+
+    public DietDay(List<Recipe> recipesForToday, DietWeek dietWeek)
+    {
+        this.recipesForToday = recipesForToday;
+        this.dietWeek = dietWeek;
+    }
 
 
     public Long getId() {
@@ -31,5 +48,13 @@ public class DietDay {
 
     public void setDietWeek(DietWeek dietWeek) {
         this.dietWeek = dietWeek;
+    }
+
+    public List<Recipe> getRecipesForToday() {
+        return recipesForToday;
+    }
+
+    public void setRecipesForToday(List<Recipe> recipesForToday) {
+        this.recipesForToday = recipesForToday;
     }
 }

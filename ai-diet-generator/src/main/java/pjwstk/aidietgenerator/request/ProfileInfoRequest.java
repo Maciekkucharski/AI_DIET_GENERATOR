@@ -2,6 +2,8 @@ package pjwstk.aidietgenerator.request;
 
 import pjwstk.aidietgenerator.entity.Gender;
 
+import java.sql.Timestamp;
+
 public class ProfileInfoRequest {
     private String profilePicturePath;
     private String firstName;
@@ -11,6 +13,8 @@ public class ProfileInfoRequest {
     private Double weight;
     private Integer height;
     private Gender gender;
+
+    private Timestamp timestamp;
 
     public ProfileInfoRequest(){
 
@@ -23,7 +27,8 @@ public class ProfileInfoRequest {
                               String email,
                               double weight,
                               int height,
-                              Gender gender) {
+                              Gender gender,
+                              Timestamp timestamp) {
 
         this.profilePicturePath = profilePicturePath;
         this.firstName = firstName;
@@ -33,6 +38,7 @@ public class ProfileInfoRequest {
         this.weight = weight;
         this.height = height;
         this.gender = gender;
+        this.timestamp = timestamp;
     }
 
     public String getProfilePicturePath() {
@@ -65,5 +71,9 @@ public class ProfileInfoRequest {
 
     public Integer getAge() {
         return age;
+    }
+
+    public Timestamp getTimestamp() {
+        return timestamp;
     }
 }

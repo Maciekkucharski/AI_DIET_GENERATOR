@@ -13,10 +13,20 @@ public class DietWeek {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @OneToMany
+    private List<DietDay> daysForWeekDiet;
+
     @OneToOne
     @JoinColumn(name = "user_id")
     @JsonIgnoreProperties({"firstName", "lastName", "password", "authorities", "email"})
     private User user;
+
+    public DietWeek(){}
+
+    public DietWeek(List<DietDay> daysForWeekDiet, User user){
+        this.daysForWeekDiet = daysForWeekDiet;
+        this.user = user;
+    }
 
     public Long getId() {
         return id;
@@ -32,5 +42,13 @@ public class DietWeek {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public List<DietDay> getDaysForWeekDiet() {
+        return daysForWeekDiet;
+    }
+
+    public void setDaysForWeekDiet(List<DietDay> daysForWeekDiet) {
+        this.daysForWeekDiet = daysForWeekDiet;
     }
 }

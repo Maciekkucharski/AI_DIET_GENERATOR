@@ -51,7 +51,7 @@ public class ProfileController {
         return profileService.getCurrentUsersWeightStory(response);
     }
     @DeleteMapping("/info/weights/{id}")
-    public void deleteUserStatsEntry(@PathVariable(value = "id") Long id, HttpServletResponse response){
-        profileService.deleteUserStatsEntry(id, response);
+    public void deleteUserStatsWeightEntry(@PathVariable(value = "id") Long id, HttpServletResponse response){
+        profileService.deleteUserStatsWeightEntry(id, response);
     }
 }
