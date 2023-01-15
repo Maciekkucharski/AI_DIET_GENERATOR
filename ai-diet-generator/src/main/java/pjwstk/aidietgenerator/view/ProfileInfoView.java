@@ -2,6 +2,8 @@ package pjwstk.aidietgenerator.view;
 
 import pjwstk.aidietgenerator.entity.Gender;
 
+import java.util.List;
+
 public class ProfileInfoView {
     private Long id;
     private String profilePicturePath;
@@ -14,6 +16,8 @@ public class ProfileInfoView {
     private Gender gender;
     private double BMI;
     private int kCal;
+
+    List<String> authorities;
 
     public ProfileInfoView(){
 
@@ -28,7 +32,8 @@ public class ProfileInfoView {
                            int height,
                            Gender gender,
                            double BMI,
-                           int kCal) {
+                           int kCal,
+                           List<String> authorities) {
         this.id = id;
         this.profilePicturePath = profilePicturePath;
         this.firstName = firstName;
@@ -40,6 +45,7 @@ public class ProfileInfoView {
         this.gender = gender;
         this.BMI = BMI;
         this.kCal = kCal;
+        this.authorities = authorities;
     }
 
     public Long getId() {
@@ -128,5 +134,13 @@ public class ProfileInfoView {
 
     public void setkCal(int kCal) {
         this.kCal = kCal;
+    }
+
+    public List<String> getAuthorities() {
+        return authorities;
+    }
+
+    public void setAuthorities(List<String> authorities) {
+        this.authorities = authorities;
     }
 }

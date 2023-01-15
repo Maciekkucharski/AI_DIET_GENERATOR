@@ -16,8 +16,20 @@ public class DietDay {
     @JoinColumn(name = "week_id")
     private DietWeek dietWeek;
 
-    @OneToMany
-    @JoinColumn(name = "day_id")
-    private List<Recipe> recipesOneDay;
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public DietWeek getDietWeek() {
+        return dietWeek;
+    }
+
+    public void setDietWeek(DietWeek dietWeek) {
+        this.dietWeek = dietWeek;
+    }
 }

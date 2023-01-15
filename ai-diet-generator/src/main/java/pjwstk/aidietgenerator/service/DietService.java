@@ -1,23 +1,32 @@
 package pjwstk.aidietgenerator.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import pjwstk.aidietgenerator.entity.DietGoal;
-import pjwstk.aidietgenerator.entity.Gender;
-import pjwstk.aidietgenerator.entity.PhysicalActivity;
+import pjwstk.aidietgenerator.entity.*;
 import pjwstk.aidietgenerator.service.Utils.ApiConstants;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.List;
 
 import static pjwstk.aidietgenerator.entity.Gender.FEMALE;
 import static pjwstk.aidietgenerator.entity.Gender.MALE;
 
 @Service
 public class DietService {
+
+    private final UserDetailsService userDetailsService;
+
+    @Autowired
+    public DietService(UserDetailsService userDetailsService){
+        this.userDetailsService = userDetailsService;
+    }
 
 //    Harris-Benedict Formula
     public double dailyBMR(double bodyWeight, int bodyHeight, int age, Gender gender, PhysicalActivity physicalActivity){
@@ -34,7 +43,7 @@ public class DietService {
         double kcalIntake = bmr;
 
         switch(dietGoal){
-            case LOOSE:
+            case LOSE:
                 kcalIntake = bmr - 500;
                 if(kcalIntake <= 1200 && gender == FEMALE){
                     kcalIntake = 1200;
@@ -119,5 +128,15 @@ public class DietService {
         }
     }
 
-//    TODO
+    public ExcludedProductsList setExcludedProducts(HttpServletResponse response, List<Long> productIds){
+        User currentUser = userDetailsService.findCurrentUser();
+        if (currentUser == null) {
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            return null;
+        } else {
+            ExcludedProductsList excludedProductsList = new ExcludedProductsList();
+
+            return excludedProductsList;
+        }
+    }
 }
