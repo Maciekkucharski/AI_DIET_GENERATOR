@@ -49,7 +49,7 @@ public class ProfileService {
         User currentUser = userDetailsService.findCurrentUser();
         if(currentUser != null){
             currentUserProfile.setUser(currentUser);
-            currentUserProfile.setProfilePicturePath("TODO"); // TODO
+            currentUserProfile.setProfileImagePath(currentUser.getImagePath());
             currentUserProfile.setUserStats(userStatsRepository.findByuser(currentUser));
             currentUserProfile.setSocials(socialsRepository.findByuser(currentUser));
             currentUserProfile.setUserPosts(postRepository.findByuser(currentUser));
@@ -66,7 +66,7 @@ public class ProfileService {
         Optional<User> selectedUser = userRepository.findById(userID);
         if(!selectedUser.isEmpty()){
             selectedUserProfile.setUser(selectedUser.get());
-            selectedUserProfile.setProfilePicturePath("TODO"); // TODO
+            selectedUserProfile.setImagePath(selectedUser.get().getImagePath());
             selectedUserProfile.setSocials(socialsRepository.findByuser(selectedUser.get()));
             selectedUserProfile.setUserPosts(postRepository.findByuser(selectedUser.get()));
             response.setStatus(HttpStatus.OK.value());
@@ -94,8 +94,7 @@ public class ProfileService {
         if(currentUser != null){
             response.setStatus(HttpStatus.OK.value());
             return new ProfileInfoView(currentUser.getId(),
-//                    TODO
-                    "TODO",
+                    currentUser.getImagePath(),
                     currentUser.getFirstName(),
                     currentUser.getLastName(),
                     currentUser.getEmail(),

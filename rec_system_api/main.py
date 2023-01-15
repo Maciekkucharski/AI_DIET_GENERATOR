@@ -6,12 +6,6 @@ import pandas as pd
 
 app = FastAPI()
 
-MODEL_PARAMETERS = dict(
-    factors=100,
-    alpha=0.6,
-    regularization=0.06,
-)
-
 
 @app.get("/")
 async def root():
@@ -23,7 +17,7 @@ async def root():
 @app.post("/generate")
 async def generate(body_dict: dict = Body(..., example={
     "user_id": 30,
-    "items_to_recommend": 51,
+    "correlation_threshold": 0.7,
 })):
     ratings_result = None
     survey_results = None
@@ -79,27 +73,15 @@ async def generate(body_dict: dict = Body(..., example={
         mydb.close()
         print(str(e))
     if ratings_result is not None and survey_results is not None and recipes_results is not None and users is not None:
-        data, email_order, dishes_order, sorted_users, sorted_dishes = load_and_preprocess_data(ratings_result)
-        recommender = Recommender(
-            data['ocena'],
-            email_order,
-            dishes_order,
-        )
-        recommender.create_and_fit(
-            model_params=MODEL_PARAMETERS,
-        )
+        X = load_and_preprocess_data(df=ratings_result)
+        recommender = Recommender(X)
+        recommender.create_and_fit()
         # convert user number to user id
         user_email = users.loc[users['id'] == body_dict['user_id']]['email'].values[0]
-        user_number = list(sorted_users).index(user_email)
-        suggestions_and_score = recommender.recommend_products(user_number,
-                                                               items_to_recommend=body_dict['items_to_recommend'])
-
-        results = compare_taste_with_taste_profile([sorted_dishes[i] for i in suggestions_and_score[0].tolist()],
-                                                   user_email,
-                                                   user_profiles_df=survey_results,
-                                                   recipes_df=recipes_results)
-        # convert number of dish to dish id
-        return [int(recipes_results.loc[recipes_results['title'] == i[1]]['id'].values[0]) for i in results]
+        recommendations = recommender.recommend_products(user_email, body_dict['correlation_threshold'],
+                                                         user_profiles_df=survey_results,
+                                                         recipes_df=recipes_results)
+        return recommendations
     else:
         return "missing data from database"
 
@@ -107,7 +89,7 @@ async def generate(body_dict: dict = Body(..., example={
 @app.post("/replace")
 async def replace(body_dict: dict = Body(..., example={
     "dish_id": 640134,
-    "items_to_recommend": 10,
+    "correlation_threshold": 0.7,
 })):
     ratings_result = None
     try:
@@ -144,21 +126,13 @@ async def replace(body_dict: dict = Body(..., example={
         print(str(e))
     mydb.close()
     if ratings_result is not None and recipes_results is not None:
-        data, email_order, dishes_order, sorted_users, sorted_dishes = load_and_preprocess_data(ratings_result)
-        recommender = Recommender(
-            data['ocena'],
-            email_order,
-            dishes_order,
-        )
-        recommender.create_and_fit(
-            model_params=MODEL_PARAMETERS,
-        )
+        X = load_and_preprocess_data(df=ratings_result)
+        recommender = Recommender(X)
+        recommender.create_and_fit()
         dish_name = recipes_results.loc[recipes_results['id'] == body_dict['dish_id']]['title'].values[0]
-        dish_number = list(sorted_dishes).index(dish_name)
-        results = recommender.similar_dishes(dish_number,
-                                             items_to_recommend=body_dict['items_to_recommend'])[0]
-        results = [int(result) for result in results]
+        recommendations = recommender.similar_dishes(dish_name, body_dict['correlation_threshold'],
+                                                     recipes_df=recipes_results)
         # convert list of dish numbers to dish id
-        return [int(recipes_results.loc[recipes_results['title'] == sorted_dishes[i]]['id'].values[0]) for i in results]
+        return recommendations
     else:
         return "missing data from database"

@@ -5,7 +5,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import javax.persistence.*;
 import java.sql.Timestamp;
-import java.util.List;
 
 @Entity
 @Table(name = "recipes")
@@ -46,7 +45,7 @@ public class Recipe {
     private Integer readyInMinutes;
 
     @Column(name = "image")
-    private String image;
+    private String imagePath;
 
     @Column(name = "instructions")
     private String instructions;
@@ -89,6 +88,7 @@ public class Recipe {
     private User user;
 
     public Recipe(String title, Float saltiness, Float sourness, Float sweetness, Float bitterness, Float spiciness, Float fattiness, Integer servings, Integer readyInMinutes, String image, String instructions, Boolean vegetarian, Boolean vegan, Boolean glutenFree, Boolean dairyFree, Boolean veryHealthy, Boolean verified, Timestamp timestamp, Integer calories, Integer carbs, Integer fat, Integer protein, User user) {
+
         this.title = title;
         this.saltiness = saltiness;
         this.sourness = sourness;
@@ -98,7 +98,7 @@ public class Recipe {
         this.fattiness = fattiness;
         this.servings = servings;
         this.readyInMinutes = readyInMinutes;
-        this.image = image;
+        this.imagePath = imagePath;
         this.instructions = instructions;
         this.vegetarian = vegetarian;
         this.vegan = vegan;

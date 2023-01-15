@@ -21,16 +21,12 @@ public class PostDetailedView {
     private String title;
     private String description;
     private Timestamp timestamp;
-
-    // TODO
-    private String imagePath;
+    private String postImagePath;
 
     @JsonIgnoreProperties({"authorities", "username", "email", "authority"})
     private User author;
 
-    // TODO
-    private String userProfilePicture;
-
+    private String profileImagePath;
     private List<CommentView> postComments;
     private List<PostLike> likes;
 }

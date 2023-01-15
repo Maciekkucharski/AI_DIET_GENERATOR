@@ -6,7 +6,7 @@ import java.util.List;
 
 public class ProfileInfoView {
     private Long id;
-    private String profilePicturePath;
+    private String profileImagePath;
     private String firstName;
     private String lastName;
     private String email;
@@ -35,7 +35,7 @@ public class ProfileInfoView {
                            int kCal,
                            List<String> authorities) {
         this.id = id;
-        this.profilePicturePath = profilePicturePath;
+        this.profileImagePath = profilePicturePath;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
@@ -56,12 +56,12 @@ public class ProfileInfoView {
         this.id = id;
     }
 
-    public String getProfilePicturePath() {
-        return profilePicturePath;
+    public String getProfileImagePath() {
+        return profileImagePath;
     }
 
-    public void setProfilePicturePath(String profilePicturePath) {
-        this.profilePicturePath = profilePicturePath;
+    public void setProfileImagePath(String profileImagePath) {
+        this.profileImagePath = profileImagePath;
     }
 
     public String getFirstName() {

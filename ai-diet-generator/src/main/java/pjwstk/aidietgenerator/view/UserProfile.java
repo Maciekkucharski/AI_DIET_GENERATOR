@@ -17,6 +17,6 @@ public class UserProfile {
     @JsonIgnoreProperties({"password", "email"})
     private User user;
     private Socials socials;
-    private String profilePicturePath;
+    private String imagePath;
     private List<Post> userPosts;
 }
