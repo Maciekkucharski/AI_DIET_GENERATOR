@@ -33,7 +33,7 @@ class Recommender:
 
     def recommend_products(
             self,
-            user_email: int,
+            user_email: str,
             correlation_threshold: float = 0.7,
             user_profiles_df: pd.DataFrame = pd.DataFrame,
             recipes_df: pd.DataFrame = pd.DataFrame,
@@ -41,8 +41,10 @@ class Recommender:
     ):
         """Finds the recommended items for the user.
             Parameters:
-                user_id: id of user that you want to recommend to
+                user_email: email of user that you want to recommend to
                 correlation_threshold: threshold that satisfies the level of correlation
+                user_profiles_df: dataframe with taste profiles of users
+                recipes_df: dataframe with recipes and taste profiles
             Returns:
                 (items) list of items recommended for the user.
         """
@@ -66,8 +68,16 @@ class Recommender:
         ratings_list = sorted(list(ratings_set), key=lambda x: x[1], reverse=True)
         return [i[0] for i in ratings_list]
 
-    def similar_dishes(self, dish_id: int, correlation_threshold: float = 0.85,
+    def similar_dishes(self, dish_name: str, correlation_threshold: float = 0.85,
                        recipes_df: pd.DataFrame = None) -> list:
+        """Finds the recommended dishes similar to the one provided.
+                    Parameters:
+                        dish_name: id of dish that you want to recommend to
+                        correlation_threshold: threshold that satisfies the level of correlation
+                        recipes_df: dataframe with recipes and taste profiles
+                    Returns:
+                        (items) list of similar items recommended.
+                """
         if self.decomposed_matrix is None:
             raise InternalStatusError(
                 "Fit the model before trying to recommend"
@@ -75,12 +85,12 @@ class Recommender:
         # creating correlation matrix
         correlation_matrix = np.corrcoef(self.decomposed_matrix)
         product_names = list(self.data.index)
-        product_ID = product_names.index(dish_id)
+        product_ID = product_names.index(dish_name)
         # get correlation array for specific product
         correlation_product_ID = correlation_matrix[product_ID]
         # get only items which correlate on a satisfying level
         recommended_items = list(self.data.index[correlation_product_ID > correlation_threshold])
-        recommended_items.remove(dish_id)
+        recommended_items.remove(dish_name)
         return [get_dish_id(i, df=recipes_df) for i in recommended_items]
 
 
@@ -88,6 +98,18 @@ def compare_taste_with_taste_profile(dish_name_list, user_email, user_profiles_d
                                      user_profiles_path: str = './src/rec_system/data/user_profiles.csv',
                                      recipes_df: pd.DataFrame = None,
                                      recipes_path: str = './src/rec_system/data/recipes.csv'):
+    """returns the value of cosine distance between taste vectors.
+                Parameters:
+                    dish_name_list: list of dishes to be compared
+                    user_email: email of the user to compare to
+                    recipes_df: dataframe with recipes and taste profiles
+                    recipes_path: path to file with the recipes dataframe
+                    user_profiles_path: dataframe with recipes and taste profiles
+                    user_profiles_df: path to file with the user profiles dataframe
+                Returns:
+                    (cosine_distance,dish_name) rating and dish name of provided dishes.
+            """
+    # print(dish_name_list)
     if user_profiles_df is None:
         user_profiles_df = pd.read_csv(user_profiles_path)
     if user_profiles_df.empty:
