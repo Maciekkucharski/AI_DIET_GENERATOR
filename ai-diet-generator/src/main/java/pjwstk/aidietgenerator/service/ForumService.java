@@ -67,7 +67,7 @@ public class ForumService {
                 postSimplifiedView.setCommentsCount(postCommentsRepository.findBypost(post).size());
                 postSimplifiedView.setLikesCount(postLikesRepository.findBypost(post).size());
                 postSimplifiedView.setTitle(post.getTitle());
-                postSimplifiedView.setUserProfilePicture(post.getUser().getImage_path());
+                postSimplifiedView.setUserProfilePicture(post.getUser().getImagePath());
                 postSimplifiedViewList.add(postSimplifiedView);
             }
             response.setStatus(HttpStatus.OK.value());
@@ -88,7 +88,7 @@ public class ForumService {
                         comment.getContent(),
                         comment.getTimestamp(),
                         comment.getUser(),
-                        comment.getUser().getImage_path()
+                        comment.getUser().getImagePath()
                 );
                 postCommentsView.add(newCommentView);
             }
@@ -100,7 +100,7 @@ public class ForumService {
                     post.get().getTimestamp(),
                     post.get().getImagePath(),
                     post.get().getUser(),
-                    post.get().getUser().getImage_path(),
+                    post.get().getUser().getImagePath(),
                     postCommentsView,
                     likes);
         }
@@ -241,7 +241,7 @@ public class ForumService {
                 newRecipeSimplifiedView.setTimestamp(recipe.getTimestamp());
                 newRecipeSimplifiedView.setDescription(recipe.getInstructions());
                 newRecipeSimplifiedView.setAuthor(recipe.getUser());
-                newRecipeSimplifiedView.setUserProfilePicture(recipe.getUser().getImage_path());
+                newRecipeSimplifiedView.setUserProfilePicture(recipe.getUser().getImagePath());
                 newRecipeSimplifiedView.setCommentsCount(recipeCommentsRepository.findByrecipe(recipe).size());
                 newRecipeSimplifiedView.setLikesCount(recipeLikesRepository.findByrecipe(recipe).size());
                 recipeSimplifiedViewList.add(newRecipeSimplifiedView);
@@ -260,9 +260,9 @@ public class ForumService {
             RecipeDetailedView detailedRecipe = new RecipeDetailedView();
             RecipeView view = recipeService.view(recipeID, response);
             detailedRecipe.setRecipeView(view);
-            detailedRecipe.setImagePath(recipe.get().getImage());
+            detailedRecipe.setImagePath(recipe.get().getImagePath());
             detailedRecipe.setAuthor(recipe.get().getUser());
-            detailedRecipe.setUserProfilePicture(recipe.get().getUser().getImage_path());
+            detailedRecipe.setUserProfilePicture(recipe.get().getUser().getImagePath());
             detailedRecipe.setRecipeLikes(recipeLikesRepository.findByrecipe(recipe.get()));
             List<CommentView> recipeCommentsView = new ArrayList<>();
             for (RecipeComment comment : recipeCommentsRepository.findByrecipe(recipe.get())){
@@ -271,7 +271,7 @@ public class ForumService {
                         comment.getContent(),
                         comment.getTimestamp(),
                         comment.getUser(),
-                        comment.getUser().getImage_path()
+                        comment.getUser().getImagePath()
                 );
                 recipeCommentsView.add(newCommentView);
             }

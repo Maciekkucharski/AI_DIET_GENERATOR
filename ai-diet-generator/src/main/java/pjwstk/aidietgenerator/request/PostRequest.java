@@ -10,5 +10,5 @@ import lombok.NoArgsConstructor;
 public class PostRequest {
     private String title;
     private String description;
-    private String image_path;
+    private String imagePath;
 }

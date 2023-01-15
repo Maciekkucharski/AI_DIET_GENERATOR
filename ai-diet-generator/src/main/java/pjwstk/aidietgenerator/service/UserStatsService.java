@@ -50,7 +50,7 @@ public class UserStatsService {
         User currentUser = userDetailsService.findCurrentUser();
         if(currentUser != null){
             if(request.getImage_path() !=null || !request.getImage_path().equals(""))
-                currentUser.setImage_path(request.getImage_path());
+                currentUser.setImagePath(request.getImage_path());
             userRepository.save(currentUser);
         }
     }

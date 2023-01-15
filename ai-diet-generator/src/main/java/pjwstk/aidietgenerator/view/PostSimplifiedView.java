@@ -23,7 +23,6 @@ public class PostSimplifiedView {
     private User author;
 
     private String userProfilePicture;
-
     private int commentsCount;
     private int likesCount;
 }

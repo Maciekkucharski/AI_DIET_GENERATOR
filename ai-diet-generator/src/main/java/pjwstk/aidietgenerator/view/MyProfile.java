@@ -16,7 +16,7 @@ public class MyProfile {
     private User user;
     private List<UserStats> userStats;
     private Socials socials;
-    private String profilePicturePath;
+    private String profileImagePath;
     private List<Post> userPosts;
     private List<Recipe> userRecipes;
     // wykluczenia

@@ -11,5 +11,5 @@ import org.springframework.web.multipart.MultipartFile;
 @Setter
 @Getter
 public class ImageRequest {
-    private MultipartFile multipartFile;
+    private MultipartFile image;
 }

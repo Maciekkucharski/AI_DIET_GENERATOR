@@ -10,5 +10,5 @@ import lombok.Setter;
 @Setter
 @Getter
 public class ImagePathRequest {
-    private String image_path;
+    private String imagePath;
 }

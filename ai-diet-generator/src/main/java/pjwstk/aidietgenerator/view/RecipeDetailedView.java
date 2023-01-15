@@ -15,16 +15,12 @@ import java.util.List;
 @Getter
 public class RecipeDetailedView {
     private RecipeView recipeView;
-
-    // TODO
-    private String imagePath = "TODO";
+    private String recipeImagePath;
 
     @JsonIgnoreProperties({"authorities", "username", "email", "authority"})
     private User author;
 
-    // TODO
-    private String userProfilePicture = "TODO";
-
+    private String profileImagePath;
     private List<CommentView> recipeComments;
     private List<RecipeLike> recipeLikes;
 }

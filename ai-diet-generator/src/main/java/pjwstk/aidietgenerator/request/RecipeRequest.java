@@ -5,7 +5,6 @@ import pjwstk.aidietgenerator.entity.Ingredient;
 import pjwstk.aidietgenerator.entity.User;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.List;
 
 @NoArgsConstructor
@@ -15,7 +14,7 @@ public class RecipeRequest {
     private String title;
     private int servings;
     private int readyInMinutes;
-    private String image;
+    private String imagePath;
     private String instructions;
     private boolean vegetarian;
     private boolean vegan;
@@ -36,7 +35,7 @@ public class RecipeRequest {
     public RecipeRequest(String title,
                       int servings,
                       int readyInMinutes,
-                      String image,
+                      String imagePath,
                       String instructions,
                       boolean vegetarian, boolean vegan, boolean glutenFree, boolean dairyFree, boolean veryHealthy, boolean verified,
                       Timestamp created_at,
@@ -49,7 +48,7 @@ public class RecipeRequest {
         this.title = title;
         this.servings = servings;
         this.readyInMinutes = readyInMinutes;
-        this.image = image;
+        this.imagePath = imagePath;
         this.instructions = instructions;
         this.vegetarian = vegetarian;
         this.vegan = vegan;
@@ -78,8 +77,8 @@ public class RecipeRequest {
         return readyInMinutes;
     }
 
-    public String getImage() {
-        return image;
+    public String getImagePath() {
+        return imagePath;
     }
 
     public String getInstructions() {

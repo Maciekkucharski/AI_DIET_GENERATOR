@@ -8,7 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class UserExtrasRequest {
-    private String background_image;
+    private String backgroundImagePath;
     private String about_me;
     private String profession;
 }

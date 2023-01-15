@@ -1,9 +1,7 @@
 package pjwstk.aidietgenerator.service;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
-import pjwstk.aidietgenerator.entity.Gender;
 import pjwstk.aidietgenerator.view.MyProfile;
 import pjwstk.aidietgenerator.entity.User;
 import pjwstk.aidietgenerator.view.UserProfile;
@@ -19,7 +17,6 @@ import pjwstk.aidietgenerator.view.WeightView;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -52,7 +49,7 @@ public class ProfileService {
         User currentUser = userDetailsService.findCurrentUser();
         if(currentUser != null){
             currentUserProfile.setUser(currentUser);
-            currentUserProfile.setProfilePicturePath(currentUser.getImage_path());
+            currentUserProfile.setProfileImagePath(currentUser.getImagePath());
             currentUserProfile.setUserStats(userStatsRepository.findByuser(currentUser));
             currentUserProfile.setSocials(socialsRepository.findByuser(currentUser));
             currentUserProfile.setUserPosts(postRepository.findByuser(currentUser));
@@ -69,7 +66,7 @@ public class ProfileService {
         Optional<User> selectedUser = userRepository.findById(userID);
         if(!selectedUser.isEmpty()){
             selectedUserProfile.setUser(selectedUser.get());
-            selectedUserProfile.setProfilePicturePath(selectedUser.get().getImage_path());
+            selectedUserProfile.setImagePath(selectedUser.get().getImagePath());
             selectedUserProfile.setSocials(socialsRepository.findByuser(selectedUser.get()));
             selectedUserProfile.setUserPosts(postRepository.findByuser(selectedUser.get()));
             response.setStatus(HttpStatus.OK.value());
@@ -97,7 +94,7 @@ public class ProfileService {
         if(currentUser != null){
             response.setStatus(HttpStatus.OK.value());
             return new ProfileInfoView(currentUser.getId(),
-                    currentUser.getImage_path(),
+                    currentUser.getImagePath(),
                     currentUser.getFirstName(),
                     currentUser.getLastName(),
                     currentUser.getEmail(),

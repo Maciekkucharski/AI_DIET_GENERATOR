@@ -15,7 +15,7 @@ public class RecipeView {
     private String title;
     private int servings;
     private int readyInMinutes;
-    private String image;
+    private String imagePath;
     private String instructions;
     private boolean vegetarian;
     private boolean vegan;
@@ -36,7 +36,7 @@ public class RecipeView {
     public RecipeView(Long id, String title,
                       int servings,
                       int readyInMinutes,
-                      String image,
+                      String imagePath,
                       String instructions,
                       boolean vegetarian, boolean vegan, boolean glutenFree, boolean dairyFree, boolean veryHealthy, boolean verified,
                       Timestamp created_at,
@@ -50,7 +50,7 @@ public class RecipeView {
         this.title = title;
         this.servings = servings;
         this.readyInMinutes = readyInMinutes;
-        this.image = image;
+        this.imagePath = imagePath;
         this.instructions = instructions;
         this.vegetarian = vegetarian;
         this.vegan = vegan;
@@ -99,12 +99,12 @@ public class RecipeView {
         this.readyInMinutes = readyInMinutes;
     }
 
-    public String getImage() {
-        return image;
+    public String getImagePath() {
+        return imagePath;
     }
 
-    public void setImage(String image) {
-        this.image = image;
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
     }
 
     public String getInstructions() {

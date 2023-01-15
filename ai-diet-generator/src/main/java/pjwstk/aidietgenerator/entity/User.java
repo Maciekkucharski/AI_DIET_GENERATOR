@@ -44,7 +44,7 @@ public class User implements UserDetails {
     private Timestamp timestamp;
 
     @Column(name = "image_path")
-    private String image_path;
+    private String imagePath;
 
     public User() {
 
@@ -140,12 +140,12 @@ public class User implements UserDetails {
         this.timestamp = new Timestamp(System.currentTimeMillis());
     }
 
-    public String getImage_path() {
-        return image_path;
+    public String getImagePath() {
+        return imagePath;
     }
 
-    public void setImage_path(String image_path) {
-        this.image_path = image_path;
+    public void setImagePath(String image_path) {
+        this.imagePath = image_path;
     }
 
     public Collection<? extends GrantedAuthority> getAuthorities() {

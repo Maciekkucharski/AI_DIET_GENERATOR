@@ -49,7 +49,7 @@ public class RecipeService {
                 newRecipe.setTitle(recipeRequest.getTitle());
                 newRecipe.setServings(recipeRequest.getServings());
                 newRecipe.setReadyInMinutes(recipeRequest.getReadyInMinutes());
-                newRecipe.setImage(recipeRequest.getImage());
+                newRecipe.setImagePath(recipeRequest.getImagePath());
                 newRecipe.setInstructions(recipeRequest.getInstructions());
                 newRecipe.setVegetarian(recipeRequest.isVegetarian());
                 newRecipe.setVegan(recipeRequest.isVegan());
@@ -110,7 +110,7 @@ public class RecipeService {
                     recipe.get().getTitle(),
                     recipe.get().getServings(),
                     recipe.get().getReadyInMinutes(),
-                    recipe.get().getImage(),
+                    recipe.get().getImagePath(),
                     recipe.get().getInstructions(),
                     recipe.get().getVegetarian(),
                     recipe.get().getVegan(),
@@ -145,7 +145,7 @@ public class RecipeService {
             existingRecipe.setTitle(editedRecipe.getTitle());
             existingRecipe.setServings(editedRecipe.getServings());
             existingRecipe.setReadyInMinutes(editedRecipe.getReadyInMinutes());
-            existingRecipe.setImage(editedRecipe.getImage());
+            existingRecipe.setImagePath(editedRecipe.getImagePath());
             existingRecipe.setInstructions(editedRecipe.getInstructions());
             existingRecipe.setVegetarian(editedRecipe.isVegetarian());
             existingRecipe.setVegan(editedRecipe.isVegan());
