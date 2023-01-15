@@ -2,19 +2,28 @@ package pjwstk.aidietgenerator.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import pjwstk.aidietgenerator.entity.User;
 import pjwstk.aidietgenerator.entity.UserStats;
+import pjwstk.aidietgenerator.repository.UserRepository;
 import pjwstk.aidietgenerator.repository.UserStatsRepository;
+import pjwstk.aidietgenerator.request.ImagePathRequest;
+
+import javax.servlet.http.HttpServletResponse;
 
 @Service
 public class UserStatsService {
 
     private final UserDetailsService userDetailsService;
     private final UserStatsRepository userStatsRepository;
+    private final UserRepository userRepository;
 
     @Autowired
-    public UserStatsService(UserDetailsService userDetailsService, UserStatsRepository userStatsRepository) {
+    public UserStatsService(UserDetailsService userDetailsService,
+                            UserStatsRepository userStatsRepository,
+                            UserRepository userRepository) {
         this.userDetailsService = userDetailsService;
         this.userStatsRepository = userStatsRepository;
+        this.userRepository = userRepository;
     }
 
     public double calculateBmi(double weight, int height){
@@ -37,4 +46,12 @@ public class UserStatsService {
     }
 
 
+    public void setUserImage(ImagePathRequest request, HttpServletResponse response) {
+        User currentUser = userDetailsService.findCurrentUser();
+        if(currentUser != null){
+            if(request.getImage_path() !=null || !request.getImage_path().equals(""))
+                currentUser.setImage_path(request.getImage_path());
+            userRepository.save(currentUser);
+        }
+    }
 }

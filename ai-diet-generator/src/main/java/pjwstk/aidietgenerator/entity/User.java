@@ -22,7 +22,6 @@ public class User implements UserDetails {
     @Access(AccessType.PROPERTY)
     private Long id;
 
-//    @JsonView(UserProfile.class)
     @Column(name = "first_name")
     private String firstName;
 
@@ -43,6 +42,9 @@ public class User implements UserDetails {
 
     @Column(name = "created_at")
     private Timestamp timestamp;
+
+    @Column(name = "image_path")
+    private String image_path;
 
     public User() {
 
@@ -136,6 +138,14 @@ public class User implements UserDetails {
 
     public void setCreatedAt(){
         this.timestamp = new Timestamp(System.currentTimeMillis());
+    }
+
+    public String getImage_path() {
+        return image_path;
+    }
+
+    public void setImage_path(String image_path) {
+        this.image_path = image_path;
     }
 
     public Collection<? extends GrantedAuthority> getAuthorities() {

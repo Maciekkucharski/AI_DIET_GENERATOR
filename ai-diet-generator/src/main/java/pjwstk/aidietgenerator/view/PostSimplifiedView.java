@@ -22,7 +22,6 @@ public class PostSimplifiedView {
     @JsonIgnoreProperties({"authorities", "username", "email", "authority"})
     private User author;
 
-    // TODO
     private String userProfilePicture;
 
     private int commentsCount;

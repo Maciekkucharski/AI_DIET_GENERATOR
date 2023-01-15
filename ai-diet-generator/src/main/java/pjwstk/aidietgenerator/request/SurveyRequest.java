@@ -1,26 +1,15 @@
 package pjwstk.aidietgenerator.request;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import pjwstk.aidietgenerator.entity.Question;
-
 import java.util.List;
 
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
 public class SurveyRequest {
     private List<String> exclusions;
     private List<Question> answers;
-
-    public SurveyRequest(List<String> exclusions, List<Question> answers) {
-        this.exclusions = exclusions;
-        this.answers = answers;
-    }
-
-    public SurveyRequest() {
-    }
-
-    public List<String> getExclusions() {
-        return exclusions;
-    }
-
-    public List<Question> getAnswers() {
-        return answers;
-    }
 }

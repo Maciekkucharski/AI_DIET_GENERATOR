@@ -3,12 +3,12 @@ package pjwstk.aidietgenerator.request;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
+@Setter
 @Getter
-public class PostRequest {
-    private String title;
-    private String description;
+public class ImagePathRequest {
     private String image_path;
 }
