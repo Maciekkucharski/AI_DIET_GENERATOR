@@ -1,9 +1,7 @@
 package pjwstk.aidietgenerator.service;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
-import pjwstk.aidietgenerator.entity.Gender;
 import pjwstk.aidietgenerator.view.MyProfile;
 import pjwstk.aidietgenerator.entity.User;
 import pjwstk.aidietgenerator.view.UserProfile;
@@ -19,7 +17,6 @@ import pjwstk.aidietgenerator.view.WeightView;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -177,7 +174,11 @@ public class ProfileService {
                 updatedUserStats.setBmi(0.0);
             }
 
-            updatedUserStats.setUpdatedAt();
+            if(profileInfoRequest.getTimestamp() != null){
+                updatedUserStats.setTimestamp(profileInfoRequest.getTimestamp());
+            } else {
+                updatedUserStats.setUpdatedAt();
+            }
             updatedUserStats.setUser(currentUser);
 
             if(profileInfoRequest.getEmail() != null) {
@@ -217,13 +218,19 @@ public class ProfileService {
         }
     }
 
-    public void deleteUserStatsEntry(long id, HttpServletResponse response){
+    public void deleteUserStatsWeightEntry(long id, HttpServletResponse response){
         User currentUser = userDetailsService.findCurrentUser();
         if(currentUser == null){
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
         } else {
-            userStatsRepository.deleteById(id);
-            response.setStatus(HttpStatus.ACCEPTED.value());
+            Optional<UserStats> stats = userStatsRepository.findById(id);
+            if(stats.isPresent()){
+                stats.get().setWeight(0.0);
+                userStatsRepository.save(stats.get());
+                response.setStatus(HttpStatus.ACCEPTED.value());
+            } else {
+                response.setStatus(HttpStatus.NOT_FOUND.value());
+            }
         }
     }
 }

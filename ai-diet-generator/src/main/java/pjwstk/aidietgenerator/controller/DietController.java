@@ -2,12 +2,14 @@ package pjwstk.aidietgenerator.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import pjwstk.aidietgenerator.entity.DietWeek;
 import pjwstk.aidietgenerator.entity.ExcludedProductsList;
 import pjwstk.aidietgenerator.entity.Product;
 import pjwstk.aidietgenerator.entity.User;
 import pjwstk.aidietgenerator.repository.ExcludedProductsListRepository;
 import pjwstk.aidietgenerator.repository.ProductRepository;
 import pjwstk.aidietgenerator.repository.RecipeRepository;
+import pjwstk.aidietgenerator.request.DietRequest;
 import pjwstk.aidietgenerator.service.DietService;
 import pjwstk.aidietgenerator.service.UserDetailsService;
 
@@ -38,9 +40,8 @@ public class DietController {
 
     @PostMapping("/generate")
     @Transactional
-    public void getIds() throws IOException {
-        User currentUser = userDetailsService.findCurrentUser();
-        dietService.getRecommendedIds(currentUser.getId());
+    public DietWeek getIds(@RequestBody DietRequest dietRequest, HttpServletResponse response) throws IOException {
+        return dietService.generateDiet(dietRequest, response);
     }
 
     @GetMapping("/products")
