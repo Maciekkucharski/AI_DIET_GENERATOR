@@ -47,7 +47,7 @@ class TestRecipesNoApi:
 
 
     @pytest.mark.parametrize("test_input,expected",
-                             [((pd.read_csv('tests/unit/data/recipes.csv'), 'Simple Skillet Lasagna'), [715573])])
+                             [((pd.read_csv('tests/unit/data/recipes.csv'), 'Simple Skillet Lasagna'), 715573)])
     def test_get_dish_df(self, test_input, expected):
         df = get_dish_id(df=test_input[0], dish_name=test_input[1])
         assert df == expected
@@ -59,7 +59,7 @@ class TestRecipesNoApi:
         assert df == expected
 
 
-    @pytest.mark.parametrize("test_input,expected", [((pd.read_csv('tests/unit/data/recipes.csv'), 'foo_dish_name'), [])])
+    @pytest.mark.parametrize("test_input,expected", [((pd.read_csv('tests/unit/data/recipes.csv'), 'foo_dish_name'), None)])
     def test_get_dish_wrong_name(self, test_input, expected):
         df = get_dish_id(df=test_input[0], dish_name=test_input[1])
         assert df == expected

@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 
 
-VERSION = '0.0.3'
+VERSION = '0.0.4'
 DESCRIPTION = 'package for recommending dishes in out taste profile, part of engeneering thesis, link to repo https://github.com/Maciekkucharski/AI_DIET_GENERATOR'
 
 # Setting up
