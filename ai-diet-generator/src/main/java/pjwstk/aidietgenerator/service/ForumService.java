@@ -116,7 +116,7 @@ public class ForumService {
             } else {
                 Post newPost = new Post();
                 newPost.setTitle(post.getTitle());
-                newPost.setImagePath(post.getImage_path());
+                newPost.setImagePath(post.getImagePath());
                 newPost.setUser(currentUser);
                 newPost.setCreatedAt();
                 newPost.setDescription(post.getDescription());
@@ -158,7 +158,7 @@ public class ForumService {
         if (currentUser == existingPost.getUser()) {
             if (post.getTitle() != null) existingPost.setTitle(post.getTitle());
             if (post.getDescription() != null) existingPost.setDescription(post.getDescription());
-            if (post.getImage_path() != null) existingPost.setImagePath(post.getImage_path());
+            if (post.getImagePath() != null) existingPost.setImagePath(post.getImagePath());
             postRepository.save(existingPost);
             response.setStatus(HttpStatus.OK.value());
         } else {
@@ -241,7 +241,7 @@ public class ForumService {
                 newRecipeSimplifiedView.setTimestamp(recipe.getTimestamp());
                 newRecipeSimplifiedView.setDescription(recipe.getInstructions());
                 newRecipeSimplifiedView.setAuthor(recipe.getUser());
-                newRecipeSimplifiedView.setUserProfilePicture(recipe.getUser().getImagePath());
+                newRecipeSimplifiedView.setProfileImagePath(recipe.getUser().getImagePath());
                 newRecipeSimplifiedView.setCommentsCount(recipeCommentsRepository.findByrecipe(recipe).size());
                 newRecipeSimplifiedView.setLikesCount(recipeLikesRepository.findByrecipe(recipe).size());
                 recipeSimplifiedViewList.add(newRecipeSimplifiedView);
@@ -260,9 +260,9 @@ public class ForumService {
             RecipeDetailedView detailedRecipe = new RecipeDetailedView();
             RecipeView view = recipeService.view(recipeID, response);
             detailedRecipe.setRecipeView(view);
-            detailedRecipe.setImagePath(recipe.get().getImagePath());
+            detailedRecipe.setRecipeImagePath(recipe.get().getImagePath());
             detailedRecipe.setAuthor(recipe.get().getUser());
-            detailedRecipe.setUserProfilePicture(recipe.get().getUser().getImagePath());
+            detailedRecipe.setProfileImagePath(recipe.get().getUser().getImagePath());
             detailedRecipe.setRecipeLikes(recipeLikesRepository.findByrecipe(recipe.get()));
             List<CommentView> recipeCommentsView = new ArrayList<>();
             for (RecipeComment comment : recipeCommentsRepository.findByrecipe(recipe.get())){

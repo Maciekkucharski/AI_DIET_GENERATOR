@@ -42,7 +42,7 @@ public class ImageService {
         BlobId blobId = BlobId.of(bucketName, fileName);
         BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("multipart").build();
         try {
-            Blob blob = storage.create(blobInfo, imageRequest.getMultipartFile().getBytes());
+            Blob blob = storage.create(blobInfo, imageRequest.getImage().getBytes());
             response.setStatus(HttpStatus.OK.value());
             return URL;
         } catch (StorageException e){

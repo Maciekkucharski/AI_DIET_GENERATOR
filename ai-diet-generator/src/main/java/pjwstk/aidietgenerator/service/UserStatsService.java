@@ -49,8 +49,8 @@ public class UserStatsService {
     public void setUserImage(ImagePathRequest request, HttpServletResponse response) {
         User currentUser = userDetailsService.findCurrentUser();
         if(currentUser != null){
-            if(request.getImage_path() !=null || !request.getImage_path().equals(""))
-                currentUser.setImagePath(request.getImage_path());
+            if(request.getImagePath() !=null || !request.getImagePath().equals(""))
+                currentUser.setImagePath(request.getImagePath());
             userRepository.save(currentUser);
         }
     }
