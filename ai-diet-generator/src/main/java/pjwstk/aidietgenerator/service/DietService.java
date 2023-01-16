@@ -178,13 +178,38 @@ public class DietService {
         }
     }
 
+    public DietDay generateDietForDay(List<Long> recommendedRecipesIds, double caloriesPerDay, int mealsPerDay, List<Long> usedRecipesIds){
+        DietDay dietDay = new DietDay();
+        double remainingCalories = caloriesPerDay;
+        List<Recipe> recipesToday = new ArrayList<>();
+        int addedMealsForToday = 0;
+
+
+        for (Long id : recommendedRecipesIds) {
+            Optional<Recipe> currentRecipe = recipeRepository.findById(id);
+            if (currentRecipe.get().getCalories() < remainingCalories) {
+                recipesToday.add(currentRecipe.get());
+                remainingCalories = remainingCalories - currentRecipe.get().getCalories();
+                addedMealsForToday++;
+
+                if(addedMealsForToday == mealsPerDay){
+                    break;
+                }
+            }
+        }
+
+//        if
+        dietDay.setRecipesForToday(recipesToday);
+        return dietDay;
+    }
+
     public DietWeek generateDiet(DietRequest dietRequest, HttpServletResponse response) throws IOException {
         User currentUser = userDetailsService.findCurrentUser();
         DietWeek newDiet = new DietWeek();
 
         PhysicalActivity physicalActivity = dietRequest.getPhysicalActivity();
         DietGoal dietGoal = dietRequest.getDietGoal();
-        ExcludedProductsList excludedProductsList = dietRequest.getExcludedProductsList();
+        List<Product> excludedProductsList = dietRequest.getExcludedProductsList();
         int mealsPerDay = dietRequest.getMealsPerDay();
 
         if(currentUser != null) {
@@ -213,31 +238,12 @@ public class DietService {
                     List<Long> usedRecipesIds = new ArrayList<>();
 
                     for(int i=0; i<7; i++){
-                        DietDay dietDay = new DietDay();
-                        double remainingCalories = caloriesPerDay;
-                        List<Recipe> recipesToday = new ArrayList<>();
-                        int addedMealsForToday = 0;
-
-
-                        for (Long id : recommendedRecipesIds) {
-                            Optional<Recipe> currentRecipe = recipeRepository.findById(id);
-                            if (currentRecipe.get().getCalories() < remainingCalories) {
-                                recipesToday.add(currentRecipe.get());
-                                remainingCalories = remainingCalories - currentRecipe.get().getCalories();
-                                usedRecipesIds.add(id);
-                                addedMealsForToday++;
-
-                                if(addedMealsForToday == mealsPerDay){
-                                    recommendedRecipesIds.removeAll(usedRecipesIds);
-                                    break;
-                                }
-                            }
-                        }
-
-                        dietDay.setRecipesForToday(recipesToday);
+                        DietDay dietDay = generateDietForDay(recommendedRecipesIds, caloriesPerDay, mealsPerDay, usedRecipesIds);
                         dietDay.setDietWeek(newDiet);
-//                           dayDietRepository.save(dietDay);
 
+                        usedRecipesIds.addAll(dietDay.getTodaysRecipesIds());
+                        recommendedRecipesIds.removeAll(usedRecipesIds);
+//                           dayDietRepository.save(dietDay);
                         dietWeek.add(dietDay);
                     }
                     newDiet.setDaysForWeekDiet(dietWeek);
@@ -245,12 +251,10 @@ public class DietService {
 
                 } else {
                     response.setStatus(HttpStatus.BAD_REQUEST.value());
-                    System.out.println("Jeblo ze statami");
                     return null;
                 }
             } else {
                 response.setStatus(HttpStatus.BAD_REQUEST.value());
-                System.out.println("Jeblo z historia stat");
                 return null;
             }
         } else {
