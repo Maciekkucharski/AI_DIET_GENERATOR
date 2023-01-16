@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -56,5 +57,16 @@ public class DietDay {
 
     public void setRecipesForToday(List<Recipe> recipesForToday) {
         this.recipesForToday = recipesForToday;
+    }
+
+    public List<Long> getTodaysRecipesIds(){
+        List<Recipe> todaysRecipes = getRecipesForToday();
+        List<Long> todaysIds = new ArrayList<>();
+
+        for(Recipe recipe : todaysRecipes){
+            todaysIds.add(recipe.getId());
+        }
+
+        return todaysIds;
     }
 }
