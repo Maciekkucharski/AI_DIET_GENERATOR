@@ -232,18 +232,46 @@ public class DietService {
         }
         return false;
     }
+//  TERA TUTAJ JEDEN PRZEPIS ZAMIENIA NA JEDEN PRZEPIS JEZELI DA RADE
+    public List<Long> replaceRemovedRecipes(List<Long> removedRecipesIds, List<Product> excludedProductsList) throws IOException {
+        int numberOfRemovedRecipes = removedRecipesIds.size();
+        List<Long> replacementRecipesIds = new ArrayList<>();
+
+        for(Long removedRecipeId : removedRecipesIds){
+            List<Long> replacementIds = getRecommendedReplacementIds(removedRecipeId);
+            boolean replaced = false;
+
+            for(Long replacementId : replacementIds){
+                Optional<Recipe> suggestedRecipe = recipeRepository.findById(replacementId);
+
+                for(Product excludedProduct : excludedProductsList){
+                    if(checkForExcludedProduct(suggestedRecipe.get(), excludedProduct) == true) {
+                        break;
+                    }
+                }
+                if(replaced){
+                    break;
+                }
+            }
+        }
+
+        return replacementRecipesIds;
+    }
     public List<Long> getFilteredRecommendedIds(List<Long> recommendedIds, List<Product> excludedProductsList){
         List<Recipe> recommendedRecipes = recipeRepository.findAllById(recommendedIds);
         List<Long> newRecommendedIds = recommendedIds;
+        List<Long> removedIds = new ArrayList<>();
 
         for(Recipe currentRecipe : recommendedRecipes){
             for(Product product : excludedProductsList){
                 if(checkForExcludedProduct(currentRecipe, product) ==  true) {
                     newRecommendedIds.remove(currentRecipe.getId());
+                    removedIds.add(currentRecipe.getId());
                     break;
                 }
             }
         }
+
         return newRecommendedIds;
     }
     public DietWeek generateDiet(DietRequest dietRequest, HttpServletResponse response) throws IOException {
