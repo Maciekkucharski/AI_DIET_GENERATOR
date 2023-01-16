@@ -62,7 +62,7 @@ public class ProfileService {
             currentUserProfile.setSocials(socialsRepository.findByuser(currentUser));
             List<PostDetailedView> userPostsView = new ArrayList<>();
             for(Post post : postRepository.findByuser(currentUser)){
-                userPostsView.add(forumService.viewPost(post.getId(), null));
+                userPostsView.add(forumService.viewPost(post.getId(), response));
             }
             currentUserProfile.setUserPosts(userPostsView);
             currentUserProfile.setProfileImagePath(currentUser.getImagePath());
