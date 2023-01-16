@@ -14,6 +14,7 @@ import pjwstk.aidietgenerator.repository.RecipeRepository;
 import pjwstk.aidietgenerator.repository.UserExtrasRepository;
 import pjwstk.aidietgenerator.repository.UserRepository;
 import pjwstk.aidietgenerator.service.UserDetailsService;
+
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Optional;
@@ -26,7 +27,6 @@ public class ImageService {
     private final RecipeRepository recipeRepository;
     private final PostRepository postRepository;
     private final UserRepository userRepository;
-
     private final UserExtrasRepository userExtrasRepository;
 
     @Autowired
@@ -52,59 +52,136 @@ public class ImageService {
         BlobId blobId = BlobId.of(bucketName, fileName);
         BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("multipart").build();
         try {
-            Blob blob = storage.create(blobInfo, imageRequest.getImage().getBytes());
+            storage.create(blobInfo, imageRequest.getImage().getBytes());
             response.setStatus(HttpStatus.OK.value());
             return URL;
-        } catch (StorageException e){
+        } catch (StorageException e) {
             response.setStatus(e.getCode());
             return e.getMessage();
         }
     }
 
-    public String updateImage(ImageRequest imageRequest, String folder, Optional<Long> ID, HttpServletResponse response) throws IOException, StorageException {
-        boolean deleted = false;
-        if(folder.equals("Profile")){
-            User existingUser = userDetailsService.findCurrentUser();
-            String imagePath = existingUser.getImagePath();
-            if(imagePath != null) {
-                String fileName = imagePath.replace("https://storage.cloud.google.com/foodie-images/", "");
-                BlobId blobId = BlobId.of(bucketName, fileName);
-                deleted = storage.delete(blobId);
-            }
-        } else if (folder.equals("Background")) {
-            UserExtras existingUserExtras = userExtrasRepository.findByuser(userDetailsService.findCurrentUser());
-            String imagePath = existingUserExtras.getBackground_image();
-            if(imagePath != null) {
-                String fileName = imagePath.replace("https://storage.cloud.google.com/foodie-images/", "");
-                BlobId blobId = BlobId.of(bucketName, fileName);
-                deleted = storage.delete(blobId);
-            }
-        } else if (folder.equals("Post")) {
-            Optional<Post> existingPost = postRepository.findById(ID.get());
-            if(existingPost.isPresent()){
-                String imagePath = existingPost.get().getImagePath();
-                if(imagePath != null){
-                    String fileName = imagePath.replace("https://storage.cloud.google.com/foodie-images/", "");
-                    BlobId blobId = BlobId.of(bucketName, fileName);
-                    deleted = storage.delete(blobId);
+    public String updateImage(ImageRequest imageRequest, String folder, long ID, HttpServletResponse response) throws IOException, StorageException {
+        boolean deleted = delete(folder, ID);
+        if (deleted) {
+            String newURL = uploadImage(imageRequest, folder, response);
+            User currentUser = userDetailsService.findCurrentUser();
+            if (newURL.contains("https://storage.cloud.google.com/foodie-images/")) {
+                switch (folder) {
+                    case "Profile": {
+                        currentUser.setImagePath(newURL);
+                        userRepository.save(currentUser);
+                        response.setStatus(HttpStatus.OK.value());
+                        return "Profile image updated.";
+                    }
+                    case "Background": {
+                        UserExtras existingUserExtras = userExtrasRepository.findByuser(currentUser);
+                        existingUserExtras.setBackground_image(newURL);
+                        userExtrasRepository.save(existingUserExtras);
+                        response.setStatus(HttpStatus.OK.value());
+                        return "Background image updated.";
+                    }
+                    case "Post": {
+                        Optional<Post> existingPost = postRepository.findById(ID);
+                        if (existingPost.isPresent() && existingPost.get().getUser() == currentUser) {
+                            existingPost.get().setImagePath(newURL);
+                            postRepository.save(existingPost.get());
+                        }
+                        response.setStatus(HttpStatus.OK.value());
+                        return "Post image updated.";
+                    }
+                    case "Recipe": {
+                        Optional<Recipe> existingRecipe = recipeRepository.findById(ID);
+                        if (existingRecipe.isPresent() && existingRecipe.get().getUser() == currentUser) {
+                            existingRecipe.get().setImagePath(newURL);
+                            recipeRepository.save(existingRecipe.get());
+                        }
+                        response.setStatus(HttpStatus.OK.value());
+                        return "Recipe image updated.";
+                    }
                 }
-            }
-        } else if (folder.equals("Recipe")) {
-            Optional<Recipe> existingRecipe = recipeRepository.findById(ID.get());
-            if(existingRecipe.isPresent()){
-                String imagePath = existingRecipe.get().getImagePath();
-                if(imagePath != null){
-                    String fileName = imagePath.replace("https://storage.cloud.google.com/foodie-images/", "");
-                    BlobId blobId = BlobId.of(bucketName, fileName);
-                    deleted = storage.delete(blobId);
-                }
+            } else {
+                response.setStatus(HttpStatus.CONFLICT.value());
+                return "Error occurred. Image was not updated";
             }
         }
-        if(deleted){
-            return uploadImage(imageRequest, folder, response);
+        response.setStatus(HttpStatus.CONFLICT.value());
+        return "Error occurred. Image was not updated";
+    }
+
+    public String deleteImage(String folder, long ID, HttpServletResponse response) {
+        boolean deleted = delete(folder, ID);
+        if (deleted) {
+            response.setStatus(HttpStatus.OK.value());
+            return "Image deleted.";
         } else {
             response.setStatus(HttpStatus.CONFLICT.value());
-            return "Error occurred. Image was not updated";
+            return "Error occurred. Image was not deleted";
         }
+    }
+
+    private boolean delete(String folder, long ID) {
+        boolean deleted = false;
+        User currentUser = userDetailsService.findCurrentUser();
+        switch (folder) {
+            case "Profile": {
+                String imagePath = currentUser.getImagePath();
+                if (imagePath != null && imagePath.contains("https://storage.cloud.google.com/foodie-images/")) {
+                    String fileName = imagePath.replace("https://storage.cloud.google.com/foodie-images/", "");
+                    BlobId blobId = BlobId.of(bucketName, fileName);
+                    deleted = storage.delete(blobId);
+                    if (deleted) {
+                        currentUser.setImagePath(null);
+                        userRepository.save(currentUser);
+                    }
+                }
+                break;
+            }
+            case "Background": {
+                UserExtras existingUserExtras = userExtrasRepository.findByuser(currentUser);
+                String imagePath = existingUserExtras.getBackground_image();
+                if (imagePath != null && imagePath.contains("https://storage.cloud.google.com/foodie-images/")) {
+                    String fileName = imagePath.replace("https://storage.cloud.google.com/foodie-images/", "");
+                    BlobId blobId = BlobId.of(bucketName, fileName);
+                    deleted = storage.delete(blobId);
+                    if (deleted) {
+                        existingUserExtras.setBackground_image(null);
+                        userExtrasRepository.save(existingUserExtras);
+                    }
+                }
+                break;
+            }
+            case "Post":
+                Optional<Post> existingPost = postRepository.findById(ID);
+                if (existingPost.isPresent()) {
+                    String imagePath = existingPost.get().getImagePath();
+                    if (imagePath != null && imagePath.contains("https://storage.cloud.google.com/foodie-images/") && existingPost.get().getUser() == currentUser) {
+                        String fileName = imagePath.replace("https://storage.cloud.google.com/foodie-images/", "");
+                        BlobId blobId = BlobId.of(bucketName, fileName);
+                        deleted = storage.delete(blobId);
+                        if (deleted) {
+                            existingPost.get().setImagePath(null);
+                            postRepository.save(existingPost.get());
+                        }
+                    }
+                }
+                break;
+            case "Recipe":
+                Optional<Recipe> existingRecipe = recipeRepository.findById(ID);
+                if (existingRecipe.isPresent()) {
+                    String imagePath = existingRecipe.get().getImagePath();
+                    if (imagePath != null && imagePath.contains("https://storage.cloud.google.com/foodie-images/") && existingRecipe.get().getUser() == currentUser) {
+                        String fileName = imagePath.replace("https://storage.cloud.google.com/foodie-images/", "");
+                        BlobId blobId = BlobId.of(bucketName, fileName);
+                        deleted = storage.delete(blobId);
+                        if (deleted) {
+                            existingRecipe.get().setImagePath(null);
+                            recipeRepository.save(existingRecipe.get());
+                        }
+                    }
+                }
+                break;
+        }
+        return deleted;
     }
 }
