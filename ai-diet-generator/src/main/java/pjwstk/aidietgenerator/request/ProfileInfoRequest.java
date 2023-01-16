@@ -5,7 +5,7 @@ import pjwstk.aidietgenerator.entity.Gender;
 import java.sql.Timestamp;
 
 public class ProfileInfoRequest {
-    private String profilePicturePath;
+    private String profileImagePath;
     private String firstName;
     private String lastName;
     private Integer age;
@@ -20,7 +20,7 @@ public class ProfileInfoRequest {
 
     }
 
-    public ProfileInfoRequest(String profilePicturePath,
+    public ProfileInfoRequest(String profileImagePath,
                               String firstName,
                               String lastName,
                               int age,
@@ -30,7 +30,7 @@ public class ProfileInfoRequest {
                               Gender gender,
                               Timestamp timestamp) {
 
-        this.profilePicturePath = profilePicturePath;
+        this.profileImagePath = profileImagePath;
         this.firstName = firstName;
         this.lastName = lastName;
         this.age = age;
@@ -41,8 +41,8 @@ public class ProfileInfoRequest {
         this.timestamp = timestamp;
     }
 
-    public String getProfilePicturePath() {
-        return profilePicturePath;
+    public String getProfileImagePath() {
+        return profileImagePath;
     }
 
     public String getFirstName() {
