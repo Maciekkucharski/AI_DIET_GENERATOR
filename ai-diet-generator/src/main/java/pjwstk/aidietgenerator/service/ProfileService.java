@@ -1,18 +1,15 @@
 package pjwstk.aidietgenerator.service;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
-import pjwstk.aidietgenerator.view.MyProfile;
+import pjwstk.aidietgenerator.entity.Post;
+import pjwstk.aidietgenerator.entity.UserExtras;
+import pjwstk.aidietgenerator.repository.*;
+import pjwstk.aidietgenerator.view.*;
 import pjwstk.aidietgenerator.entity.User;
-import pjwstk.aidietgenerator.view.UserProfile;
 import pjwstk.aidietgenerator.entity.UserStats;
-import pjwstk.aidietgenerator.repository.PostRepository;
-import pjwstk.aidietgenerator.repository.SocialsRepository;
-import pjwstk.aidietgenerator.repository.UserRepository;
-import pjwstk.aidietgenerator.repository.UserStatsRepository;
 import pjwstk.aidietgenerator.request.ProfileInfoRequest;
-import pjwstk.aidietgenerator.view.ProfileInfoView;
-import pjwstk.aidietgenerator.view.WeightView;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
@@ -29,19 +26,31 @@ public class ProfileService {
     private final UserDetailsService userDetailsService;
     private final PostRepository postRepository;
     private final UserStatsService userStatsService;
+    private final UserExtrasRepository userExtrasRepository;
+    private final RecipeRepository recipeRepository;
+    private final ExcludedProductsListRepository excludedProductsListRepository;
+    private final ForumService forumService;
 
     public ProfileService(UserRepository userRepository,
                           SocialsRepository socialsRepository,
                           UserStatsRepository userStatsRepository,
                           UserDetailsService userDetailsService,
                           PostRepository postRepository,
-                          UserStatsService userStatsService) {
+                          UserStatsService userStatsService,
+                          UserExtrasRepository userExtrasRepository,
+                          RecipeRepository recipeRepository,
+                          ExcludedProductsListRepository excludedProductsListRepository,
+                          ForumService forumService) {
         this.userRepository = userRepository;
         this.socialsRepository = socialsRepository;
         this.userStatsRepository = userStatsRepository;
         this.userDetailsService = userDetailsService;
         this.postRepository = postRepository;
         this.userStatsService = userStatsService;
+        this.userExtrasRepository = userExtrasRepository;
+        this.recipeRepository = recipeRepository;
+        this.excludedProductsListRepository = excludedProductsListRepository;
+        this.forumService = forumService;
     }
 
     public MyProfile getLoggedUserProfile(HttpServletResponse response){
@@ -50,9 +59,17 @@ public class ProfileService {
         if(currentUser != null){
             currentUserProfile.setUser(currentUser);
             currentUserProfile.setProfileImagePath(currentUser.getImagePath());
-            currentUserProfile.setUserStats(userStatsRepository.findByuser(currentUser));
             currentUserProfile.setSocials(socialsRepository.findByuser(currentUser));
-            currentUserProfile.setUserPosts(postRepository.findByuser(currentUser));
+            List<PostDetailedView> userPostsView = new ArrayList<>();
+            for(Post post : postRepository.findByuser(currentUser)){
+                userPostsView.add(forumService.viewPost(post.getId(), null));
+            }
+            currentUserProfile.setUserPosts(userPostsView);
+            currentUserProfile.setProfileImagePath(currentUser.getImagePath());
+            currentUserProfile.setSubscribed(true); // TODO
+            currentUserProfile.setUserRecipes(recipeRepository.findByuser(currentUser));
+            currentUserProfile.setExcludedProductsList(excludedProductsListRepository.findByuser(currentUser));
+            currentUserProfile.setUserExtras(userExtrasRepository.findByuser(currentUser));
             response.setStatus(HttpStatus.OK.value());
             return currentUserProfile;
         } else {

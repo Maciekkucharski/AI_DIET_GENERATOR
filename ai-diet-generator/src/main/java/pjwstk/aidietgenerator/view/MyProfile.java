@@ -14,12 +14,15 @@ import java.util.List;
 public class MyProfile {
     @JsonIgnoreProperties({"password"})
     private User user;
-    private List<UserStats> userStats;
     private Socials socials;
     private String profileImagePath;
-    private List<Post> userPosts;
+    private Boolean subscribed;
+    private UserExtras userExtras;
+    @JsonIgnoreProperties("user")
+    private List<PostDetailedView> userPosts;
+    @JsonIgnoreProperties("user")
     private List<Recipe> userRecipes;
-    // wykluczenia
+    private ExcludedProductsList excludedProductsList;
 }
 
 //profil dietetyk: about me, tytuł
