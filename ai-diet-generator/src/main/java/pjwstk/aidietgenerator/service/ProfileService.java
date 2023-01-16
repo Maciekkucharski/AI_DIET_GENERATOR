@@ -141,6 +141,10 @@ public class ProfileService {
                 lastUserStats.setCal(0);
             }
 
+//            if(profileInfoRequest.getProfilePicturePath() != null) {
+//
+//            }
+
             if(profileInfoRequest.getFirstName() != null) {currentUser.setFirstName(profileInfoRequest.getFirstName());}
             if(profileInfoRequest.getLastName() != null) {currentUser.setLastName(profileInfoRequest.getLastName());}
 
