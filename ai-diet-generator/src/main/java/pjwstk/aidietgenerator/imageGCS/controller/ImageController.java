@@ -44,4 +44,25 @@ public class ImageController {
     public String uploadRecipePicture(@ModelAttribute ImageRequest imageRequest, HttpServletResponse response) throws IOException, StorageException {
         return imageService.uploadImage(imageRequest, "Recipe", response);
     }
+
+    @PostMapping("/profile")
+    public String updateProfilePicture(@ModelAttribute ImageRequest imageRequest, HttpServletResponse response) throws IOException, StorageException {
+        return imageService.updateImage(imageRequest, "Profile", null, response);
+    }
+
+    @PostMapping("/background")
+    public String updateBackgroundPicture(@ModelAttribute ImageRequest imageRequest, HttpServletResponse response) throws IOException, StorageException {
+        return imageService.updateImage(imageRequest, "Background", null, response);
+    }
+
+    @PostMapping("/post/{ID}")
+    public String updatePostPicture(@ModelAttribute ImageRequest imageRequest, HttpServletResponse response) throws IOException, StorageException {
+        return imageService.updateImage(imageRequest, "Post", @PathVariable(name = "ID") long id, response);
+    }
+
+    @PostMapping("/recipe/{ID}")
+    public String updateRecipePicture(@ModelAttribute ImageRequest imageRequest, HttpServletResponse response) throws IOException, StorageException {
+        return imageService.updateImage(imageRequest, "Recipe", response);
+    }
+
 }
