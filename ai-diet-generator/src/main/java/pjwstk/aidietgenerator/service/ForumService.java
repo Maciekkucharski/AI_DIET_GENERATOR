@@ -262,7 +262,7 @@ public class ForumService {
             detailedRecipe.setRecipeView(view);
             detailedRecipe.setRecipeImagePath(recipe.get().getImagePath());
             detailedRecipe.setAuthor(recipe.get().getUser());
-            detailedRecipe.setProfileImagePath(recipe.get().getUser().getImagePath());
+            detailedRecipe.setUserImagePath(recipe.get().getUser().getImagePath());
             detailedRecipe.setRecipeLikes(recipeLikesRepository.findByrecipe(recipe.get()));
             List<CommentView> recipeCommentsView = new ArrayList<>();
             for (RecipeComment comment : recipeCommentsRepository.findByrecipe(recipe.get())){

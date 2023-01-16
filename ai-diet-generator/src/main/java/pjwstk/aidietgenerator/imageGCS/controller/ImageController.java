@@ -16,7 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @RestController
-@RequestMapping("/upload/image/")
+@RequestMapping("/image")
 public class ImageController {
 
     private final ImageService imageService;
@@ -25,22 +25,22 @@ public class ImageController {
     public ImageController(ImageService imageService) {
         this.imageService = imageService;
     }
-    @PostMapping("/profile")
+    @PostMapping("/upload/profile")
     public String uploadProfilePicture(@ModelAttribute ImageRequest imageRequest, HttpServletResponse response) throws IOException, StorageException {
         return imageService.uploadImage(imageRequest, "Profile", response);
     }
 
-    @PostMapping("/background")
+    @PostMapping("/upload/background")
     public String uploadBackgroundPicture(@ModelAttribute ImageRequest imageRequest, HttpServletResponse response) throws IOException, StorageException {
         return imageService.uploadImage(imageRequest, "Background", response);
     }
 
-    @PostMapping("/post/")
+    @PostMapping("/upload/post")
     public String uploadPostPicture(@ModelAttribute ImageRequest imageRequest, HttpServletResponse response) throws IOException, StorageException {
         return imageService.uploadImage(imageRequest, "Post", response);
     }
 
-    @PostMapping("/recipe/")
+    @PostMapping("/upload/recipe")
     public String uploadRecipePicture(@ModelAttribute ImageRequest imageRequest, HttpServletResponse response) throws IOException, StorageException {
         return imageService.uploadImage(imageRequest, "Recipe", response);
     }

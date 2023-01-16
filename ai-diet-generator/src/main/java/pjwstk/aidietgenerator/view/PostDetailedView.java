@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import pjwstk.aidietgenerator.entity.PostComment;
 import pjwstk.aidietgenerator.entity.PostLike;
 import pjwstk.aidietgenerator.entity.User;
 
@@ -26,7 +25,7 @@ public class PostDetailedView {
     @JsonIgnoreProperties({"authorities", "username", "email", "authority"})
     private User author;
 
-    private String profileImagePath;
+    private String userImagePath;
     private List<CommentView> postComments;
     private List<PostLike> likes;
 }
