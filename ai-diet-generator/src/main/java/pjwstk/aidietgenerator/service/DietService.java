@@ -32,10 +32,12 @@ public class DietService {
     private final WeekDietRepository weekDietRepository;
     private final UserStatsRepository userStatsRepository;
     private final RecipeRepository recipeRepository;
+    private final IngredientRepository ingredientRepository;
 
     @Autowired
     public DietService(UserDetailsService userDetailsService, ProductRepository productRepository, ExcludedProductsListRepository excludedProductsListRepository,
-                       DayDietRepository dayDietRepository, WeekDietRepository weekDietRepository, UserStatsRepository userStatsRepository, RecipeRepository recipeRepository){
+                       DayDietRepository dayDietRepository, WeekDietRepository weekDietRepository, UserStatsRepository userStatsRepository, RecipeRepository recipeRepository,
+                       IngredientRepository ingredientRepository){
         this.userDetailsService = userDetailsService;
         this.productRepository = productRepository;
         this.excludedProductsListRepository = excludedProductsListRepository;
@@ -43,6 +45,7 @@ public class DietService {
         this.weekDietRepository = weekDietRepository;
         this.userStatsRepository = userStatsRepository;
         this.recipeRepository = recipeRepository;
+        this.ingredientRepository = ingredientRepository;
     }
 
 //    Harris-Benedict Formula
@@ -177,7 +180,6 @@ public class DietService {
             return excludedProductsList;
         }
     }
-
     public DietDay generateDietForDay(List<Long> recommendedRecipesIds, double caloriesPerDay, int mealsPerDay, List<Long> usedRecipesIds){
         DietDay dietDay = new DietDay();
         double remainingCalories = caloriesPerDay;
@@ -198,11 +200,52 @@ public class DietService {
             }
         }
 
-//        if
+        if(addedMealsForToday < mealsPerDay) {
+            for (Long id : usedRecipesIds) {
+                Optional<Recipe> currentUsedRecipe = recipeRepository.findById(id);
+                if (currentUsedRecipe.get().getCalories() < remainingCalories) {
+                    recipesToday.add(currentUsedRecipe.get());
+                    remainingCalories = remainingCalories - currentUsedRecipe.get().getCalories();
+                    addedMealsForToday++;
+
+                    if (addedMealsForToday == mealsPerDay) {
+                        break;
+                    }
+                }
+            }
+        }
         dietDay.setRecipesForToday(recipesToday);
         return dietDay;
     }
 
+//    public Long replaceRecipe(Long recipeId){
+//
+//    }
+
+    public Boolean checkForExcludedProduct(Recipe recipe, Product excludedProduct){
+        List<Ingredient> currentRecipeIngredients = ingredientRepository.findByrecipe(recipe);
+        String currentProductName = excludedProduct.getName();
+        for (Ingredient currentIngredient : currentRecipeIngredients) {
+            if(currentProductName.equals(currentIngredient.getName())){
+                return true;
+            }
+        }
+        return false;
+    }
+    public List<Long> getFilteredRecommendedIds(List<Long> recommendedIds, List<Product> excludedProductsList){
+        List<Recipe> recommendedRecipes = recipeRepository.findAllById(recommendedIds);
+        List<Long> newRecommendedIds = recommendedIds;
+
+        for(Recipe currentRecipe : recommendedRecipes){
+            for(Product product : excludedProductsList){
+                if(checkForExcludedProduct(currentRecipe, product) ==  true) {
+                    newRecommendedIds.remove(currentRecipe.getId());
+                    break;
+                }
+            }
+        }
+        return newRecommendedIds;
+    }
     public DietWeek generateDiet(DietRequest dietRequest, HttpServletResponse response) throws IOException {
         User currentUser = userDetailsService.findCurrentUser();
         DietWeek newDiet = new DietWeek();
@@ -228,6 +271,7 @@ public class DietService {
                     lastUserStats.setCal((int) caloriesPerDay);
 
                     List<Long> recommendedRecipesIds = getRecommendedIds(currentUser.getId());
+                    recommendedRecipesIds = getFilteredRecommendedIds(recommendedRecipesIds, excludedProductsList);
 
                     if(recommendedRecipesIds.isEmpty()){
                         response.setStatus(HttpStatus.NO_CONTENT.value());
