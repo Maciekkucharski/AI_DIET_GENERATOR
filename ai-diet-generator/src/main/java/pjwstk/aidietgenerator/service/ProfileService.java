@@ -67,6 +67,7 @@ public class ProfileService {
             currentUserProfile.setUserPosts(userPostsView);
             currentUserProfile.setProfileImagePath(currentUser.getImagePath());
             currentUserProfile.setSubscribed(true); // TODO
+            currentUserProfile.setUserStats(userStatsRepository.findByuser(currentUser));
             currentUserProfile.setUserRecipes(recipeRepository.findByuser(currentUser));
             currentUserProfile.setExcludedProductsList(excludedProductsListRepository.findByuser(currentUser));
             currentUserProfile.setUserExtras(userExtrasRepository.findByuser(currentUser));

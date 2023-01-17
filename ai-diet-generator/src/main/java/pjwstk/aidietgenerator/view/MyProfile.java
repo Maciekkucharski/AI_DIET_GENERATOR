@@ -18,11 +18,10 @@ public class MyProfile {
     private String profileImagePath;
     private Boolean subscribed;
     private UserExtras userExtras;
+    private List<UserStats> userStats;
     @JsonIgnoreProperties("user")
     private List<PostDetailedView> userPosts;
     @JsonIgnoreProperties("user")
     private List<Recipe> userRecipes;
     private ExcludedProductsList excludedProductsList;
 }
-
-//profil dietetyk: about me, tytuł
