@@ -55,8 +55,14 @@ public class ForumService {
         this.followRepository = followRepository;
     }
 
-    public List<PostSimplifiedView> findAllSimplifiedPosts(HttpServletResponse response) {
+    public List<List<PostSimplifiedView>> findAllSimplifiedPosts(HttpServletResponse response) {
+        User currentUser = userDetailsService.findCurrentUser();
         List<PostSimplifiedView> postSimplifiedViewList = new ArrayList<>();
+        List<PostSimplifiedView> followingPostList = new ArrayList<>();
+        List<Follow> followList = new ArrayList<>();
+        if(currentUser != null) {
+            followList = followRepository.findByFollower(currentUser);
+        }
         List<Post> allPosts = postRepository.findAll();
         if (allPosts.isEmpty()) {
             response.setStatus(HttpStatus.NOT_FOUND.value());
@@ -72,10 +78,23 @@ public class ForumService {
                 postSimplifiedView.setLikesCount(postLikesRepository.findBypost(post).size());
                 postSimplifiedView.setTitle(post.getTitle());
                 postSimplifiedView.setUserProfilePicture(post.getUser().getImagePath());
-                postSimplifiedViewList.add(postSimplifiedView);
+                if(currentUser != null){
+                    for(Follow follow : followList){
+                        if(post.getUser() == follow.getUser()) {
+                            followingPostList.add(postSimplifiedView);
+                        }
+                    }
+                    postSimplifiedViewList.add(postSimplifiedView);
+                } else {
+                    postSimplifiedViewList.add(postSimplifiedView);
+                }
             }
+            List<List<PostSimplifiedView>> listOfListsToReturn = new ArrayList<>();
+            postSimplifiedViewList.removeAll(followingPostList);
+            listOfListsToReturn.add(followingPostList);
+            listOfListsToReturn.add(postSimplifiedViewList);
             response.setStatus(HttpStatus.OK.value());
-            return postSimplifiedViewList;
+            return listOfListsToReturn;
         }
     }
 
@@ -224,8 +243,14 @@ public class ForumService {
         }
     }
 
-    public List<RecipeSimplifiedView> findSimplifiedRecipes(HttpServletResponse response, String option) {
+    public List<List<RecipeSimplifiedView>> findSimplifiedRecipes(HttpServletResponse response, String option) {
+        User currentUser = userDetailsService.findCurrentUser();
         List<RecipeSimplifiedView> recipeSimplifiedViewList = new ArrayList<>();
+        List<RecipeSimplifiedView> followingRecipeList = new ArrayList<>();
+        List<Follow> followList = new ArrayList<>();
+        if(currentUser != null) {
+            followList = followRepository.findByFollower(currentUser);
+        }
         List<Recipe> allRecipes = new ArrayList<>();
         if (Objects.equals(option, "all")) {
             allRecipes = recipeRepository.findByUserNotNull();
@@ -248,10 +273,23 @@ public class ForumService {
                 newRecipeSimplifiedView.setProfileImagePath(recipe.getUser().getImagePath());
                 newRecipeSimplifiedView.setCommentsCount(recipeCommentsRepository.findByrecipe(recipe).size());
                 newRecipeSimplifiedView.setLikesCount(recipeLikesRepository.findByrecipe(recipe).size());
-                recipeSimplifiedViewList.add(newRecipeSimplifiedView);
+                if(currentUser != null && Objects.equals(option, "all")){
+                    for(Follow follow : followList){
+                        if(recipe.getUser() == follow.getUser()) {
+                            followingRecipeList.add(newRecipeSimplifiedView);
+                        }
+                    }
+                    recipeSimplifiedViewList.add(newRecipeSimplifiedView);
+                } else {
+                    recipeSimplifiedViewList.add(newRecipeSimplifiedView);
+                }
             }
+            List<List<RecipeSimplifiedView>> listOfListsToReturn = new ArrayList<>();
+            recipeSimplifiedViewList.removeAll(followingRecipeList);
+            listOfListsToReturn.add(followingRecipeList);
+            listOfListsToReturn.add(recipeSimplifiedViewList);
             response.setStatus(HttpStatus.OK.value());
-            return recipeSimplifiedViewList;
+            return listOfListsToReturn;
         }
     }
 
