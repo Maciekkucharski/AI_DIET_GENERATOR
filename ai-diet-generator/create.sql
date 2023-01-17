@@ -1,5 +1,6 @@
 create table excluded_products (id bigint not null auto_increment, user_id bigint not null, primary key (id)) engine=InnoDB;
 create table excluded_products_products (excluded_products_id bigint not null, listOfExcludedProducts_id bigint not null) engine=InnoDB;
+create table following (id bigint not null auto_increment, follower_id bigint, user_id bigint, primary key (id)) engine=InnoDB;
 create table ingredients (id bigint not null auto_increment, amount double precision, name varchar(255), unit varchar(255), recipe_id bigint, primary key (id)) engine=InnoDB;
 create table post_comments (id bigint not null auto_increment, content varchar(255), created_at datetime, post_id bigint, creator_id bigint, primary key (id)) engine=InnoDB;
 create table post_likes (id bigint not null auto_increment, created_at datetime, post_id bigint, creator_id bigint, primary key (id)) engine=InnoDB;
@@ -24,6 +25,8 @@ alter table users add constraint UK_6dotkott2kjsp8vw4d0m25fb7 unique (email);
 alter table excluded_products add constraint FKgb1js7uidnmviora0jp3ddhuv foreign key (user_id) references users (id);
 alter table excluded_products_products add constraint FKq65nw6nlnle0a8u6sodpm3lw9 foreign key (listOfExcludedProducts_id) references products (id);
 alter table excluded_products_products add constraint FK69wlyt97635thbcn01vlfmka6 foreign key (excluded_products_id) references excluded_products (id);
+alter table following add constraint FK7o8rmeuf83dqi0b2bvdhuwo9g foreign key (follower_id) references users (id);
+alter table following add constraint FKs8v9phajoli0ka1vbrj7ypkpd foreign key (user_id) references users (id);
 alter table ingredients add constraint FK7p08vcn6wf7fd6qp79yy2jrwg foreign key (recipe_id) references recipes (id);
 alter table post_comments add constraint FKaawaqxjs3br8dw5v90w7uu514 foreign key (post_id) references posts (id);
 alter table post_comments add constraint FKrn27ncjs8y0upol448yposgjb foreign key (creator_id) references users (id);

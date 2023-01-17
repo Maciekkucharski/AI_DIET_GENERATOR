@@ -121,4 +121,9 @@ public class ForumController {
     public List<Recipe> findUserRecipes(@PathVariable(value = "userID") long userId, HttpServletResponse response){
         return forumService.getSelectedUserRecipes(userId, response);
     }
+
+    @GetMapping("/follow/{userID}")
+    public void followUser(@PathVariable(value = "userID") long userID, HttpServletResponse response){
+        forumService.follow(userID, response);
+    }
 }

@@ -2,6 +2,7 @@ package pjwstk.aidietgenerator.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import pjwstk.aidietgenerator.entity.*;
 import pjwstk.aidietgenerator.exception.ResourceNotFoundException;
@@ -29,6 +30,7 @@ public class ForumService {
     private final RecipeLikesRepository recipeLikesRepository;
     private final RecipeCommentsRepository recipeCommentsRepository;
     private final RecipeService recipeService;
+    private final FollowRepository followRepository;
 
     @Autowired
     public ForumService(PostRepository postRepository,
@@ -39,7 +41,8 @@ public class ForumService {
                         RecipeRepository recipeRepository,
                         RecipeLikesRepository recipeLikesRepository,
                         RecipeCommentsRepository recipeCommentsRepository,
-                        RecipeService recipeService) {
+                        RecipeService recipeService,
+                        FollowRepository followRepository) {
         this.postRepository = postRepository;
         this.userDetailsService = userDetailsService;
         this.userRepository = userRepository;
@@ -49,6 +52,7 @@ public class ForumService {
         this.recipeLikesRepository = recipeLikesRepository;
         this.recipeCommentsRepository = recipeCommentsRepository;
         this.recipeService = recipeService;
+        this.followRepository = followRepository;
     }
 
     public List<PostSimplifiedView> findAllSimplifiedPosts(HttpServletResponse response) {
@@ -82,7 +86,7 @@ public class ForumService {
             return null;
         } else {
             List<CommentView> postCommentsView = new ArrayList<>();
-            for (PostComment comment : postCommentsRepository.findBypost(post.get())){
+            for (PostComment comment : postCommentsRepository.findBypost(post.get())) {
                 CommentView newCommentView = new CommentView(
                         comment.getId(),
                         comment.getContent(),
@@ -223,11 +227,11 @@ public class ForumService {
     public List<RecipeSimplifiedView> findSimplifiedRecipes(HttpServletResponse response, String option) {
         List<RecipeSimplifiedView> recipeSimplifiedViewList = new ArrayList<>();
         List<Recipe> allRecipes = new ArrayList<>();
-        if(Objects.equals(option, "all")) {
+        if (Objects.equals(option, "all")) {
             allRecipes = recipeRepository.findByUserNotNull();
-        } else if(Objects.equals(option, "verified")){
+        } else if (Objects.equals(option, "verified")) {
             allRecipes = recipeRepository.findByVerifiedTrueAndUserNotNull();
-        } else if(Objects.equals(option, "notVerified")){
+        } else if (Objects.equals(option, "notVerified")) {
             allRecipes = recipeRepository.findByVerifiedFalseAndUserNotNull();
         }
         if (allRecipes.isEmpty()) {
@@ -265,7 +269,7 @@ public class ForumService {
             detailedRecipe.setUserImagePath(recipe.get().getUser().getImagePath());
             detailedRecipe.setRecipeLikes(recipeLikesRepository.findByrecipe(recipe.get()));
             List<CommentView> recipeCommentsView = new ArrayList<>();
-            for (RecipeComment comment : recipeCommentsRepository.findByrecipe(recipe.get())){
+            for (RecipeComment comment : recipeCommentsRepository.findByrecipe(recipe.get())) {
                 CommentView newCommentView = new CommentView(
                         comment.getId(),
                         comment.getContent(),
@@ -344,4 +348,25 @@ public class ForumService {
         return null;
     }
 
+    public void follow(long userID, HttpServletResponse response) {
+        User currentUser = userDetailsService.findCurrentUser();
+        Optional<User> userToFollow = userRepository.findById(userID);
+        if (userToFollow.isPresent()) {
+            Follow existingFollow = followRepository.findByUserAndFollower(userToFollow.get(), currentUser);
+            if (existingFollow != null) {
+                followRepository.delete(existingFollow);
+                response.setStatus(HttpStatus.OK.value());
+            } else if (currentUser != userToFollow.get()) {
+                Follow newFollow = new Follow();
+                newFollow.setFollower(currentUser);
+                newFollow.setUser(userToFollow.get());
+                followRepository.save(newFollow);
+                response.setStatus(HttpStatus.OK.value());
+            } else {
+                response.setStatus(HttpStatus.CONFLICT.value());
+            }
+        } else {
+            response.setStatus(HttpStatus.NOT_FOUND.value());
+        }
+    }
 }
