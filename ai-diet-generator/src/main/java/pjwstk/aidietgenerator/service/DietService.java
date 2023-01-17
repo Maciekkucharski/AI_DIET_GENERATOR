@@ -222,28 +222,59 @@ public class DietService {
 //
 //    }
 
-    public Boolean checkForExcludedProduct(Recipe recipe, Product excludedProduct){
+    public Boolean checkForExcludedProducts(Recipe recipe, List<Product> excludedProducts){
         List<Ingredient> currentRecipeIngredients = ingredientRepository.findByrecipe(recipe);
-        String currentProductName = excludedProduct.getName();
-        for (Ingredient currentIngredient : currentRecipeIngredients) {
-            if(currentProductName.equals(currentIngredient.getName())){
-                return true;
+
+        for(Product excludedProduct : excludedProducts) {
+            String currentProductName = excludedProduct.getName();
+            for (Ingredient currentIngredient : currentRecipeIngredients) {
+                if (currentProductName.equals(currentIngredient.getName())) {
+                    return true;
+                }
             }
         }
         return false;
     }
-    public List<Long> getFilteredRecommendedIds(List<Long> recommendedIds, List<Product> excludedProductsList){
-        List<Recipe> recommendedRecipes = recipeRepository.findAllById(recommendedIds);
-        List<Long> newRecommendedIds = recommendedIds;
 
-        for(Recipe currentRecipe : recommendedRecipes){
-            for(Product product : excludedProductsList){
-                if(checkForExcludedProduct(currentRecipe, product) ==  true) {
-                    newRecommendedIds.remove(currentRecipe.getId());
+    
+//  TERA TUTAJ JEDEN PRZEPIS ZAMIENIA NA JEDEN PRZEPIS JEZELI DA RADE
+    public List<Long> replaceRemovedRecipes(List<Long> removedRecipesIds, List<Product> excludedProductsList) throws IOException {
+        int numberOfRemovedRecipes = removedRecipesIds.size();
+        List<Long> replacementRecipesIds = new ArrayList<>();
+
+        for(Long removedRecipeId : removedRecipesIds){
+            List<Long> replacementIds = getRecommendedReplacementIds(removedRecipeId);
+            boolean replaced = false;
+
+            for(Long replacementId : replacementIds){
+                Optional<Recipe> suggestedRecipe = recipeRepository.findById(replacementId);
+
+                if(checkForExcludedProducts(suggestedRecipe.get(), excludedProductsList) == true){
+                    break;
+                }
+
+                if(replaced){
                     break;
                 }
             }
         }
+
+        return replacementRecipesIds;
+    }
+    public List<Long> getFilteredRecommendedIds(List<Long> recommendedIds, List<Product> excludedProductsList){
+        List<Recipe> recommendedRecipes = recipeRepository.findAllById(recommendedIds);
+        List<Long> newRecommendedIds = recommendedIds;
+        List<Long> removedIds = new ArrayList<>();
+
+        for(Recipe currentRecipe : recommendedRecipes){
+            if(checkForExcludedProducts(currentRecipe, excludedProductsList) == true){
+                newRecommendedIds.remove(currentRecipe.getId());
+                removedIds.add(currentRecipe.getId());
+                break;
+            }
+        }
+
+//  TUTAJ WDUPIE TEN ZASTEPUJACY ALGORYTM HEHE
         return newRecommendedIds;
     }
     public DietWeek generateDiet(DietRequest dietRequest, HttpServletResponse response) throws IOException {
