@@ -191,7 +191,13 @@ public class ProfileService {
                     userStatsRepository.save(updatedUserStats);
                     response.setStatus(HttpStatus.OK.value());
                 } else {
-                    response.setStatus(HttpServletResponse.SC_CONFLICT);
+                    if(profileInfoRequest.getEmail().equals(currentUser.getEmail())){
+                        userRepository.save(currentUser);
+                        userStatsRepository.save(updatedUserStats);
+                        response.setStatus(HttpStatus.OK.value());
+                    } else {
+                        response.setStatus(HttpServletResponse.SC_CONFLICT);
+                    }
                 }
             } else {
                 userRepository.save(currentUser);
