@@ -23,7 +23,7 @@ public class DietDay {
     private DietWeek dietWeek;
 
     @OneToMany
-    @JsonIgnoreProperties({"saltiness", "sourness", "sweetness", "bitterness", "fattiness", "spiciness", "instructions", "verified", "vegetarian", "vegan", "glutenFree", "dairyFree", "veryHealthy", "timestamp", "user"})
+    @JsonIgnoreProperties({"saltiness", "sourness", "sweetness", "bitterness", "fattiness", "spiciness", "instructions", "timestamp", "user"})
     private List<Recipe> recipesForToday;
 
     public DietDay(){}
@@ -68,5 +68,14 @@ public class DietDay {
         }
 
         return todaysIds;
+    }
+
+    public double getTodaysCalories(){
+        List<Recipe> todaysRecipes = getRecipesForToday();
+        double calories = 0;
+        for(Recipe recipe : todaysRecipes){
+            calories += recipe.getCalories();
+        }
+        return calories;
     }
 }

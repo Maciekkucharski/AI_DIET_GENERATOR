@@ -104,27 +104,67 @@ public class RecipeService {
                 e.printStackTrace();
             }
 
+            RecipeView currentRecipeView = new RecipeView();
+
             response.setStatus(HttpStatus.OK.value());
 
-            return new RecipeView(recipe.get().getId(),
-                    recipe.get().getTitle(),
-                    recipe.get().getServings(),
-                    recipe.get().getReadyInMinutes(),
-                    recipe.get().getImagePath(),
-                    recipe.get().getInstructions(),
-                    recipe.get().getVegetarian(),
-                    recipe.get().getVegan(),
-                    recipe.get().getGlutenFree(),
-                    recipe.get().getDairyFree(),
-                    recipe.get().getVeryHealthy(),
-                    recipe.get().getVerified(),
-                    recipe.get().getTimestamp(),
-                    recipe.get().getUser(),
-                    recipe.get().getCalories(),
-                    recipe.get().getCarbs(),
-                    recipe.get().getFat(),
-                    recipe.get().getProtein(),
-                    ingredients);
+            if(recipe.get().getId() != null) {
+                currentRecipeView.setId(recipe.get().getId());
+            }
+            if(recipe.get().getTitle() != null){
+                currentRecipeView.setTitle(recipe.get().getTitle());
+            }
+            if(recipe.get().getReadyInMinutes() != null){
+                currentRecipeView.setReadyInMinutes(recipe.get().getReadyInMinutes());
+            }
+            if(recipe.get().getImagePath() != null){
+                currentRecipeView.setImagePath(recipe.get().getImagePath());
+            }
+            if(recipe.get().getInstructions() != null){
+                currentRecipeView.setInstructions(recipe.get().getInstructions());
+            }
+            if(recipe.get().getVegetarian() != null){
+                currentRecipeView.setVegetarian(recipe.get().getVegetarian());
+            }
+            if(recipe.get().getVegan() != null){
+                currentRecipeView.setVegan(recipe.get().getVegan());
+            }
+            if(recipe.get().getGlutenFree() != null){
+                currentRecipeView.setGlutenFree(recipe.get().getGlutenFree());
+            }
+            if(recipe.get().getDairyFree() != null){
+                currentRecipeView.setDairyFree(recipe.get().getDairyFree());
+            }
+            if(recipe.get().getVeryHealthy() != null){
+                currentRecipeView.setVeryHealthy(recipe.get().getVeryHealthy());
+            }
+            if(recipe.get().getVerified() != null){
+                currentRecipeView.setVerified(recipe.get().getVerified());
+            }
+            if(recipe.get().getTimestamp() != null){
+                currentRecipeView.setCreated_at(recipe.get().getTimestamp());
+            }
+            if(recipe.get().getUser() != null){
+                currentRecipeView.setUser(recipe.get().getUser());
+            }
+            if(recipe.get().getCalories() != null){
+                currentRecipeView.setCalories(recipe.get().getCalories());
+            }
+            if(recipe.get().getCarbs() != null){
+                currentRecipeView.setCarbs(recipe.get().getCarbs());
+            }
+            if(recipe.get().getFat() != null){
+                currentRecipeView.setFat(recipe.get().getFat());
+            }
+            if(recipe.get().getProtein() != null){
+                currentRecipeView.setProtein(recipe.get().getProtein());
+            }
+            if(ingredients != null){
+                currentRecipeView.setIngredients(ingredients);
+            }
+
+
+            return currentRecipeView;
         }
     }
 
