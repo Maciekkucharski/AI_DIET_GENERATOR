@@ -176,7 +176,7 @@ public class RecipeService {
 
     public Recipe verifyRecipe(Long recipeId, HttpServletResponse response) {
         User currentUser = userDetailsService.findCurrentUser();
-        if (currentUser == null || !currentUser.getAuthorities().contains("ROLE_DIETICIAN") || !currentUser.getAuthorities().contains("ROLE_ADMIN")) {
+        if (currentUser == null || !currentUser.getAuthorities().contains("ROLE_DIETITIAN") || !currentUser.getAuthorities().contains("ROLE_ADMIN")) {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
         } else {
             Recipe existingRecipe = recipeRepository.findById(recipeId)
