@@ -3,6 +3,7 @@ package pjwstk.aidietgenerator.entity;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -50,5 +51,18 @@ public class DietWeek {
 
     public void setDaysForWeekDiet(List<DietDay> daysForWeekDiet) {
         this.daysForWeekDiet = daysForWeekDiet;
+    }
+
+    public List<Long> getRecipeIdsForTheWeek(){
+        List<Long> thisWeeksRecipesIds = new ArrayList<>();
+        for(DietDay oneDay : daysForWeekDiet){
+            List<Recipe> oneDaysRecipes = oneDay.getRecipesForToday();
+            for(Recipe recipe : oneDaysRecipes){
+                if(!thisWeeksRecipesIds.contains(recipe.getId())) {
+                    thisWeeksRecipesIds.add(recipe.getId());
+                }
+            }
+        }
+        return thisWeeksRecipesIds;
     }
 }
