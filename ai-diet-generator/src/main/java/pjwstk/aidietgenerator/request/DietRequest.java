@@ -26,6 +26,8 @@ public class DietRequest {
 
     private Boolean verified;
 
+    private double threshold = 0.8;
+
     public DietRequest(){}
 
     public DietRequest(PhysicalActivity physicalActivity, DietGoal dietGoal, int mealsPerDay, List<Product> excludedProductsList,
@@ -80,5 +82,13 @@ public class DietRequest {
 
     public Boolean getVerified() {
         return verified;
+    }
+
+    public double getThreshold() {
+        return threshold;
+    }
+
+    public void setThreshold(double threshold) {
+        this.threshold = threshold;
     }
 }

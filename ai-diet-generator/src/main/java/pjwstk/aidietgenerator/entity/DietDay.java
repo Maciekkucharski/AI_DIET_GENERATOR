@@ -64,7 +64,9 @@ public class DietDay {
         List<Long> todaysIds = new ArrayList<>();
 
         for(Recipe recipe : todaysRecipes){
-            todaysIds.add(recipe.getId());
+            if(!todaysIds.contains(recipe.getId())) {
+                todaysIds.add(recipe.getId());
+            }
         }
 
         return todaysIds;

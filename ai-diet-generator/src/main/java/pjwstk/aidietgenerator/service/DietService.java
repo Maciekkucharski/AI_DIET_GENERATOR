@@ -184,37 +184,78 @@ public class DietService {
             return excludedProductsList;
         }
     }
-    public DietDay generateDietForDay(List<Long> recommendedRecipesIds, double caloriesPerDay, int mealsPerDay, List<Long> usedRecipesIds){
-        DietDay dietDay = new DietDay();
-        double remainingCalories = caloriesPerDay;
-        List<Recipe> recipesToday = new ArrayList<>();
-        int addedMealsForToday = 0;
 
+    public Recipe getClosestRecipeToCaloriesNeed(List<Long> recipesIds, int mealsLeft, double remainingCalories, double accuracy){
+        Recipe closestRecipe = new Recipe();
+        double caloriesForAMeal = remainingCalories/mealsLeft;
+        double closestCaloriesDif = Double.POSITIVE_INFINITY;
 
-        for (Long id : recommendedRecipesIds) {
-            Optional<Recipe> currentRecipe = recipeRepository.findById(id);
-            if (currentRecipe.get().getCalories() <= remainingCalories) {
-                recipesToday.add(currentRecipe.get());
-                remainingCalories = remainingCalories - currentRecipe.get().getCalories();
-                addedMealsForToday++;
+        for(Long recipeId : recipesIds){
+            Recipe currentRecipe = recipeRepository.findById(recipeId).get();
+            if(currentRecipe != null){
+                int currentRecipeCalories = currentRecipe.getCalories();
+                double caloriesDifference = Math.abs(caloriesForAMeal-currentRecipeCalories);
 
-                if(addedMealsForToday == mealsPerDay){
-                    break;
+                if(caloriesDifference < closestCaloriesDif){
+                    closestCaloriesDif = caloriesDifference;
+                    closestRecipe = currentRecipe;
                 }
             }
         }
 
-        if(addedMealsForToday < mealsPerDay) {
-            for (Long id : usedRecipesIds) {
-                Optional<Recipe> currentUsedRecipe = recipeRepository.findById(id);
-                if (currentUsedRecipe.get().getCalories() <= remainingCalories) {
-                    recipesToday.add(currentUsedRecipe.get());
-                    remainingCalories = remainingCalories - currentUsedRecipe.get().getCalories();
-                    addedMealsForToday++;
+        if(closestRecipe.getCalories()/caloriesForAMeal > 1+accuracy || closestRecipe.getCalories()/caloriesForAMeal < 1-accuracy){
+            if(accuracy < 0.3) {
+                return getClosestRecipeToCaloriesNeed(recipesIds, mealsLeft, remainingCalories, accuracy + 0.01);
+            } else {
+                return null;
+            }
+        }
+        return closestRecipe;
+    }
+    public Recipe findRecipeWithLeastCalories(List<Long> recipeIds){
+        Recipe leastCalRecipe = new Recipe();
+        Double leastCal = Double.POSITIVE_INFINITY;
 
-                    if (addedMealsForToday == mealsPerDay) {
-                        break;
-                    }
+        for(Long id : recipeIds){
+            Recipe currentRecipe = recipeRepository.findById(id).get();
+            if(currentRecipe != null){
+                if(currentRecipe.getCalories() < leastCal){
+                    leastCalRecipe = currentRecipe;
+                    leastCal = (double) currentRecipe.getCalories();
+                }
+            }
+        }
+        return leastCalRecipe;
+    }
+
+    public DietDay generateDietForDay(List<Long> recommendedRecipesIds, double caloriesPerDay, int mealsPerDay, List<Long> usedRecipesIds){
+        DietDay dietDay = new DietDay();
+        double remainingCalories = caloriesPerDay;
+        List<Recipe> recipesToday = new ArrayList<>();
+
+        for(int mealsLeft = mealsPerDay; mealsLeft>0;) {
+            Recipe recommendedRecipe = getClosestRecipeToCaloriesNeed(recommendedRecipesIds, mealsLeft, remainingCalories, 0.01);
+
+            if(recommendedRecipe != null){
+                recommendedRecipesIds.remove(recommendedRecipe.getId());
+                usedRecipesIds.add(recommendedRecipe.getId());
+            } else {
+                if(!usedRecipesIds.isEmpty()) {
+                    recommendedRecipe = getClosestRecipeToCaloriesNeed(usedRecipesIds, mealsLeft, remainingCalories, 0.01);
+                }
+            }
+
+            if(recommendedRecipe != null) {
+                recipesToday.add(recommendedRecipe);
+                remainingCalories -= recommendedRecipe.getCalories();
+                mealsLeft--;
+
+                if(remainingCalories < 0){
+                    List<Long> allRecommendedRecipes = new ArrayList<>();
+                    allRecommendedRecipes.addAll(recommendedRecipesIds);
+                    allRecommendedRecipes.addAll(usedRecipesIds);
+
+                    remainingCalories = findRecipeWithLeastCalories(allRecommendedRecipes).getCalories() * mealsLeft;
                 }
             }
         }
@@ -387,7 +428,7 @@ public class DietService {
                     double caloriesPerDay = goalCalories(currentUserWeight, currentUserHeight, currentUserAge, currentUserGender, physicalActivity, dietGoal);
                     lastUserStats.setCal((int) caloriesPerDay);
 
-                    List<Long> recommendedRecipesIds = getRecommendedIds(currentUser.getId(), 0.8);
+                    List<Long> recommendedRecipesIds = getRecommendedIds(currentUser.getId(), dietRequest.getThreshold());
 
                     recommendedRecipesIds = getFilteredRecommendedIds(recommendedRecipesIds, excludedProductsList,
                             dietRequest.getVegetarian(), dietRequest.getVegan(), dietRequest.getGlutenFree(),
@@ -406,7 +447,7 @@ public class DietService {
                         dietDay.setDietWeek(newDiet);
 
                         usedRecipesIds.addAll(dietDay.getTodaysRecipesIds());
-                        recommendedRecipesIds.removeAll(usedRecipesIds);
+                        recommendedRecipesIds.removeAll(dietDay.getTodaysRecipesIds());
 //                           dayDietRepository.save(dietDay);
                         dietWeek.add(dietDay);
                     }
@@ -427,6 +468,11 @@ public class DietService {
         }
 
         response.setStatus(HttpStatus.CREATED.value());
+        if(newDiet.getRecipeIdsForTheWeek().size() < mealsPerDay){
+            dietRequest.setThreshold(dietRequest.getThreshold()-0.05);
+            System.out.println("I'M GOING DEEPER WITH NEW THRESHOLD: " + dietRequest.getThreshold());
+            return generateDiet(dietRequest, response);
+        }
         return newDiet;
 //        return weekDietRepository.save(newDiet);
     }
