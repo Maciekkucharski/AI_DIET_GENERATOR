@@ -5,6 +5,7 @@ import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import pjwstk.aidietgenerator.entity.*;
 import pjwstk.aidietgenerator.repository.*;
+import pjwstk.aidietgenerator.request.UserExtrasRequest;
 import pjwstk.aidietgenerator.view.*;
 import pjwstk.aidietgenerator.request.ProfileInfoRequest;
 
@@ -270,6 +271,57 @@ public class ProfileService {
                 }
                 response.setStatus(HttpStatus.ACCEPTED.value());
             }
+        }
+    }
+
+    public void saveUserExtras(UserExtrasRequest userExtrasRequest, HttpServletResponse response) {
+        User currentUser = userDetailsService.findCurrentUser();
+        if(currentUser != null){
+            UserExtras newUserExtras = new UserExtras();
+            newUserExtras.setUser(currentUser);
+            newUserExtras.setBackground_image(userExtrasRequest.getBackgroundImagePath());
+            newUserExtras.setProfession(userExtrasRequest.getProfession());
+            newUserExtras.setAbout_me(userExtrasRequest.getAbout_me());
+            userExtrasRepository.save(newUserExtras);
+            response.setStatus(HttpStatus.OK.value());
+        } else {
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+        }
+    }
+
+    public void updateUserExtras(UserExtrasRequest userExtrasRequest, HttpServletResponse response){
+        User currentUser = userDetailsService.findCurrentUser();
+        if(currentUser != null){
+            UserExtras existingExtras = userExtrasRepository.findByuser(currentUser);
+            if(existingExtras != null) {
+                if(userExtrasRequest.getBackgroundImagePath().length()>0 && userExtrasRequest.getBackgroundImagePath().contains("www"))
+                    existingExtras.setBackground_image(userExtrasRequest.getBackgroundImagePath());
+                if(userExtrasRequest.getProfession().length()>0)
+                    existingExtras.setProfession(userExtrasRequest.getProfession());
+                if(userExtrasRequest.getAbout_me().length()>0)
+                    existingExtras.setAbout_me(userExtrasRequest.getAbout_me());
+                userExtrasRepository.save(existingExtras);
+                response.setStatus(HttpStatus.OK.value());
+            } else {
+                response.setStatus(HttpStatus.NOT_FOUND.value());
+            }
+        } else {
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+        }
+    }
+
+    public void deleteUserExtras(HttpServletResponse response){
+        User currentUser = userDetailsService.findCurrentUser();
+        if(currentUser != null){
+            UserExtras existingExtras = userExtrasRepository.findByuser(currentUser);
+            if(existingExtras != null) {
+                userExtrasRepository.delete(existingExtras);
+                response.setStatus(HttpStatus.OK.value());
+            } else {
+                response.setStatus(HttpStatus.NOT_FOUND.value());
+            }
+        } else {
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
         }
     }
 }

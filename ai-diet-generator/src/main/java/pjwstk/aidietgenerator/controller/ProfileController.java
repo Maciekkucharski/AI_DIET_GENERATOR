@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import pjwstk.aidietgenerator.request.UserExtrasRequest;
 import pjwstk.aidietgenerator.view.MyProfile;
 import org.springframework.web.bind.annotation.*;
 import pjwstk.aidietgenerator.request.ProfileInfoRequest;
@@ -53,5 +54,20 @@ public class ProfileController {
     @DeleteMapping("/info/weights")
     public void deleteUserStatsWeightEntry(@RequestBody List<Long> ids, HttpServletResponse response){
         profileService.deleteUserStatsWeightEntry(ids, response);
+    }
+
+    @PostMapping("/extras")
+    public void createUserExtras(@RequestBody UserExtrasRequest userExtrasRequest, HttpServletResponse response){
+        profileService.saveUserExtras(userExtrasRequest, response);
+    }
+
+    @PutMapping("/extras")
+    public void updateExtras(@RequestBody UserExtrasRequest userExtrasRequest, HttpServletResponse response){
+        profileService.updateUserExtras(userExtrasRequest, response);
+    }
+
+    @DeleteMapping("/extras")
+    public void deleteExtras(HttpServletResponse response){
+        profileService.deleteUserExtras(response);
     }
 }
