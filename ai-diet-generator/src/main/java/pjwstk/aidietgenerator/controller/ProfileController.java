@@ -5,11 +5,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pjwstk.aidietgenerator.view.MyProfile;
-import pjwstk.aidietgenerator.view.UserProfile;
 import org.springframework.web.bind.annotation.*;
 import pjwstk.aidietgenerator.request.ProfileInfoRequest;
 import pjwstk.aidietgenerator.service.ProfileService;
 import pjwstk.aidietgenerator.view.ProfileInfoView;
+import pjwstk.aidietgenerator.view.UserProfile;
 import pjwstk.aidietgenerator.view.WeightView;
 
 

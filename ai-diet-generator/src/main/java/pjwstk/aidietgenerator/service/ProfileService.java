@@ -3,12 +3,9 @@ package pjwstk.aidietgenerator.service;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
-import pjwstk.aidietgenerator.entity.Post;
-import pjwstk.aidietgenerator.entity.UserExtras;
+import pjwstk.aidietgenerator.entity.*;
 import pjwstk.aidietgenerator.repository.*;
 import pjwstk.aidietgenerator.view.*;
-import pjwstk.aidietgenerator.entity.User;
-import pjwstk.aidietgenerator.entity.UserStats;
 import pjwstk.aidietgenerator.request.ProfileInfoRequest;
 
 import javax.servlet.http.HttpServletResponse;
@@ -30,6 +27,7 @@ public class ProfileService {
     private final RecipeRepository recipeRepository;
     private final ExcludedProductsListRepository excludedProductsListRepository;
     private final ForumService forumService;
+    private final FollowRepository followRepository;
 
     public ProfileService(UserRepository userRepository,
                           SocialsRepository socialsRepository,
@@ -40,7 +38,8 @@ public class ProfileService {
                           UserExtrasRepository userExtrasRepository,
                           RecipeRepository recipeRepository,
                           ExcludedProductsListRepository excludedProductsListRepository,
-                          ForumService forumService) {
+                          ForumService forumService,
+                          FollowRepository followRepository) {
         this.userRepository = userRepository;
         this.socialsRepository = socialsRepository;
         this.userStatsRepository = userStatsRepository;
@@ -51,6 +50,7 @@ public class ProfileService {
         this.recipeRepository = recipeRepository;
         this.excludedProductsListRepository = excludedProductsListRepository;
         this.forumService = forumService;
+        this.followRepository = followRepository;
     }
 
     public MyProfile getLoggedUserProfile(HttpServletResponse response){
@@ -82,11 +82,21 @@ public class ProfileService {
     public UserProfile getSelectedUserProfile(Long userID, HttpServletResponse response){
         UserProfile selectedUserProfile = new UserProfile();
         Optional<User> selectedUser = userRepository.findById(userID);
-        if(!selectedUser.isEmpty()){
+        if(selectedUser.isPresent()){
+            UserExtras userExtras = userExtrasRepository.findByuser(selectedUser.get());
+            List<Follow> userFollows = followRepository.findByUser(selectedUser.get());
+            Socials userSocials = socialsRepository.findByuser(selectedUser.get());
+            List<PostDetailedView> userPostsView = new ArrayList<>();
+            for(Post post : postRepository.findByuser(selectedUser.get())){
+                userPostsView.add(forumService.viewPost(post.getId(), response));
+            }
             selectedUserProfile.setUser(selectedUser.get());
-            selectedUserProfile.setImagePath(selectedUser.get().getImagePath());
+            selectedUserProfile.setUserExtras(userExtras);
+            selectedUserProfile.setFollowerCount(userFollows.size());
+            selectedUserProfile.setSocials(userSocials);
             selectedUserProfile.setSocials(socialsRepository.findByuser(selectedUser.get()));
-            selectedUserProfile.setUserPosts(postRepository.findByuser(selectedUser.get()));
+            selectedUserProfile.setUserPosts(userPostsView);
+            selectedUserProfile.setUserRecipes(recipeRepository.findByuser(selectedUser.get()));
             response.setStatus(HttpStatus.OK.value());
             return selectedUserProfile;
         }else {
