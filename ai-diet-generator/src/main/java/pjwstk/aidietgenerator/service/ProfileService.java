@@ -1,18 +1,13 @@
 package pjwstk.aidietgenerator.service;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
-import pjwstk.aidietgenerator.view.MyProfile;
-import pjwstk.aidietgenerator.entity.User;
-import pjwstk.aidietgenerator.view.UserProfile;
-import pjwstk.aidietgenerator.entity.UserStats;
-import pjwstk.aidietgenerator.repository.PostRepository;
-import pjwstk.aidietgenerator.repository.SocialsRepository;
-import pjwstk.aidietgenerator.repository.UserRepository;
-import pjwstk.aidietgenerator.repository.UserStatsRepository;
+import pjwstk.aidietgenerator.entity.*;
+import pjwstk.aidietgenerator.repository.*;
+import pjwstk.aidietgenerator.request.UserExtrasRequest;
+import pjwstk.aidietgenerator.view.*;
 import pjwstk.aidietgenerator.request.ProfileInfoRequest;
-import pjwstk.aidietgenerator.view.ProfileInfoView;
-import pjwstk.aidietgenerator.view.WeightView;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
@@ -29,19 +24,34 @@ public class ProfileService {
     private final UserDetailsService userDetailsService;
     private final PostRepository postRepository;
     private final UserStatsService userStatsService;
+    private final UserExtrasRepository userExtrasRepository;
+    private final RecipeRepository recipeRepository;
+    private final ExcludedProductsListRepository excludedProductsListRepository;
+    private final ForumService forumService;
+    private final FollowRepository followRepository;
 
     public ProfileService(UserRepository userRepository,
                           SocialsRepository socialsRepository,
                           UserStatsRepository userStatsRepository,
                           UserDetailsService userDetailsService,
                           PostRepository postRepository,
-                          UserStatsService userStatsService) {
+                          UserStatsService userStatsService,
+                          UserExtrasRepository userExtrasRepository,
+                          RecipeRepository recipeRepository,
+                          ExcludedProductsListRepository excludedProductsListRepository,
+                          ForumService forumService,
+                          FollowRepository followRepository) {
         this.userRepository = userRepository;
         this.socialsRepository = socialsRepository;
         this.userStatsRepository = userStatsRepository;
         this.userDetailsService = userDetailsService;
         this.postRepository = postRepository;
         this.userStatsService = userStatsService;
+        this.userExtrasRepository = userExtrasRepository;
+        this.recipeRepository = recipeRepository;
+        this.excludedProductsListRepository = excludedProductsListRepository;
+        this.forumService = forumService;
+        this.followRepository = followRepository;
     }
 
     public MyProfile getLoggedUserProfile(HttpServletResponse response){
@@ -50,9 +60,18 @@ public class ProfileService {
         if(currentUser != null){
             currentUserProfile.setUser(currentUser);
             currentUserProfile.setProfileImagePath(currentUser.getImagePath());
-            currentUserProfile.setUserStats(userStatsRepository.findByuser(currentUser));
             currentUserProfile.setSocials(socialsRepository.findByuser(currentUser));
-            currentUserProfile.setUserPosts(postRepository.findByuser(currentUser));
+            List<PostDetailedView> userPostsView = new ArrayList<>();
+            for(Post post : postRepository.findByuser(currentUser)){
+                userPostsView.add(forumService.viewPost(post.getId(), response));
+            }
+            currentUserProfile.setUserPosts(userPostsView);
+            currentUserProfile.setProfileImagePath(currentUser.getImagePath());
+            currentUserProfile.setSubscribed(true); // TODO
+            currentUserProfile.setUserStats(userStatsRepository.findByuser(currentUser));
+            currentUserProfile.setUserRecipes(recipeRepository.findByuser(currentUser));
+            currentUserProfile.setExcludedProductsList(excludedProductsListRepository.findByuser(currentUser));
+            currentUserProfile.setUserExtras(userExtrasRepository.findByuser(currentUser));
             response.setStatus(HttpStatus.OK.value());
             return currentUserProfile;
         } else {
@@ -64,11 +83,21 @@ public class ProfileService {
     public UserProfile getSelectedUserProfile(Long userID, HttpServletResponse response){
         UserProfile selectedUserProfile = new UserProfile();
         Optional<User> selectedUser = userRepository.findById(userID);
-        if(!selectedUser.isEmpty()){
+        if(selectedUser.isPresent()){
+            UserExtras userExtras = userExtrasRepository.findByuser(selectedUser.get());
+            List<Follow> userFollows = followRepository.findByUser(selectedUser.get());
+            Socials userSocials = socialsRepository.findByuser(selectedUser.get());
+            List<PostDetailedView> userPostsView = new ArrayList<>();
+            for(Post post : postRepository.findByuser(selectedUser.get())){
+                userPostsView.add(forumService.viewPost(post.getId(), response));
+            }
             selectedUserProfile.setUser(selectedUser.get());
-            selectedUserProfile.setImagePath(selectedUser.get().getImagePath());
+            selectedUserProfile.setUserExtras(userExtras);
+            selectedUserProfile.setFollowerCount(userFollows.size());
+            selectedUserProfile.setSocials(userSocials);
             selectedUserProfile.setSocials(socialsRepository.findByuser(selectedUser.get()));
-            selectedUserProfile.setUserPosts(postRepository.findByuser(selectedUser.get()));
+            selectedUserProfile.setUserPosts(userPostsView);
+            selectedUserProfile.setUserRecipes(recipeRepository.findByuser(selectedUser.get()));
             response.setStatus(HttpStatus.OK.value());
             return selectedUserProfile;
         }else {
@@ -248,6 +277,57 @@ public class ProfileService {
                 }
                 response.setStatus(HttpStatus.ACCEPTED.value());
             }
+        }
+    }
+
+    public void saveUserExtras(UserExtrasRequest userExtrasRequest, HttpServletResponse response) {
+        User currentUser = userDetailsService.findCurrentUser();
+        if(currentUser != null){
+            UserExtras newUserExtras = new UserExtras();
+            newUserExtras.setUser(currentUser);
+            newUserExtras.setBackground_image(userExtrasRequest.getBackgroundImagePath());
+            newUserExtras.setProfession(userExtrasRequest.getProfession());
+            newUserExtras.setAbout_me(userExtrasRequest.getAbout_me());
+            userExtrasRepository.save(newUserExtras);
+            response.setStatus(HttpStatus.OK.value());
+        } else {
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+        }
+    }
+
+    public void updateUserExtras(UserExtrasRequest userExtrasRequest, HttpServletResponse response){
+        User currentUser = userDetailsService.findCurrentUser();
+        if(currentUser != null){
+            UserExtras existingExtras = userExtrasRepository.findByuser(currentUser);
+            if(existingExtras != null) {
+                if(userExtrasRequest.getBackgroundImagePath().length()>0 && userExtrasRequest.getBackgroundImagePath().contains("www"))
+                    existingExtras.setBackground_image(userExtrasRequest.getBackgroundImagePath());
+                if(userExtrasRequest.getProfession().length()>0)
+                    existingExtras.setProfession(userExtrasRequest.getProfession());
+                if(userExtrasRequest.getAbout_me().length()>0)
+                    existingExtras.setAbout_me(userExtrasRequest.getAbout_me());
+                userExtrasRepository.save(existingExtras);
+                response.setStatus(HttpStatus.OK.value());
+            } else {
+                response.setStatus(HttpStatus.NOT_FOUND.value());
+            }
+        } else {
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+        }
+    }
+
+    public void deleteUserExtras(HttpServletResponse response){
+        User currentUser = userDetailsService.findCurrentUser();
+        if(currentUser != null){
+            UserExtras existingExtras = userExtrasRepository.findByuser(currentUser);
+            if(existingExtras != null) {
+                userExtrasRepository.delete(existingExtras);
+                response.setStatus(HttpStatus.OK.value());
+            } else {
+                response.setStatus(HttpStatus.NOT_FOUND.value());
+            }
+        } else {
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
         }
     }
 }

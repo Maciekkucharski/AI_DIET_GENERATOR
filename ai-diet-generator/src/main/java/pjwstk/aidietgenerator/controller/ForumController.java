@@ -28,7 +28,7 @@ public class ForumController {
     }
 
     @GetMapping("/post")
-    public List<PostSimplifiedView> viewAllSimplifiedPosts(HttpServletResponse response) {
+    public List<List<PostSimplifiedView>> viewAllSimplifiedPosts(HttpServletResponse response) {
         return forumService.findAllSimplifiedPosts(response);
     }
 
@@ -79,17 +79,17 @@ public class ForumController {
     }
 
     @GetMapping("/recipe")
-    public List<RecipeSimplifiedView> viewAllSimplifiedRecipes(HttpServletResponse response, String option){
+    public List<List<RecipeSimplifiedView>> viewAllSimplifiedRecipes(HttpServletResponse response, String option){
         return forumService.findSimplifiedRecipes(response, "all");
     }
 
     @GetMapping("/recipe/verified")
-    public List<RecipeSimplifiedView> viewVerifiedRecipes(HttpServletResponse response, String option){
+    public List<List<RecipeSimplifiedView>> viewVerifiedRecipes(HttpServletResponse response, String option){
         return forumService.findSimplifiedRecipes(response, "verified");
     }
 
     @GetMapping("/recipe/notVerified")
-    public List<RecipeSimplifiedView> viewNotVerifiedRecipes(HttpServletResponse response, String option){
+    public List<List<RecipeSimplifiedView>> viewNotVerifiedRecipes(HttpServletResponse response, String option){
         return forumService.findSimplifiedRecipes(response, "notVerified");
     }
 
@@ -120,5 +120,10 @@ public class ForumController {
     @GetMapping("/recipe/user/{userID}")
     public List<Recipe> findUserRecipes(@PathVariable(value = "userID") long userId, HttpServletResponse response){
         return forumService.getSelectedUserRecipes(userId, response);
+    }
+
+    @GetMapping("/follow/{userID}")
+    public void followUser(@PathVariable(value = "userID") long userID, HttpServletResponse response){
+        forumService.follow(userID, response);
     }
 }
