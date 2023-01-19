@@ -188,12 +188,16 @@ public class ProfileService {
                 if(userRepository.findByemail(profileInfoRequest.getEmail()) == null) {
                     currentUser.setEmail(profileInfoRequest.getEmail());
                     userRepository.save(currentUser);
-                    userStatsRepository.save(updatedUserStats);
+                    if(profileInfoRequest.getWeight() != null || profileInfoRequest.getHeight() != null || profileInfoRequest.getAge() != null || profileInfoRequest.getGender() != null) {
+                        userStatsRepository.save(updatedUserStats);
+                    }
                     response.setStatus(HttpStatus.OK.value());
                 } else {
                     if(profileInfoRequest.getEmail().equals(currentUser.getEmail())){
                         userRepository.save(currentUser);
-                        userStatsRepository.save(updatedUserStats);
+                        if(profileInfoRequest.getWeight() != null || profileInfoRequest.getHeight() != null || profileInfoRequest.getAge() != null || profileInfoRequest.getGender() != null) {
+                            userStatsRepository.save(updatedUserStats);
+                        }
                         response.setStatus(HttpStatus.OK.value());
                     } else {
                         response.setStatus(HttpServletResponse.SC_CONFLICT);
@@ -201,7 +205,9 @@ public class ProfileService {
                 }
             } else {
                 userRepository.save(currentUser);
-                userStatsRepository.save(updatedUserStats);
+                if(profileInfoRequest.getWeight() != null || profileInfoRequest.getHeight() != null || profileInfoRequest.getAge() != null || profileInfoRequest.getGender() != null) {
+                    userStatsRepository.save(updatedUserStats);
+                }
                 response.setStatus(HttpStatus.OK.value());
             }
         }
