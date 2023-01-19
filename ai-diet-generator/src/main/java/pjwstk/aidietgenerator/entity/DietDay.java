@@ -22,7 +22,7 @@ public class DietDay {
     @JoinColumn(name = "week_id")
     private DietWeek dietWeek;
 
-    @OneToMany
+    @ManyToMany
     @JsonIgnoreProperties({"saltiness", "sourness", "sweetness", "bitterness", "fattiness", "spiciness", "instructions", "timestamp", "user"})
     private List<Recipe> recipesForToday;
 
@@ -80,4 +80,30 @@ public class DietDay {
         }
         return calories;
     }
+
+    public double getTodaysCarbs(){
+        List<Recipe> todaysRecipes = getRecipesForToday();
+        int carbs = 0;
+        for(Recipe recipe : todaysRecipes){
+            carbs += recipe.getCarbs();
+        }
+        return carbs;
+    }
+    public double getTodaysFat(){
+        List<Recipe> todaysRecipes = getRecipesForToday();
+        int fat = 0;
+        for(Recipe recipe : todaysRecipes){
+            fat += recipe.getFat();
+        }
+        return fat;
+    }
+    public double getTodaysProtein(){
+        List<Recipe> todaysRecipes = getRecipesForToday();
+        int protein = 0;
+        for(Recipe recipe : todaysRecipes){
+            protein += recipe.getProtein();
+        }
+        return protein;
+    }
+
 }
