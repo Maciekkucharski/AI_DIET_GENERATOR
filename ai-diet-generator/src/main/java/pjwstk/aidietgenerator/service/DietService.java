@@ -429,11 +429,11 @@ public class DietService {
                     lastUserStats.setCal((int) caloriesPerDay);
 
                     List<Long> recommendedRecipesIds = getRecommendedIds(currentUser.getId(), dietRequest.getThreshold());
-
+                    System.out.println("RECOMMENDED: " + recommendedRecipesIds.size());
                     recommendedRecipesIds = getFilteredRecommendedIds(recommendedRecipesIds, excludedProductsList,
                             dietRequest.getVegetarian(), dietRequest.getVegan(), dietRequest.getGlutenFree(),
                             dietRequest.getDairyFree(), dietRequest.getVeryHealthy(), dietRequest.getVerified());
-
+                    System.out.println("RECOMMENDED AFTER FILTER: " + recommendedRecipesIds.size());
                     if(recommendedRecipesIds.isEmpty()){
                         response.setStatus(HttpStatus.NO_CONTENT.value());
                         return null;
