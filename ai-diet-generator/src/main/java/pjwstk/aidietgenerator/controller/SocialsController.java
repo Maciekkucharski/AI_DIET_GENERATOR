@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import pjwstk.aidietgenerator.entity.Socials;
 import pjwstk.aidietgenerator.repository.SocialsRepository;
+import pjwstk.aidietgenerator.request.SocialsRequest;
 import pjwstk.aidietgenerator.service.SocialsService;
 import pjwstk.aidietgenerator.service.UserDetailsService;
 
@@ -39,13 +40,13 @@ public class SocialsController {
 
     @PostMapping
     @Transactional
-    public Socials addUserSocials(@RequestBody Socials socials, HttpServletResponse response){
+    public Socials addUserSocials(@RequestBody SocialsRequest socials, HttpServletResponse response){
         return socialsService.saveSocials(response, socials);
     }
 
     @PutMapping
     @Transactional
-    public Socials editUserSocials(@RequestBody Socials socials, HttpServletResponse response){
+    public Socials editUserSocials(@RequestBody SocialsRequest socials, HttpServletResponse response){
         return socialsService.updateSocials(response, socials);
     }
 }

@@ -19,11 +19,12 @@ import java.util.List;
 public class UserProfile {
     @JsonIgnoreProperties({"password", "email", "authority", "authorities", "username"})
     private User user;
+    private String userImagePath;
     private UserExtras userExtras;
     private Socials socials;
     private int followerCount;
-    @JsonIgnoreProperties("user")
+    @JsonIgnoreProperties({"author", "user"})
     private List<PostDetailedView> userPosts;
-    @JsonIgnoreProperties("user")
+    @JsonIgnoreProperties({"author", "user"})
     private List<Recipe> userRecipes;
 }

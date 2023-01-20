@@ -7,6 +7,7 @@ import pjwstk.aidietgenerator.entity.Socials;
 import pjwstk.aidietgenerator.entity.User;
 import pjwstk.aidietgenerator.repository.SocialsRepository;
 import pjwstk.aidietgenerator.repository.UserRepository;
+import pjwstk.aidietgenerator.request.SocialsRequest;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.Optional;
@@ -27,7 +28,7 @@ public class SocialsService {
 
 
 
-    public Socials saveSocials(HttpServletResponse response, Socials socials){
+    public Socials saveSocials(HttpServletResponse response, SocialsRequest socials){
         User currentUser = userDetailsService.findCurrentUser();
         if (currentUser == null) {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
@@ -49,7 +50,7 @@ public class SocialsService {
         return null;
     }
 
-    public Socials updateSocials(HttpServletResponse response, Socials socials) {
+    public Socials updateSocials(HttpServletResponse response, SocialsRequest socials) {
         User currentUser = userDetailsService.findCurrentUser();
         if (currentUser == null) {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());

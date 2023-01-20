@@ -39,15 +39,17 @@ public class RegisterController {
 
     @PostMapping("/register")
     @Transactional
-    public void register(@RequestBody RegisterRequest registerRequest, HttpServletResponse response) {
+    public User register(@RequestBody RegisterRequest registerRequest, HttpServletResponse response) {
 
         if (userDetailsService.doesUserExist(registerRequest.getEmail())) {
             response.setStatus(HttpStatus.CONFLICT.value()); //User already exists.
+            return null;
         } else {
             if (registerRequest.getPassword() == null || registerRequest.getPassword() == ""
                     || registerRequest.getEmail() == null || registerRequest.getPassword().length() < 6
                     || !userDetailsService.patternMatches(registerRequest.getEmail())) {
                 response.setStatus(HttpStatus.CONFLICT.value()); //Invalid password.
+                return null;
             } else {
                 User newUser = new User(registerRequest.getEmail(), registerRequest.getPassword()); //New user created.
                 if (userDetailsService.isEmpty()) {
@@ -56,8 +58,8 @@ public class RegisterController {
                 }
                 GrantedAuthority defaultAuthority = () -> "ROLE_USER";
                 newUser.addAuthority(defaultAuthority);
-                userDetailsService.saveUser(newUser);
                 response.setStatus(HttpStatus.CREATED.value());
+                return userDetailsService.saveUser(newUser);
             }
         }
     }

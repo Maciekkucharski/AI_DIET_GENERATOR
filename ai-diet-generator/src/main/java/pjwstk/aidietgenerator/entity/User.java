@@ -58,7 +58,6 @@ public class User implements UserDetails {
     }
 
     public User(String email, String password) {
-        super();
         this.email = email;
         this.password = password;
     }

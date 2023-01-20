@@ -129,13 +129,15 @@ public class ForumService {
         }
     }
 
-    public void createPost(PostRequest post, HttpServletResponse response) {
+    public Post createPost(PostRequest post, HttpServletResponse response) {
         User currentUser = userDetailsService.findCurrentUser();
         if (currentUser == null) {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            return null;
         } else {
             if (post.getDescription() == null || post.getTitle() == null) {
                 response.setStatus(HttpStatus.BAD_REQUEST.value());
+                return null;
             } else {
                 Post newPost = new Post();
                 newPost.setTitle(post.getTitle());
@@ -143,8 +145,8 @@ public class ForumService {
                 newPost.setUser(currentUser);
                 newPost.setCreatedAt();
                 newPost.setDescription(post.getDescription());
-                postRepository.save(newPost);
                 response.setStatus(HttpStatus.CREATED.value());
+                return postRepository.save(newPost);
             }
         }
     }
@@ -189,7 +191,7 @@ public class ForumService {
         }
     }
 
-    public void likePost(long postId, HttpServletResponse response) {
+    public Boolean likePost(long postId, HttpServletResponse response) {
         Post existingPost = postRepository.findById(postId)
                 .orElseThrow(() -> new ResourceNotFoundException("Post not found with id :" + postId));
         User currentUser = userDetailsService.findCurrentUser();
@@ -198,6 +200,7 @@ public class ForumService {
             if (existingLike != null) {
                 postLikesRepository.delete(existingLike);
                 response.setStatus(HttpStatus.OK.value());
+                return false;
             } else {
                 PostLike newLike = new PostLike();
                 newLike.setPost(existingPost);
@@ -205,13 +208,15 @@ public class ForumService {
                 newLike.setTimestamp(new Timestamp(System.currentTimeMillis()));
                 postLikesRepository.save(newLike);
                 response.setStatus(HttpStatus.OK.value());
+                return true;
             }
         } else {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            return null;
         }
     }
 
-    public void addPostComment(long postId, CommentRequest request, HttpServletResponse response) {
+    public PostComment addPostComment(long postId, CommentRequest request, HttpServletResponse response) {
         Post existingPost = postRepository.findById(postId)
                 .orElseThrow(() -> new ResourceNotFoundException("Post not found with id :" + postId));
         User currentUser = userDetailsService.findCurrentUser();
@@ -222,13 +227,15 @@ public class ForumService {
                 newComment.setUser(currentUser);
                 newComment.setContent(request.getContent());
                 newComment.setTimestamp(new Timestamp(System.currentTimeMillis()));
-                postCommentsRepository.save(newComment);
                 response.setStatus(HttpStatus.OK.value());
+                return postCommentsRepository.save(newComment);
             } else {
                 response.setStatus(HttpStatus.BAD_REQUEST.value());
+                return null;
             }
         } else {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            return null;
         }
     }
 

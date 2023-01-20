@@ -98,6 +98,7 @@ public class ProfileService {
             selectedUserProfile.setSocials(socialsRepository.findByuser(selectedUser.get()));
             selectedUserProfile.setUserPosts(userPostsView);
             selectedUserProfile.setUserRecipes(recipeRepository.findByuser(selectedUser.get()));
+            selectedUserProfile.setUserImagePath(selectedUser.get().getImagePath());
             response.setStatus(HttpStatus.OK.value());
             return selectedUserProfile;
         }else {
