@@ -45,6 +45,8 @@ public class SocialsService {
                 newSocials.setUser(currentUser);
                 response.setStatus(HttpStatus.CREATED.value());
                 return socialsRepository.save(newSocials);
+            } else {
+                updateSocials(response, socials);
             }
         }
         return null;

@@ -306,11 +306,11 @@ public class ProfileService {
         if(currentUser != null){
             UserExtras existingExtras = userExtrasRepository.findByuser(currentUser);
             if(existingExtras != null) {
-                if(userExtrasRequest.getBackgroundImagePath().length()>0 && userExtrasRequest.getBackgroundImagePath().contains("www"))
+                if(userExtrasRequest != null)
                     existingExtras.setBackground_image(userExtrasRequest.getBackgroundImagePath());
-                if(userExtrasRequest.getProfession().length()>0)
+                if(userExtrasRequest.getProfession() != null)
                     existingExtras.setProfession(userExtrasRequest.getProfession());
-                if(userExtrasRequest.getAbout_me().length()>0)
+                if(userExtrasRequest.getAbout_me() != null)
                     existingExtras.setAbout_me(userExtrasRequest.getAbout_me());
                 userExtrasRepository.save(existingExtras);
                 response.setStatus(HttpStatus.OK.value());
