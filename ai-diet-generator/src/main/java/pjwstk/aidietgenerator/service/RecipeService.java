@@ -37,13 +37,15 @@ public class RecipeService {
     }
 
 
-    public void addRecipe(RecipeRequest recipeRequest, HttpServletResponse response) {
+    public Recipe addRecipe(RecipeRequest recipeRequest, HttpServletResponse response) {
         User currentUser = userDetailsService.findCurrentUser();
         if (currentUser == null) {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            return null;
         } else {
             if (recipeRequest.getTitle() == null || recipeRequest.getInstructions() == null || recipeRequest.getIngredients().isEmpty()) {
                 response.setStatus(HttpStatus.BAD_REQUEST.value());
+                return null;
             } else {
                 Recipe newRecipe = new Recipe();
                 newRecipe.setTitle(recipeRequest.getTitle());
@@ -82,6 +84,7 @@ public class RecipeService {
                 }
 
                 response.setStatus(HttpStatus.CREATED.value());
+                return newRecipe;
             }
         }
     }

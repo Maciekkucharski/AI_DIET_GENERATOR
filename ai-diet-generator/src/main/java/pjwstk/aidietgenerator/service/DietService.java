@@ -15,6 +15,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import static pjwstk.aidietgenerator.entity.Gender.FEMALE;
@@ -101,12 +102,12 @@ public class DietService {
 
 
         try(OutputStream os = con.getOutputStream()) {
-            byte[] input = jsonInputString.getBytes("utf-8");
+            byte[] input = jsonInputString.getBytes(StandardCharsets.UTF_8);
             os.write(input, 0, input.length);
         }
 
         try(BufferedReader br = new BufferedReader(
-                new InputStreamReader(con.getInputStream(), "utf-8"))) {
+                new InputStreamReader(con.getInputStream(), StandardCharsets.UTF_8))) {
             StringBuilder response = new StringBuilder();
             String responseLine = null;
             while ((responseLine = br.readLine()) != null) {
@@ -137,12 +138,12 @@ public class DietService {
         List<Long> replacementsIds = new ArrayList<>();
 
         try(OutputStream os = con.getOutputStream()) {
-            byte[] input = jsonInputString.getBytes("utf-8");
+            byte[] input = jsonInputString.getBytes(StandardCharsets.UTF_8);
             os.write(input, 0, input.length);
         }
 
         try(BufferedReader br = new BufferedReader(
-                new InputStreamReader(con.getInputStream(), "utf-8"))) {
+                new InputStreamReader(con.getInputStream(), StandardCharsets.UTF_8))) {
             StringBuilder response = new StringBuilder();
             String responseLine = null;
             while ((responseLine = br.readLine()) != null) {
@@ -245,10 +246,8 @@ public class DietService {
         double remainingCalories = caloriesPerDay;
         List<Recipe> recipesToday = new ArrayList<>();
 
-        List<Long> recommendedRecipesIds = new ArrayList<>();
-        List<Long> usedRecipesIds = new ArrayList<>();
-        recommendedRecipesIds.addAll(startingRecommendedRecipesIds);
-        usedRecipesIds.addAll(startingUsedRecipesIds);
+        List<Long> recommendedRecipesIds = new ArrayList<>(startingRecommendedRecipesIds);
+        List<Long> usedRecipesIds = new ArrayList<>(startingUsedRecipesIds);
 
         List<Long> allRecipeIds = new ArrayList<>();
         allRecipeIds.addAll(recommendedRecipesIds);
@@ -304,12 +303,8 @@ public class DietService {
                         remainingCalories = findRecipeWithLeastCalories(allRecommendedRecipes).getCalories();
                     }
                 } else {
-                    if (usedRecipesIds.contains(recommendedRecipe.getId())) {
-                        usedRecipesIds.remove(recommendedRecipe.getId());
-                    }
-                    if (recommendedRecipesIds.contains(recommendedRecipe.getId())) {
-                        recommendedRecipesIds.remove(recommendedRecipe.getId());
-                    }
+                    usedRecipesIds.remove(recommendedRecipe.getId());
+                    recommendedRecipesIds.remove(recommendedRecipe.getId());
                 }
             } else {
                 firstRecipeIndex += 1;
@@ -402,7 +397,7 @@ public class DietService {
                               Boolean vegetarian, Boolean vegan, Boolean glutenFree, Boolean dairyFree, Boolean veryHealthy, Boolean verified,
                               double threshold) throws IOException {
 
-        Boolean replaced = false;
+        boolean replaced = false;
         Long returnId = null;
 
         if(threshold < 0) {
@@ -426,7 +421,7 @@ public class DietService {
             }
         }
 
-        return replaced == true ? returnId : replaceRecipe(recipeToReplaceId, excludedProductsList, vegetarian, vegan, glutenFree, dairyFree, veryHealthy, verified, threshold-0.1);
+        return replaced ? returnId : replaceRecipe(recipeToReplaceId, excludedProductsList, vegetarian, vegan, glutenFree, dairyFree, veryHealthy, verified, threshold-0.1);
     }
     public List<Long> replaceRemovedRecipes(List<Long> removedRecipesIds, List<Product> excludedProductsList,
                                             Boolean vegetarian, Boolean vegan, Boolean glutenFree, Boolean dairyFree, Boolean veryHealthy, Boolean verified) throws IOException {
@@ -446,7 +441,6 @@ public class DietService {
     public List<Long> getFilteredRecommendedIds(List<Long> recommendedIds, List<Product> excludedProductsList,
                                                 Boolean vegetarian, Boolean vegan, Boolean glutenFree, Boolean dairyFree, Boolean veryHealthy, Boolean verified) throws IOException {
         List<Recipe> recommendedRecipes = recipeRepository.findAllById(recommendedIds);
-        List<Long> newRecommendedIds = recommendedIds;
         List<Long> removedIds = new ArrayList<>();
 
         for(Recipe currentRecipe : recommendedRecipes){
@@ -454,17 +448,17 @@ public class DietService {
                 removedIds.add(currentRecipe.getId());
                 continue;
             }
-            if(doesRecipeHaveExcludedProduct(currentRecipe, excludedProductsList) == true){
+            if(doesRecipeHaveExcludedProduct(currentRecipe, excludedProductsList)){
                 removedIds.add(currentRecipe.getId());
             }
         }
 
-        newRecommendedIds.removeAll(removedIds);
+        recommendedIds.removeAll(removedIds);
 
         List<Long> substitutesForRemovedIds = replaceRemovedRecipes(removedIds, excludedProductsList, vegetarian, vegan, glutenFree, dairyFree, veryHealthy, verified);
-        newRecommendedIds.addAll(substitutesForRemovedIds);
+        recommendedIds.addAll(substitutesForRemovedIds);
 
-        return newRecommendedIds;
+        return recommendedIds;
     }
     public DietWeek generateDiet(DietRequest dietRequest, HttpServletResponse response) throws IOException {
         User currentUser = userDetailsService.findCurrentUser();
@@ -522,9 +516,7 @@ public class DietService {
                         dietDay.setDietWeek(currentUserDiet);
 
                         for(Long todaysRecipeId : dietDay.getTodaysRecipesIds()){
-                            if(recommendedRecipesIds.contains(todaysRecipeId)){
-                                recommendedRecipesIds.remove(todaysRecipeId);
-                            }
+                            recommendedRecipesIds.remove(todaysRecipeId);
                             if(!usedRecipesIds.contains(todaysRecipeId)){
                                 usedRecipesIds.add(todaysRecipeId);
                             }
@@ -533,6 +525,7 @@ public class DietService {
                         dietWeek.add(dietDay);
                     }
                     currentUserDiet.setDaysForWeekDiet(dietWeek);
+                    currentUserDiet.setCreatedAt();
 
                     response.setStatus(HttpStatus.CREATED.value());
 

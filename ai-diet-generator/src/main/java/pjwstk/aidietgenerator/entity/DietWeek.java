@@ -3,6 +3,7 @@ package pjwstk.aidietgenerator.entity;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,10 +23,14 @@ public class DietWeek {
     @JsonIgnoreProperties({"firstName", "lastName", "password", "authorities", "email"})
     private User user;
 
+    @Column(name = "timestamp")
+    private Timestamp timestamp;
+
     public DietWeek(){}
 
-    public DietWeek(List<DietDay> daysForWeekDiet, User user){
+    public DietWeek(List<DietDay> daysForWeekDiet, Timestamp timestamp, User user){
         this.daysForWeekDiet = daysForWeekDiet;
+        this.timestamp = timestamp;
         this.user = user;
     }
 
@@ -64,5 +69,17 @@ public class DietWeek {
             }
         }
         return thisWeeksRecipesIds;
+    }
+
+    public void setCreatedAt(){
+        this.timestamp = new Timestamp(System.currentTimeMillis());
+    }
+
+    public Timestamp getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(Timestamp timestamp) {
+        this.timestamp = timestamp;
     }
 }

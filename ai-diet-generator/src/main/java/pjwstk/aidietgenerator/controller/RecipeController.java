@@ -37,8 +37,8 @@ public class RecipeController {
 
     @PostMapping("/add")
     @Transactional
-    public void addRecipe(@RequestBody RecipeRequest recipeRequest, HttpServletResponse response){
-        recipeService.addRecipe(recipeRequest, response);
+    public Recipe addRecipe(@RequestBody RecipeRequest recipeRequest, HttpServletResponse response){
+        return recipeService.addRecipe(recipeRequest, response);
     }
 
     @GetMapping("/all")
