@@ -284,13 +284,18 @@ public class ProfileService {
     public void saveUserExtras(UserExtrasRequest userExtrasRequest, HttpServletResponse response) {
         User currentUser = userDetailsService.findCurrentUser();
         if(currentUser != null){
-            UserExtras newUserExtras = new UserExtras();
-            newUserExtras.setUser(currentUser);
-            newUserExtras.setBackground_image(userExtrasRequest.getBackgroundImagePath());
-            newUserExtras.setProfession(userExtrasRequest.getProfession());
-            newUserExtras.setAbout_me(userExtrasRequest.getAbout_me());
-            userExtrasRepository.save(newUserExtras);
-            response.setStatus(HttpStatus.OK.value());
+            UserExtras existingUserExtras = userExtrasRepository.findByuser(currentUser);
+            if(existingUserExtras != null) {
+                UserExtras newUserExtras = new UserExtras();
+                newUserExtras.setUser(currentUser);
+                newUserExtras.setBackground_image(userExtrasRequest.getBackgroundImagePath());
+                newUserExtras.setProfession(userExtrasRequest.getProfession());
+                newUserExtras.setAbout_me(userExtrasRequest.getAbout_me());
+                userExtrasRepository.save(newUserExtras);
+                response.setStatus(HttpStatus.OK.value());
+            } else {
+                updateUserExtras(userExtrasRequest, response);
+            }
         } else {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
         }
