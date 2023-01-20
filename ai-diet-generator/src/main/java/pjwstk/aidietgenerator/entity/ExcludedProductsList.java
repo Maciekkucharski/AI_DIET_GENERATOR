@@ -10,6 +10,7 @@ import java.util.List;
 public class ExcludedProductsList {
 
     @Id
+    @JsonIgnore
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
