@@ -285,7 +285,7 @@ public class ProfileService {
         User currentUser = userDetailsService.findCurrentUser();
         if(currentUser != null){
             UserExtras existingUserExtras = userExtrasRepository.findByuser(currentUser);
-            if(existingUserExtras != null) {
+            if(existingUserExtras == null) {
                 UserExtras newUserExtras = new UserExtras();
                 newUserExtras.setUser(currentUser);
                 newUserExtras.setBackground_image(userExtrasRequest.getBackgroundImagePath());
