@@ -28,7 +28,7 @@ public class UserDetailsService implements org.springframework.security.core.use
         this.passwordEncoder = passwordEncoder;
     }
 
-    public void saveUser(User user){
+    public User saveUser(User user){
         var userEntity = new User();
         userEntity.setFirstName(user.getFirstName());
         userEntity.setLastName(user.getLastName());
@@ -36,7 +36,7 @@ public class UserDetailsService implements org.springframework.security.core.use
         userEntity.setPassword (passwordEncoder.encode(user.getPassword()));
         userEntity.setAuthority(String.join(",", user.getAuthority()));
         userEntity.setCreatedAt();
-        userRepository.save(userEntity);
+        return userRepository.save(userEntity);
     }
 
     public boolean doesUserExist (String email){

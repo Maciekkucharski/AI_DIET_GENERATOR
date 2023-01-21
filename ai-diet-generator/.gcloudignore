@@ -12,6 +12,6 @@
 # below:
 .git
 .gitignore
-
+test/
 # Target directory for maven builds
 target/

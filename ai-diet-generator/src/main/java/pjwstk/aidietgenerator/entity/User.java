@@ -13,7 +13,7 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 
 @Entity
-@JsonIgnoreProperties({"credentialsNonExpired", "accountNonExpired", "accountNonLocked", "enabled", "password", "imagePath"})
+@JsonIgnoreProperties({"credentialsNonExpired", "accountNonExpired", "accountNonLocked", "enabled", "password", "imagePath", "authorities"})
 @Table(name = "users")
 public class User implements UserDetails {
 
@@ -46,6 +46,9 @@ public class User implements UserDetails {
     @Column(name = "image_path")
     private String imagePath;
 
+    @Column(name = "subscribed")
+    private Boolean subscribed;
+
     public User() {
 
     }
@@ -58,7 +61,6 @@ public class User implements UserDetails {
     }
 
     public User(String email, String password) {
-        super();
         this.email = email;
         this.password = password;
     }
@@ -148,6 +150,14 @@ public class User implements UserDetails {
         this.imagePath = image_path;
     }
 
+    public Boolean getSubscribed() {
+        return subscribed;
+    }
+
+    public void setSubscribed(Boolean subscribed) {
+        this.subscribed = subscribed;
+    }
+
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Arrays
                 .stream(this.authority.split(","))
@@ -170,4 +180,6 @@ public class User implements UserDetails {
                 .trim();
         this.authority = remainingAuthorities;
     }
+
+
 }
