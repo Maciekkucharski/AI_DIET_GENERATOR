@@ -25,6 +25,7 @@ import static pjwstk.aidietgenerator.entity.Gender.MALE;
 @Service
 public class DietService {
 
+    private int numberOfCalls = 0;
     private final UserDetailsService userDetailsService;
     private final ProductRepository productRepository;
     private final ExcludedProductsListRepository excludedProductsListRepository;
@@ -307,7 +308,6 @@ public class DietService {
                 }
                 break;
         }
-        System.out.println("MY GOAL : " + dietGoal + " MY RATIOS : CARBS{ " + carbsRatio + " } FAT { " + fatRatio + " } PROTEIN { " + proteinRatio + " }");
         return true;
     }
     public DietDay generateDietForDay(List<Long> startingRecommendedRecipesIds, double caloriesPerDay, int mealsPerDay, List<Long> startingUsedRecipesIds, DietGoal dietGoal){
@@ -395,7 +395,6 @@ public class DietService {
                 }
             }
         }
-
         dietDay.setRecipesForToday(recipesToday);
         return dietDay;
     }
@@ -547,7 +546,7 @@ public class DietService {
                                     Integer suggestedRecipeCalories = suggestedRecipe.getCalories();
                                     if (oldRecipeCalories != null && suggestedRecipeCalories != null) {
                                         int caloriesDifference = Math.abs(oldRecipeCalories - suggestedRecipeCalories);
-                                        if(caloriesDifference < 150){
+                                        if(caloriesDifference < 100){
                                             List<Recipe> daysRecipes = dayToChange.get().getRecipesForToday();
                                             daysRecipes.remove(recipeToReplace.get());
                                             daysRecipes.add(suggestedRecipe);
@@ -593,7 +592,6 @@ public class DietService {
         double threshold = 0.7;
 
 //        TO AVOID 502 RESPONSE FROM MACIEK'S API :)
-        int numberOfCalls = 0;
 
         for(Long removedRecipeId : removedRecipesIds){
             numberOfCalls++;
@@ -624,7 +622,6 @@ public class DietService {
 
         recommendedIds.removeAll(removedIds);
 
-        System.out.println("WE ARE MANY: " + removedIds.size());
         List<Long> substitutesForRemovedIds = replaceRemovedRecipes(removedIds, excludedProductsList, vegetarian, vegan, glutenFree, dairyFree, veryHealthy, verified);
         recommendedIds.addAll(substitutesForRemovedIds);
 
@@ -635,7 +632,10 @@ public class DietService {
 
         PhysicalActivity physicalActivity = dietRequest.getPhysicalActivity();
         DietGoal dietGoal = dietRequest.getDietGoal();
-        List<Product> excludedProductsList = dietRequest.getExcludedProductsList();
+        List<Product> excludedProductsList = new ArrayList<>();
+        if(dietRequest.getExcludedProductsList() != null) {
+            excludedProductsList = dietRequest.getExcludedProductsList();
+        }
         int mealsPerDay = dietRequest.getMealsPerDay();
 
         if(currentUser != null) {
@@ -657,49 +657,75 @@ public class DietService {
                 Gender currentUserGender = lastUserStats.getGender();
 
                 if(currentUserWeight !=0 && currentUserHeight !=0 && currentUserAge !=0 && currentUserGender != null) {
-                    double caloriesPerDay = goalCalories(currentUserWeight, currentUserHeight, currentUserAge, currentUserGender, physicalActivity, dietGoal);
-                    lastUserStats.setCal((int) caloriesPerDay);
-                    List<Long> recommendedRecipesIds = getRecommendedIds(currentUser.getId(), dietRequest.getThreshold());
-                    recommendedRecipesIds = getFilteredRecommendedIds(recommendedRecipesIds, excludedProductsList,
-                            dietRequest.getVegetarian(), dietRequest.getVegan(), dietRequest.getGlutenFree(),
-                            dietRequest.getDairyFree(), dietRequest.getVeryHealthy(), dietRequest.getVerified());
+                    if(mealsPerDay >= 3 && mealsPerDay <= 5) {
+                        double caloriesPerDay = goalCalories(currentUserWeight, currentUserHeight, currentUserAge, currentUserGender, physicalActivity, dietGoal);
+                        lastUserStats.setCal((int) caloriesPerDay);
+                        List<Long> recommendedRecipesIds = getRecommendedIds(currentUser.getId(), dietRequest.getThreshold());
+                        recommendedRecipesIds = getFilteredRecommendedIds(recommendedRecipesIds, excludedProductsList,
+                                dietRequest.getVegetarian(), dietRequest.getVegan(), dietRequest.getGlutenFree(),
+                                dietRequest.getDairyFree(), dietRequest.getVeryHealthy(), dietRequest.getVerified());
 
-                    if(recommendedRecipesIds.isEmpty()){
-                        response.setStatus(HttpStatus.NO_CONTENT.value());
+                        if (recommendedRecipesIds.isEmpty()) {
+                            response.setStatus(HttpStatus.NO_CONTENT.value());
+                            return null;
+                        }
+
+                        List<DietDay> dietWeek = new ArrayList<>();
+                        List<Long> usedRecipesIds = new ArrayList<>();
+
+                        for (int i = 0; i < 7; i++) {
+                            DietDay dietDay = generateDietForDay(recommendedRecipesIds, caloriesPerDay, mealsPerDay, usedRecipesIds, dietGoal);
+                            if (dietDay == null) {
+                                dietRequest.setThreshold(dietRequest.getThreshold() - 0.05);
+                                if (dietRequest.getThreshold() < 0.6) {
+                                    response.setStatus(HttpStatus.NO_CONTENT.value());
+                                    return null;
+                                }
+                                if (!dietWeek.isEmpty() && dietRequest.getThreshold() <= 0.70) {
+                                    List<DietDay> alreadyAddedDays = dietWeek;
+                                    for (; i < 7; i++) {
+                                        DietDay dayToReuse = new DietDay();
+
+                                        DietDay alreadyUsedDietDay = alreadyAddedDays.get((int) (Math.random() * (alreadyAddedDays.size() - 1)));
+                                        List<Recipe> usedDietDayRecipes = alreadyUsedDietDay.getRecipesForToday();
+
+                                        dayToReuse.setRecipesForToday(usedDietDayRecipes);
+                                        dayToReuse.setDietWeek(currentUserDiet);
+
+                                        dayDietRepository.save(dayToReuse);
+                                        dietWeek.add(dayToReuse);
+                                    }
+
+                                    currentUserDiet.setDaysForWeekDiet(dietWeek);
+                                    currentUserDiet.setCreatedAt();
+                                    response.setStatus(HttpStatus.CREATED.value());
+                                    return weekDietRepository.save(currentUserDiet);
+                                } else {
+                                    return generateDiet(dietRequest, response);
+                                }
+                            }
+
+                            dietDay.setDietWeek(currentUserDiet);
+
+                            for (Long todaysRecipeId : dietDay.getTodaysRecipesIds()) {
+                                recommendedRecipesIds.remove(todaysRecipeId);
+                                if (!usedRecipesIds.contains(todaysRecipeId)) {
+                                    usedRecipesIds.add(todaysRecipeId);
+                                }
+                            }
+                            dayDietRepository.save(dietDay);
+                            dietWeek.add(dietDay);
+                        }
+                        currentUserDiet.setDaysForWeekDiet(dietWeek);
+                        currentUserDiet.setCreatedAt();
+
+                        response.setStatus(HttpStatus.CREATED.value());
+
+                        return weekDietRepository.save(currentUserDiet);
+                    } else {
+                        response.setStatus(HttpStatus.BAD_REQUEST.value());
                         return null;
                     }
-
-                    List<DietDay> dietWeek = new ArrayList<>();
-                    List<Long> usedRecipesIds = new ArrayList<>();
-
-                    for(int i=0; i<7; i++){
-                        DietDay dietDay = generateDietForDay(recommendedRecipesIds, caloriesPerDay, mealsPerDay, usedRecipesIds, dietGoal);
-                        if(dietDay == null) {
-                            dietRequest.setThreshold(dietRequest.getThreshold()-0.05);
-                            if(dietRequest.getThreshold() < 0.6){
-                                response.setStatus(HttpStatus.NO_CONTENT.value());
-                                return null;
-                            }
-                            return generateDiet(dietRequest, response);
-                        }
-
-                        dietDay.setDietWeek(currentUserDiet);
-
-                        for(Long todaysRecipeId : dietDay.getTodaysRecipesIds()){
-                            recommendedRecipesIds.remove(todaysRecipeId);
-                            if(!usedRecipesIds.contains(todaysRecipeId)){
-                                usedRecipesIds.add(todaysRecipeId);
-                            }
-                        }
-                        dayDietRepository.save(dietDay);
-                        dietWeek.add(dietDay);
-                    }
-                    currentUserDiet.setDaysForWeekDiet(dietWeek);
-                    currentUserDiet.setCreatedAt();
-
-                    response.setStatus(HttpStatus.CREATED.value());
-
-                    return weekDietRepository.save(currentUserDiet);
 
                 } else {
                     response.setStatus(HttpStatus.BAD_REQUEST.value());
