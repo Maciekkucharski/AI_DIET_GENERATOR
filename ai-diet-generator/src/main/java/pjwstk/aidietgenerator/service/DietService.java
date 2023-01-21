@@ -240,7 +240,76 @@ public class DietService {
         return recommendedRecipe;
     }
 
-    public DietDay generateDietForDay(List<Long> startingRecommendedRecipesIds, double caloriesPerDay, int mealsPerDay, List<Long> startingUsedRecipesIds){
+//    10-30% carbs, 30-40% fats, 40-50% protein lose weight
+//    45-65% carbs, 20-35% fats, 10-35% protein maintain
+//    50-60% carbs, 20-30% fats, 20% protein weight gain
+//    30-40% carbs, 30-40% fats, 30-40% protein muscle gain
+    public Boolean doRecipesFillMacroRequirements(List<Recipe> recipes, DietGoal dietGoal){
+        double todayProtein = 0;
+        double todayFat = 0;
+        double todayCarbs = 0;
+
+        for(Recipe recipe : recipes){
+            todayProtein += recipe.getProtein();
+            todayFat += recipe.getFat();
+            todayCarbs += recipe.getCarbs();
+        }
+
+        double todayMacro = todayProtein + todayFat + todayCarbs;
+        double carbsRatio = todayCarbs/todayMacro * 100;
+        double fatRatio = todayFat/todayMacro * 100;
+        double proteinRatio = todayProtein/todayMacro * 100;
+
+        switch (dietGoal){
+            case LOSE:
+                if(carbsRatio < 10 || carbsRatio > 30){
+                    return false;
+                }
+                if(fatRatio < 30 || fatRatio > 40) {
+                    return false;
+                }
+                if(proteinRatio < 40 || proteinRatio > 50) {
+                    return false;
+                }
+                break;
+            case MAINTAIN:
+                if(carbsRatio < 45 || carbsRatio > 65){
+                    return false;
+                }
+                if(fatRatio < 20 || fatRatio > 35) {
+                    return false;
+                }
+                if(proteinRatio < 10 || proteinRatio > 35) {
+                    return false;
+                }
+                break;
+            case GAIN:
+                if(carbsRatio < 50 || carbsRatio > 60){
+                    return false;
+                }
+                if(fatRatio < 20 || fatRatio > 30) {
+                    return false;
+                }
+                if(proteinRatio < 15 || proteinRatio > 25){
+                    return false;
+                }
+                break;
+            case MUSCLE:
+                if(carbsRatio < 30 || carbsRatio > 40){
+                    return false;
+                }
+                if(fatRatio < 30 || fatRatio > 40) {
+                    return false;
+                }
+                if(proteinRatio < 30 || proteinRatio > 40) {
+                    return false;
+                }
+                break;
+        }
+        System.out.println("MY GOAL : " + dietGoal + " MY RATIOS : CARBS{ " + carbsRatio + " } FAT { " + fatRatio + " } PROTEIN { " + proteinRatio + " }");
+        return true;
+    }
+    public DietDay generateDietForDay(List<Long> startingRecommendedRecipesIds, double caloriesPerDay, int mealsPerDay, List<Long> startingUsedRecipesIds, DietGoal dietGoal){
 
         DietDay dietDay = new DietDay();
         double remainingCalories = caloriesPerDay;
@@ -301,6 +370,17 @@ public class DietService {
                         allRecommendedRecipes.addAll(usedRecipesIds);
 
                         remainingCalories = findRecipeWithLeastCalories(allRecommendedRecipes).getCalories();
+                    }
+
+                    if(mealsLeft == 0) {
+                        if(!doRecipesFillMacroRequirements(recipesToday, dietGoal)){
+                            firstRecipeIndex += 1;
+                            firstRecipe = true;
+                            mealsLeft = mealsPerDay;
+                            if(firstRecipeIndex >= allRecipeIds.size()-1) {
+                                return null;
+                            }
+                        }
                     }
                 } else {
                     usedRecipesIds.remove(recommendedRecipe.getId());
@@ -428,7 +508,12 @@ public class DietService {
         List<Long> replacementRecipesIds = new ArrayList<>();
         double threshold = 0.7;
 
+//        TO AVOID 502 RESPONSE FROM MACIEK'S API :)
+        int numberOfCalls = 0;
+
         for(Long removedRecipeId : removedRecipesIds){
+            numberOfCalls++;
+            System.out.println(numberOfCalls);
             Long substituteRecipeId = replaceRecipe(removedRecipeId, excludedProductsList, vegetarian, vegan, glutenFree, dairyFree, veryHealthy, verified, threshold);
 
             if(substituteRecipeId != null){
@@ -455,6 +540,7 @@ public class DietService {
 
         recommendedIds.removeAll(removedIds);
 
+        System.out.println("WE ARE MANY: " + removedIds.size());
         List<Long> substitutesForRemovedIds = replaceRemovedRecipes(removedIds, excludedProductsList, vegetarian, vegan, glutenFree, dairyFree, veryHealthy, verified);
         recommendedIds.addAll(substitutesForRemovedIds);
 
@@ -503,7 +589,7 @@ public class DietService {
                     List<Long> usedRecipesIds = new ArrayList<>();
 
                     for(int i=0; i<7; i++){
-                        DietDay dietDay = generateDietForDay(recommendedRecipesIds, caloriesPerDay, mealsPerDay, usedRecipesIds);
+                        DietDay dietDay = generateDietForDay(recommendedRecipesIds, caloriesPerDay, mealsPerDay, usedRecipesIds, dietGoal);
                         if(dietDay == null) {
                             dietRequest.setThreshold(dietRequest.getThreshold()-0.05);
                             if(dietRequest.getThreshold() < 0.6){
