@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import pjwstk.aidietgenerator.entity.*;
 import pjwstk.aidietgenerator.repository.*;
 import pjwstk.aidietgenerator.request.DietRequest;
+import pjwstk.aidietgenerator.request.RecipeReplaceRequest;
 import pjwstk.aidietgenerator.service.Utils.ApiConstants;
 
 import javax.servlet.http.HttpServletResponse;
@@ -502,6 +503,89 @@ public class DietService {
         }
 
         return replaced ? returnId : replaceRecipe(recipeToReplaceId, excludedProductsList, vegetarian, vegan, glutenFree, dairyFree, veryHealthy, verified, threshold-0.1);
+    }
+
+    public DietWeek replaceRecipeFromADay(RecipeReplaceRequest recipeReplaceRequest, HttpServletResponse response) throws IOException {
+        User currentUser = userDetailsService.findCurrentUser();
+        if(currentUser != null) {
+            Optional<DietDay> dayToChange = dayDietRepository.findById(recipeReplaceRequest.getDayDietId());
+            DietWeek dietToChange = weekDietRepository.findByuser(currentUser);
+            if(dietToChange != null) {
+                if (dayToChange != null) {
+                    Long recipeToReplaceId = recipeReplaceRequest.getRecipeToReplaceId();
+                    Optional<Recipe> recipeToReplace = recipeRepository.findById(recipeToReplaceId);
+                    boolean changed = false;
+
+                    if (recipeToReplaceId != null) {
+                        if(recipeToReplace != null) {
+                            List<Recipe> allRecipes = recipeRepository.findAll();
+                            allRecipes.remove(recipeToReplace);
+                            int currentRecipeIndex = 0;
+
+                            while (!changed) {
+                                Recipe suggestedRecipe = allRecipes.get(currentRecipeIndex);
+                                if(doesRecipeHaveExcludedProduct(suggestedRecipe, recipeReplaceRequest.getExcludedProductsList())){
+                                    currentRecipeIndex++;
+                                    if(currentRecipeIndex >= allRecipes.size()){
+                                        response.setStatus(HttpStatus.NO_CONTENT.value());
+                                        return dietToChange;
+                                    }
+                                    continue;
+                                }
+                                if(doesRecipeMissRequirement(suggestedRecipe, recipeReplaceRequest.getVegetarian(), recipeReplaceRequest.getVegan(), recipeReplaceRequest.getGlutenFree(),
+                                        recipeReplaceRequest.getDairyFree(), recipeReplaceRequest.getVeryHealthy(), recipeReplaceRequest.getVerified())){
+                                    currentRecipeIndex++;
+                                    if(currentRecipeIndex >= allRecipes.size()){
+                                        response.setStatus(HttpStatus.NO_CONTENT.value());
+                                        return dietToChange;
+                                    }
+                                    continue;
+                                }
+
+                                if (suggestedRecipe != null) {
+                                    Integer oldRecipeCalories = recipeToReplace.get().getCalories();
+                                    Integer suggestedRecipeCalories = suggestedRecipe.getCalories();
+                                    if (oldRecipeCalories != null && suggestedRecipeCalories != null) {
+                                        int caloriesDifference = Math.abs(oldRecipeCalories - suggestedRecipeCalories);
+                                        if(caloriesDifference < 150){
+                                            List<Recipe> daysRecipes = dayToChange.get().getRecipesForToday();
+                                            daysRecipes.remove(recipeToReplace.get());
+                                            daysRecipes.add(suggestedRecipe);
+                                            dayToChange.get().setRecipesForToday(daysRecipes);
+                                            dayDietRepository.save(dayToChange.get());
+                                            weekDietRepository.save(dietToChange);
+                                            changed = true;
+                                        }
+                                    }
+                                }
+                                currentRecipeIndex++;
+                                if(currentRecipeIndex >= allRecipes.size()){
+                                    response.setStatus(HttpStatus.NO_CONTENT.value());
+                                    return dietToChange;
+                                }
+                            }
+                            response.setStatus(HttpStatus.OK.value());
+                            return dietToChange;
+                        } else {
+                            response.setStatus(HttpStatus.NO_CONTENT.value());
+                            return dietToChange;
+                        }
+                    } else {
+                        response.setStatus(HttpStatus.BAD_REQUEST.value());
+                        return dietToChange;
+                    }
+                } else {
+                    response.setStatus(HttpStatus.BAD_REQUEST.value());
+                    return dietToChange;
+                }
+            } else {
+                response.setStatus(HttpStatus.NO_CONTENT.value());
+                return null;
+            }
+        } else {
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            return null;
+        }
     }
     public List<Long> replaceRemovedRecipes(List<Long> removedRecipesIds, List<Product> excludedProductsList,
                                             Boolean vegetarian, Boolean vegan, Boolean glutenFree, Boolean dairyFree, Boolean veryHealthy, Boolean verified) throws IOException {
