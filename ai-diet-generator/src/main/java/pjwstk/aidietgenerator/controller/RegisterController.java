@@ -58,6 +58,7 @@ public class RegisterController {
                 }
                 GrantedAuthority defaultAuthority = () -> "ROLE_USER";
                 newUser.addAuthority(defaultAuthority);
+                newUser.setSubscribed(false);
                 response.setStatus(HttpStatus.CREATED.value());
                 return userDetailsService.saveUser(newUser);
             }
