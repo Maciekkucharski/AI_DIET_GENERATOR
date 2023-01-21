@@ -253,6 +253,22 @@ public class RecipeService {
     }
 
     public List<RecipeView> getUserRecipes(long userID, HttpServletResponse response) {
-        return null;
+        Optional<User> existingUser = userRepository.findById(userID);
+        if(existingUser.isPresent()){
+            List<Recipe> userRecipes = recipeRepository.findByuser(existingUser.get());
+            if(userRecipes.size()>0) {
+                List<RecipeView> recipeViewList = new ArrayList<>();
+                for (Recipe recipe : userRecipes) {
+                    recipeViewList.add(view(recipe.getId(), response));
+                }
+                return recipeViewList;
+            } else {
+                response.setStatus(HttpStatus.NOT_FOUND.value());
+                return null;
+            }
+        } else {
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            return null;
+        }
     }
 }

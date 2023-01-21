@@ -35,7 +35,7 @@ public class RecipeController {
         return recipeService.view(recipeId, response);
     }
 
-    @GetMapping("user/{userID}")
+    @GetMapping("/user/{userID}")
     public List<RecipeView> findUserRecipes(@PathVariable(value = "userID") long userID, HttpServletResponse response){
         return recipeService.getUserRecipes(userID, response);
     }

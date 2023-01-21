@@ -9,6 +9,7 @@ import pjwstk.aidietgenerator.service.SurveyService;
 import pjwstk.aidietgenerator.service.UserDetailsService;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 @RestController
 @RequestMapping("/account/survey")
@@ -27,7 +28,7 @@ public class SurveyController {
     }
 
     @GetMapping
-    public Survey getCurrentUserSurvey(){
+    public List<Survey> getCurrentUserSurvey(){
         return surveyRepository.findByuser(userDetailsService.findCurrentUser());
     }
 
@@ -35,4 +36,6 @@ public class SurveyController {
     public Survey saveUserSurvey(@RequestBody SurveyRequest surveyRequest, HttpServletResponse response){
         return surveyService.saveSurvey(surveyRequest, response);
     }
+
+
 }

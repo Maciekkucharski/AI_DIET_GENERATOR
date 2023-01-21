@@ -28,31 +28,33 @@ public class SurveyService {
 
     public Survey saveSurvey(SurveyRequest surveyRequest, HttpServletResponse response){
         User currentUser = userDetailsService.findCurrentUser();
+        Survey survey = new Survey();
         if(currentUser != null) {
-            Survey survey = new Survey();
-            List<String> exclusions = surveyRequest.getExclusions();
-            List<Question> answers = surveyRequest.getAnswers();
-            String exclusionsString = exclusions.stream().collect(Collectors.joining(", "));
-            survey.setExclusions(exclusionsString);
-            for (Question question : answers) {
-                if (question.getId() == 1) survey.setAnswer1(question.getValue());
-                if (question.getId() == 2) survey.setAnswer2(question.getValue());
-                if (question.getId() == 3) survey.setAnswer3(question.getValue());
-                if (question.getId() == 4) survey.setAnswer4(question.getValue());
-                if (question.getId() == 5) survey.setAnswer5(question.getValue());
-                if (question.getId() == 6) survey.setAnswer6(question.getValue());
-                if (question.getId() == 7) survey.setAnswer7(question.getValue());
-                if (question.getId() == 8) survey.setAnswer8(question.getValue());
-                if (question.getId() == 9) survey.setAnswer9(question.getValue());
-                if (question.getId() == 10) survey.setAnswer10(question.getValue());
-                if (question.getId() == 11) survey.setAnswer11(question.getValue());
-                if (question.getId() == 12) survey.setAnswer12(question.getValue());
-                if (question.getId() == 13) survey.setAnswer13(question.getValue());
+            if(surveyRequest.getAnswers().size() == 13) {
+                List<Question> answers = surveyRequest.getAnswers();
+                for (Question question : answers) {
+                    if (question.getId() == 1) survey.setAnswer1(question.getValue());
+                    if (question.getId() == 2) survey.setAnswer2(question.getValue());
+                    if (question.getId() == 3) survey.setAnswer3(question.getValue());
+                    if (question.getId() == 4) survey.setAnswer4(question.getValue());
+                    if (question.getId() == 5) survey.setAnswer5(question.getValue());
+                    if (question.getId() == 6) survey.setAnswer6(question.getValue());
+                    if (question.getId() == 7) survey.setAnswer7(question.getValue());
+                    if (question.getId() == 8) survey.setAnswer8(question.getValue());
+                    if (question.getId() == 9) survey.setAnswer9(question.getValue());
+                    if (question.getId() == 10) survey.setAnswer10(question.getValue());
+                    if (question.getId() == 11) survey.setAnswer11(question.getValue());
+                    if (question.getId() == 12) survey.setAnswer12(question.getValue());
+                    if (question.getId() == 13) survey.setAnswer13(question.getValue());
+                }
+                survey.setTimestamp(new Timestamp(System.currentTimeMillis()));
+                survey.setUser(currentUser);
+                response.setStatus(HttpStatus.OK.value());
+                return surveyRepository.save(survey);
+            } else {
+                response.setStatus(HttpStatus.BAD_REQUEST.value());
+                return null;
             }
-            survey.setTimestamp(new Timestamp(System.currentTimeMillis()));
-            survey.setUser(currentUser);
-            response.setStatus(HttpStatus.OK.value());
-            return surveyRepository.save(survey);
         } else {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             return null;

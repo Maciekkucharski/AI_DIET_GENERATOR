@@ -10,6 +10,5 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 public class SurveyRequest {
-    private List<String> exclusions;
     private List<Question> answers;
 }
