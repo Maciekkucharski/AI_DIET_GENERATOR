@@ -4,9 +4,11 @@ import org.springframework.web.bind.annotation.*;
 import pjwstk.aidietgenerator.entity.Survey;
 import pjwstk.aidietgenerator.repository.SurveyRepository;
 import pjwstk.aidietgenerator.repository.UserRepository;
+import pjwstk.aidietgenerator.request.SurveyRatingRequest;
 import pjwstk.aidietgenerator.request.SurveyRequest;
 import pjwstk.aidietgenerator.service.SurveyService;
 import pjwstk.aidietgenerator.service.UserDetailsService;
+import pjwstk.aidietgenerator.view.RecipeSurveyView;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
@@ -37,5 +39,14 @@ public class SurveyController {
         return surveyService.saveSurvey(surveyRequest, response);
     }
 
+    @GetMapping("/rating")
+    public List<RecipeSurveyView> get30RecipesToRate(HttpServletResponse response){
+        return surveyService.getRecipes(response);
+    }
+
+    @PostMapping("/rating")
+    public void addUserRecipesRatings(@RequestBody SurveyRatingRequest request, HttpServletResponse response){
+        surveyService.saveUserRecipeRatings(request, response);
+    }
 
 }

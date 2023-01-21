@@ -1,5 +1,6 @@
 package pjwstk.aidietgenerator.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -84,6 +85,7 @@ public class Recipe {
     private Integer protein;
 
     @ManyToOne
+    @JsonIgnoreProperties({"email", "authority", "subscribed", "username"})
     @JoinColumn(name = "user_id")
     private User user;
 

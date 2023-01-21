@@ -3,15 +3,21 @@ package pjwstk.aidietgenerator.service;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import pjwstk.aidietgenerator.entity.Question;
+import pjwstk.aidietgenerator.entity.Recipe;
 import pjwstk.aidietgenerator.entity.Survey;
 import pjwstk.aidietgenerator.entity.User;
+import pjwstk.aidietgenerator.repository.RecipeRepository;
 import pjwstk.aidietgenerator.repository.SurveyRepository;
 import pjwstk.aidietgenerator.repository.UserRepository;
+import pjwstk.aidietgenerator.request.SurveyRatingRequest;
 import pjwstk.aidietgenerator.request.SurveyRequest;
+import pjwstk.aidietgenerator.view.RecipeSurveyView;
 
 
 import javax.servlet.http.HttpServletResponse;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,18 +25,21 @@ import java.util.stream.Collectors;
 public class SurveyService {
     private final SurveyRepository surveyRepository;
     private final UserDetailsService userDetailsService;
+    private final RecipeRepository recipeRepository;
 
     public SurveyService(SurveyRepository surveyRepository,
-                         UserDetailsService userDetailsService) {
+                         UserDetailsService userDetailsService,
+                         RecipeRepository recipeRepository) {
         this.surveyRepository = surveyRepository;
         this.userDetailsService = userDetailsService;
+        this.recipeRepository = recipeRepository;
     }
 
-    public Survey saveSurvey(SurveyRequest surveyRequest, HttpServletResponse response){
+    public Survey saveSurvey(SurveyRequest surveyRequest, HttpServletResponse response) {
         User currentUser = userDetailsService.findCurrentUser();
         Survey survey = new Survey();
-        if(currentUser != null) {
-            if(surveyRequest.getAnswers().size() == 13) {
+        if (currentUser != null) {
+            if (surveyRequest.getAnswers().size() == 13) {
                 List<Question> answers = surveyRequest.getAnswers();
                 for (Question question : answers) {
                     if (question.getId() == 1) survey.setAnswer1(question.getValue());
@@ -59,5 +68,20 @@ public class SurveyService {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             return null;
         }
+    }
+
+    public List<RecipeSurveyView> getRecipes(HttpServletResponse response) {
+        List<Recipe> allRecipes = recipeRepository.findByUserNull();
+        List<RecipeSurveyView> recipesToRate = new ArrayList<>();
+        Collections.shuffle(allRecipes);
+        for (int i = 0; i < 30; i++){
+            Recipe recipe = allRecipes.get(i);
+            RecipeSurveyView view = new RecipeSurveyView(recipe.getId(), recipe.getTitle(), recipe.getImagePath());
+            recipesToRate.add(view);
+        }
+        return recipesToRate;
+    }
+
+    public void saveUserRecipeRatings(SurveyRatingRequest request, HttpServletResponse response) {
     }
 }
