@@ -9,14 +9,10 @@ import pjwstk.aidietgenerator.entity.User;
 import pjwstk.aidietgenerator.repository.SubscriptionRepository;
 import pjwstk.aidietgenerator.repository.UserRepository;
 import pjwstk.aidietgenerator.request.SubscriptionRequest;
-import pjwstk.aidietgenerator.service.Utils.ApiConstants;
-
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
@@ -43,8 +39,10 @@ public class SubscriptionService {
     public Subscription createSubscription(SubscriptionRequest request, HttpServletResponse response) {
         User currentUser = userDetailsService.findCurrentUser();
         if(currentUser != null) {
-            if(request.getEmail_address() != null && request.getStatus() == "ACTIVE" && request.getStart_time() != null
-                    && request.getFinal_payment_time() != null && request.getPayer_id() != null & request.getId() != null) {
+            Subscription existingSubscription = subscriptionRepository.findByUserAndStatus(currentUser, "ACTIVE");
+            if(request.getEmail_address() != null && request.getStatus().equals("ACTIVE") && request.getStart_time() != null
+                    && request.getFinal_payment_time() != null && request.getPayer_id() != null & request.getId() != null
+                    && existingSubscription == null) {
                 Subscription newSubscription = new Subscription();
                 newSubscription.setUser(currentUser);
                 newSubscription.setStatus(request.getStatus());
@@ -53,6 +51,8 @@ public class SubscriptionService {
                 newSubscription.setPayer_id(request.getPayer_id());
                 newSubscription.setSubscription_id(request.getId());
                 newSubscription.setValid_till(new Date(request.getStart_time().getTime() + (1000L * 60 * 60 * 24 * 30))); // + 30 days
+                currentUser.setSubscribed(true);
+                userRepository.save(currentUser);
                 response.setStatus(HttpStatus.CREATED.value());
                 return subscriptionRepository.save(newSubscription);
             } else {
@@ -65,10 +65,10 @@ public class SubscriptionService {
         }
     }
 
-    public Subscription deleteSubscription(SubscriptionRequest request, HttpServletResponse response) throws IOException {
+    public Subscription deleteSubscription(HttpServletResponse response) throws IOException {
         User currentUser = userDetailsService.findCurrentUser();
         if(currentUser != null) {
-            Subscription userSubscription = subscriptionRepository.findByUser(currentUser);
+            Subscription userSubscription = subscriptionRepository.findByUserAndStatus(currentUser, "ACTIVE");
             if(userSubscription != null){
                 String urlString = "https://api-m.sandbox.paypal.com/v1/billing/subscriptions/" + userSubscription.getSubscription_id() + "/cancel";
                 URL url = new URL (urlString);
@@ -76,6 +76,7 @@ public class SubscriptionService {
                 con.setRequestMethod("POST");
                 con.setRequestProperty("Content-Type", "application/json");
                 con.setRequestProperty("Authorization", "Basic ARmk2ZR1YkM6uHxsqnE4IC3DqaSazz7MFO2lJsA3eKl4vFbgDqBsbpHZefq2FWzkGskDq77CVrrebypy:EIWIQsYghcbsm_EwAEV_BuYJCQN_D6slPIvkf_T38zQ7lzOga2KQ5hqbEd_ZUCgQ1p6lygFeZfQaTiAX");
+                con.setDoOutput(true);
                 String jsonInputString = "{\"Reason\":\"Not satisfied with the service\"}";
                 try(OutputStream os = con.getOutputStream()) {
                     byte[] input = jsonInputString.getBytes(StandardCharsets.UTF_8);
@@ -95,10 +96,10 @@ public class SubscriptionService {
         }
     }
 
-    public Subscription getUserSubscription(HttpServletResponse response) {
+    public List<Subscription> getUserSubscription(HttpServletResponse response) {
         User currentUser = userDetailsService.findCurrentUser();
         if (currentUser != null) {
-            Subscription userSubscription = subscriptionRepository.findByUser(currentUser);
+            List<Subscription> userSubscription = subscriptionRepository.findByUser(currentUser);
             if (userSubscription != null) {
                 response.setStatus(HttpStatus.OK.value());
                 return userSubscription;

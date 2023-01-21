@@ -5,7 +5,10 @@ import org.springframework.stereotype.Repository;
 import pjwstk.aidietgenerator.entity.Subscription;
 import pjwstk.aidietgenerator.entity.User;
 
+import java.util.List;
+
 @Repository
 public interface SubscriptionRepository extends JpaRepository<Subscription, Long> {
-    Subscription findByUser(User user);
+    List<Subscription> findByUser(User user);
+    Subscription findByUserAndStatus(User user, String status);
 }

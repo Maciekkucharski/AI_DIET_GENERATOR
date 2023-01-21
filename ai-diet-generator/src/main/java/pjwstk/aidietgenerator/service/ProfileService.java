@@ -29,6 +29,7 @@ public class ProfileService {
     private final ExcludedProductsListRepository excludedProductsListRepository;
     private final ForumService forumService;
     private final FollowRepository followRepository;
+    private final SubscriptionRepository subscriptionRepository;
 
     public ProfileService(UserRepository userRepository,
                           SocialsRepository socialsRepository,
@@ -40,7 +41,8 @@ public class ProfileService {
                           RecipeRepository recipeRepository,
                           ExcludedProductsListRepository excludedProductsListRepository,
                           ForumService forumService,
-                          FollowRepository followRepository) {
+                          FollowRepository followRepository,
+                          SubscriptionRepository subscriptionRepository) {
         this.userRepository = userRepository;
         this.socialsRepository = socialsRepository;
         this.userStatsRepository = userStatsRepository;
@@ -52,6 +54,7 @@ public class ProfileService {
         this.excludedProductsListRepository = excludedProductsListRepository;
         this.forumService = forumService;
         this.followRepository = followRepository;
+        this.subscriptionRepository = subscriptionRepository;
     }
 
     public MyProfile getLoggedUserProfile(HttpServletResponse response){
@@ -67,7 +70,7 @@ public class ProfileService {
             }
             currentUserProfile.setUserPosts(userPostsView);
             currentUserProfile.setProfileImagePath(currentUser.getImagePath());
-            currentUserProfile.setSubscribed(true); // TODO
+            currentUserProfile.setUserSubscriptions(subscriptionRepository.findByUser(currentUser));
             currentUserProfile.setUserStats(userStatsRepository.findByuser(currentUser));
             currentUserProfile.setUserRecipes(recipeRepository.findByuser(currentUser));
             currentUserProfile.setExcludedProductsList(excludedProductsListRepository.findByuser(currentUser));

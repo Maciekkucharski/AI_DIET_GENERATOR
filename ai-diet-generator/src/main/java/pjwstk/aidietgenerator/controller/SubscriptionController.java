@@ -12,6 +12,7 @@ import pjwstk.aidietgenerator.service.SubscriptionService;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
 
 @EnableScheduling
 @RestController
@@ -26,7 +27,7 @@ public class SubscriptionController {
     }
 
     @GetMapping
-    public Subscription getCurrentUserSubscriptionInfo(HttpServletResponse response){
+    public List<Subscription> getCurrentUserSubscriptionInfo(HttpServletResponse response){
         return subscriptionService.getUserSubscription(response);
     }
 
@@ -34,12 +35,12 @@ public class SubscriptionController {
     public Subscription subscribe(@RequestBody SubscriptionRequest request, HttpServletResponse response){
         return subscriptionService.createSubscription(request, response);
     }
-    @PostMapping("/cancel")
-    public Subscription unsubscribe(@RequestBody SubscriptionRequest request, HttpServletResponse response) throws IOException {
-        return subscriptionService.deleteSubscription(request, response);
+    @GetMapping("/cancel")
+    public Subscription unsubscribe(HttpServletResponse response) throws IOException {
+        return subscriptionService.deleteSubscription(response);
     }
 
-    @Scheduled(fixedDelay = 1000*60*60) // one hour
+    @Scheduled(fixedDelay = 1000*60*60*12) // one hour
     public void checkSubscriptions(){
         subscriptionService.checkSubscriptionsStatus();
     }

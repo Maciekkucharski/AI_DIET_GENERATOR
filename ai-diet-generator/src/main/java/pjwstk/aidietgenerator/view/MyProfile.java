@@ -15,7 +15,7 @@ public class MyProfile {
     private User user;
     private Socials socials;
     private String profileImagePath;
-    private Boolean subscribed;
+    private List<Subscription> userSubscriptions;
     private UserExtras userExtras;
     private List<UserStats> userStats;
     @JsonIgnoreProperties("user")
