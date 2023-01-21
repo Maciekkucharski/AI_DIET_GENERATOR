@@ -2,15 +2,10 @@ package pjwstk.aidietgenerator.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import pjwstk.aidietgenerator.entity.DietWeek;
-import pjwstk.aidietgenerator.entity.ExcludedProductsList;
-import pjwstk.aidietgenerator.entity.Product;
-import pjwstk.aidietgenerator.entity.User;
-import pjwstk.aidietgenerator.repository.ExcludedProductsListRepository;
-import pjwstk.aidietgenerator.repository.ProductRepository;
-import pjwstk.aidietgenerator.repository.RecipeRepository;
-import pjwstk.aidietgenerator.repository.WeekDietRepository;
+import pjwstk.aidietgenerator.entity.*;
+import pjwstk.aidietgenerator.repository.*;
 import pjwstk.aidietgenerator.request.DietRequest;
+import pjwstk.aidietgenerator.request.RecipeReplaceRequest;
 import pjwstk.aidietgenerator.service.DietService;
 import pjwstk.aidietgenerator.service.UserDetailsService;
 
@@ -28,19 +23,20 @@ public class DietController {
     private final UserDetailsService userDetailsService;
     private final ProductRepository productRepository;
     private final ExcludedProductsListRepository excludedProductsListRepository;
-
     private final WeekDietRepository weekDietRepository;
+    private final DayDietRepository dayDietRepository;
 
     @Autowired
     public DietController(DietService dietService, RecipeRepository recipeRepository, UserDetailsService userDetailsService,
                           ProductRepository productRepository, ExcludedProductsListRepository excludedProductsListRepository,
-                          WeekDietRepository weekDietRepository){
+                          WeekDietRepository weekDietRepository, DayDietRepository dayDietRepository){
         this.dietService = dietService;
         this.recipeRepository = recipeRepository;
         this.userDetailsService = userDetailsService;
         this.productRepository = productRepository;
         this.excludedProductsListRepository = excludedProductsListRepository;
         this.weekDietRepository = weekDietRepository;
+        this.dayDietRepository = dayDietRepository;
     }
 
     @PostMapping("/generate")
@@ -52,6 +48,11 @@ public class DietController {
     @GetMapping()
     public DietWeek getCurrentUserDiet(){
         return weekDietRepository.findByuser(userDetailsService.findCurrentUser());
+    }
+
+    @PostMapping("/generate/replaceRecipe")
+    public DietWeek replaceRecipeForADayWithClosestCaloriesCount(@RequestBody RecipeReplaceRequest recipeReplaceRequest, HttpServletResponse response) throws IOException {
+        return dietService.replaceRecipeFromADay(recipeReplaceRequest, response);
     }
 
     @GetMapping("/products")
