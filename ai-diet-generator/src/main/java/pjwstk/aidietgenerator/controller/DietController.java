@@ -9,6 +9,7 @@ import pjwstk.aidietgenerator.entity.User;
 import pjwstk.aidietgenerator.repository.ExcludedProductsListRepository;
 import pjwstk.aidietgenerator.repository.ProductRepository;
 import pjwstk.aidietgenerator.repository.RecipeRepository;
+import pjwstk.aidietgenerator.repository.WeekDietRepository;
 import pjwstk.aidietgenerator.request.DietRequest;
 import pjwstk.aidietgenerator.service.DietService;
 import pjwstk.aidietgenerator.service.UserDetailsService;
@@ -28,20 +29,29 @@ public class DietController {
     private final ProductRepository productRepository;
     private final ExcludedProductsListRepository excludedProductsListRepository;
 
+    private final WeekDietRepository weekDietRepository;
+
     @Autowired
     public DietController(DietService dietService, RecipeRepository recipeRepository, UserDetailsService userDetailsService,
-                          ProductRepository productRepository, ExcludedProductsListRepository excludedProductsListRepository){
+                          ProductRepository productRepository, ExcludedProductsListRepository excludedProductsListRepository,
+                          WeekDietRepository weekDietRepository){
         this.dietService = dietService;
         this.recipeRepository = recipeRepository;
         this.userDetailsService = userDetailsService;
         this.productRepository = productRepository;
         this.excludedProductsListRepository = excludedProductsListRepository;
+        this.weekDietRepository = weekDietRepository;
     }
 
     @PostMapping("/generate")
     @Transactional
     public DietWeek getIds(@RequestBody DietRequest dietRequest, HttpServletResponse response) throws IOException {
         return dietService.generateDiet(dietRequest, response);
+    }
+
+    @GetMapping()
+    public DietWeek getCurrentUserDiet(){
+        return weekDietRepository.findByuser(userDetailsService.findCurrentUser());
     }
 
     @GetMapping("/products")
