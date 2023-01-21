@@ -40,7 +40,7 @@ public class SubscriptionController {
         return subscriptionService.deleteSubscription(response);
     }
 
-    @Scheduled(fixedDelay = 1000*60*60*12) // one hour
+    @Scheduled(fixedDelay = 1000*60*60*12) // twelve hours
     public void checkSubscriptions(){
         subscriptionService.checkSubscriptionsStatus();
     }

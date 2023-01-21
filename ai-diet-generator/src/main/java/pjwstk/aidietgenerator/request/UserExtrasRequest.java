@@ -11,4 +11,10 @@ public class UserExtrasRequest {
     private String backgroundImagePath;
     private String about_me;
     private String profession;
+    private String facebook;
+    private String twitter;
+    private String instagram;
+    private String telegram;
+    private String youtube;
+    private String discord;
 }

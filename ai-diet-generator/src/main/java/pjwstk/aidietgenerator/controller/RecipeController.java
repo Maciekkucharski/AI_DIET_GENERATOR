@@ -35,6 +35,12 @@ public class RecipeController {
         return recipeService.view(recipeId, response);
     }
 
+    @GetMapping("user/{userID}")
+    public List<RecipeView> findUserRecipes(@PathVariable(value = "userID") long userID, HttpServletResponse response){
+        return recipeService.getUserRecipes(userID, response);
+    }
+
+
     @PostMapping("/add")
     @Transactional
     public Recipe addRecipe(@RequestBody RecipeRequest recipeRequest, HttpServletResponse response){

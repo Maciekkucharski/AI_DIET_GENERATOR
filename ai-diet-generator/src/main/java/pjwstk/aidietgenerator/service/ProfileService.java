@@ -19,7 +19,6 @@ import java.util.stream.Collectors;
 public class ProfileService {
 
     private final UserRepository userRepository;
-    private final SocialsRepository socialsRepository;
     private final UserStatsRepository userStatsRepository;
     private final UserDetailsService userDetailsService;
     private final PostRepository postRepository;
@@ -32,7 +31,6 @@ public class ProfileService {
     private final SubscriptionRepository subscriptionRepository;
 
     public ProfileService(UserRepository userRepository,
-                          SocialsRepository socialsRepository,
                           UserStatsRepository userStatsRepository,
                           UserDetailsService userDetailsService,
                           PostRepository postRepository,
@@ -44,7 +42,6 @@ public class ProfileService {
                           FollowRepository followRepository,
                           SubscriptionRepository subscriptionRepository) {
         this.userRepository = userRepository;
-        this.socialsRepository = socialsRepository;
         this.userStatsRepository = userStatsRepository;
         this.userDetailsService = userDetailsService;
         this.postRepository = postRepository;
@@ -63,7 +60,6 @@ public class ProfileService {
         if(currentUser != null){
             currentUserProfile.setUser(currentUser);
             currentUserProfile.setProfileImagePath(currentUser.getImagePath());
-            currentUserProfile.setSocials(socialsRepository.findByuser(currentUser));
             List<PostDetailedView> userPostsView = new ArrayList<>();
             for(Post post : postRepository.findByuser(currentUser)){
                 userPostsView.add(forumService.viewPost(post.getId(), response));
@@ -89,7 +85,6 @@ public class ProfileService {
         if(selectedUser.isPresent()){
             UserExtras userExtras = userExtrasRepository.findByuser(selectedUser.get());
             List<Follow> userFollows = followRepository.findByUser(selectedUser.get());
-            Socials userSocials = socialsRepository.findByuser(selectedUser.get());
             List<PostDetailedView> userPostsView = new ArrayList<>();
             for(Post post : postRepository.findByuser(selectedUser.get())){
                 userPostsView.add(forumService.viewPost(post.getId(), response));
@@ -97,8 +92,6 @@ public class ProfileService {
             selectedUserProfile.setUser(selectedUser.get());
             selectedUserProfile.setUserExtras(userExtras);
             selectedUserProfile.setFollowerCount(userFollows.size());
-            selectedUserProfile.setSocials(userSocials);
-            selectedUserProfile.setSocials(socialsRepository.findByuser(selectedUser.get()));
             selectedUserProfile.setUserPosts(userPostsView);
             selectedUserProfile.setUserRecipes(recipeRepository.findByuser(selectedUser.get()));
             selectedUserProfile.setUserImagePath(selectedUser.get().getImagePath());
@@ -284,7 +277,7 @@ public class ProfileService {
         }
     }
 
-    public void saveUserExtras(UserExtrasRequest userExtrasRequest, HttpServletResponse response) {
+    public UserExtras saveUserExtras(UserExtrasRequest userExtrasRequest, HttpServletResponse response) {
         User currentUser = userDetailsService.findCurrentUser();
         if(currentUser != null){
             UserExtras existingUserExtras = userExtrasRepository.findByuser(currentUser);
@@ -294,34 +287,56 @@ public class ProfileService {
                 newUserExtras.setBackground_image(userExtrasRequest.getBackgroundImagePath());
                 newUserExtras.setProfession(userExtrasRequest.getProfession());
                 newUserExtras.setAbout_me(userExtrasRequest.getAbout_me());
-                userExtrasRepository.save(newUserExtras);
+                newUserExtras.setDiscord(userExtrasRequest.getDiscord());
+                newUserExtras.setFacebook(userExtrasRequest.getFacebook());
+                newUserExtras.setInstagram(userExtrasRequest.getInstagram());
+                newUserExtras.setTelegram(userExtrasRequest.getTelegram());
+                newUserExtras.setTwitter(userExtrasRequest.getTwitter());
+                newUserExtras.setYoutube(userExtrasRequest.getYoutube());
                 response.setStatus(HttpStatus.OK.value());
+                return userExtrasRepository.save(newUserExtras);
+
             } else {
-                updateUserExtras(userExtrasRequest, response);
+                return updateUserExtras(userExtrasRequest, response);
             }
         } else {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            return null;
         }
     }
 
-    public void updateUserExtras(UserExtrasRequest userExtrasRequest, HttpServletResponse response){
+    public UserExtras updateUserExtras(UserExtrasRequest request, HttpServletResponse response){
         User currentUser = userDetailsService.findCurrentUser();
         if(currentUser != null){
             UserExtras existingExtras = userExtrasRepository.findByuser(currentUser);
             if(existingExtras != null) {
-                if(userExtrasRequest != null)
-                    existingExtras.setBackground_image(userExtrasRequest.getBackgroundImagePath());
-                if(userExtrasRequest.getProfession() != null)
-                    existingExtras.setProfession(userExtrasRequest.getProfession());
-                if(userExtrasRequest.getAbout_me() != null)
-                    existingExtras.setAbout_me(userExtrasRequest.getAbout_me());
-                userExtrasRepository.save(existingExtras);
+                if(request != null)
+                    existingExtras.setBackground_image(request.getBackgroundImagePath());
+                if(request.getProfession() != null)
+                    existingExtras.setProfession(request.getProfession());
+                if(request.getAbout_me() != null)
+                    existingExtras.setAbout_me(request.getAbout_me());
+                if(request.getDiscord() != null)
+                    existingExtras.setDiscord(request.getDiscord());
+                if(request.getFacebook() != null)
+                    existingExtras.setFacebook(request.getFacebook());
+                if(request.getInstagram() != null)
+                    existingExtras.setInstagram(request.getInstagram());
+                if(request.getTelegram() != null)
+                    existingExtras.setTelegram(request.getTelegram());
+                if(request.getTwitter() != null)
+                    existingExtras.setTwitter(request.getTwitter());
+                if(request.getYoutube() != null)
+                    existingExtras.setYoutube(request.getYoutube());
                 response.setStatus(HttpStatus.OK.value());
+                return userExtrasRepository.save(existingExtras);
             } else {
                 response.setStatus(HttpStatus.NOT_FOUND.value());
+                return null;
             }
         } else {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            return null;
         }
     }
 

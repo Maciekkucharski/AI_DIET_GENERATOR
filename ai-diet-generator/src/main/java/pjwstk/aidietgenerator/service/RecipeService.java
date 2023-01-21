@@ -251,4 +251,8 @@ public class RecipeService {
             }
         }
     }
+
+    public List<RecipeView> getUserRecipes(long userID, HttpServletResponse response) {
+        return null;
+    }
 }

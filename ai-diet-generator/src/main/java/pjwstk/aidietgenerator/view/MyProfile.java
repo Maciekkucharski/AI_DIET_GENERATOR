@@ -13,7 +13,6 @@ import java.util.List;
 public class MyProfile {
     @JsonIgnoreProperties({"password"})
     private User user;
-    private Socials socials;
     private String profileImagePath;
     private List<Subscription> userSubscriptions;
     private UserExtras userExtras;

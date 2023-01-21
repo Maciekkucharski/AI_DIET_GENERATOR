@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import pjwstk.aidietgenerator.entity.UserExtras;
 import pjwstk.aidietgenerator.request.UserExtrasRequest;
 import pjwstk.aidietgenerator.view.MyProfile;
 import org.springframework.web.bind.annotation.*;
@@ -57,13 +58,13 @@ public class ProfileController {
     }
 
     @PostMapping("/extras")
-    public void createUserExtras(@RequestBody UserExtrasRequest userExtrasRequest, HttpServletResponse response){
-        profileService.saveUserExtras(userExtrasRequest, response);
+    public UserExtras createUserExtras(@RequestBody UserExtrasRequest userExtrasRequest, HttpServletResponse response){
+        return profileService.saveUserExtras(userExtrasRequest, response);
     }
 
     @PutMapping("/extras")
-    public void updateExtras(@RequestBody UserExtrasRequest userExtrasRequest, HttpServletResponse response){
-        profileService.updateUserExtras(userExtrasRequest, response);
+    public UserExtras updateExtras(@RequestBody UserExtrasRequest userExtrasRequest, HttpServletResponse response){
+        return profileService.updateUserExtras(userExtrasRequest, response);
     }
 
     @DeleteMapping("/extras")

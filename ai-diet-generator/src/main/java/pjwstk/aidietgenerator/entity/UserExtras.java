@@ -30,6 +30,24 @@ public class UserExtras {
     @Column(name = "profession")
     private String profession;
 
+    @Column(name = "facebook")
+    private String facebook;
+
+    @Column(name = "twitter")
+    private String twitter;
+
+    @Column(name = "instagram")
+    private String instagram;
+
+    @Column(name = "telegram")
+    private String telegram;
+
+    @Column(name = "youtube")
+    private String youtube;
+
+    @Column(name = "discord")
+    private String discord;
+
     @OneToOne
     @JoinColumn(name = "creator_id")
     @JsonIgnore

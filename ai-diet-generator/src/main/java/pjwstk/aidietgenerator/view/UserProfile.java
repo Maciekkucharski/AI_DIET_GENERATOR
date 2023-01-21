@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import pjwstk.aidietgenerator.entity.Recipe;
-import pjwstk.aidietgenerator.entity.Socials;
 import pjwstk.aidietgenerator.entity.User;
 import pjwstk.aidietgenerator.entity.UserExtras;
 
@@ -21,7 +20,6 @@ public class UserProfile {
     private User user;
     private String userImagePath;
     private UserExtras userExtras;
-    private Socials socials;
     private int followerCount;
     @JsonIgnoreProperties({"author", "user"})
     private List<PostDetailedView> userPosts;
