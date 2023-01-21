@@ -23,7 +23,7 @@ public class DietDay {
     private List<DietWeek> dietWeek;
 
     @ManyToMany
-    @JsonIgnoreProperties({"saltiness", "sourness", "sweetness", "bitterness", "fattiness", "spiciness", "instructions", "timestamp", "user"})
+    @JsonIgnoreProperties({"saltiness", "sourness", "sweetness", "bitterness", "fattiness", "spiciness", "timestamp", "user"})
     private List<Recipe> recipesForToday;
 
     public DietDay(){}
