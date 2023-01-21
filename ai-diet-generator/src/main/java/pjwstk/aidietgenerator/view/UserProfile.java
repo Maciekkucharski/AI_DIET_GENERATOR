@@ -19,7 +19,9 @@ public class UserProfile {
     @JsonIgnoreProperties({"password", "email", "authority", "authorities", "username"})
     private User user;
     private String userImagePath;
+    @JsonIgnoreProperties({"discord", "facebook", "instagram", "telegram", "facebook", "twitter", "youtube"})
     private UserExtras userExtras;
+    private SocialsView socials;
     private int followerCount;
     @JsonIgnoreProperties({"author", "user"})
     private List<PostDetailedView> userPosts;

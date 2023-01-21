@@ -15,7 +15,9 @@ public class MyProfile {
     private User user;
     private String profileImagePath;
     private List<Subscription> userSubscriptions;
+    @JsonIgnoreProperties({"discord", "facebook", "instagram", "telegram", "facebook", "twitter", "youtube"})
     private UserExtras userExtras;
+    private SocialsView socials;
     private List<UserStats> userStats;
     @JsonIgnoreProperties("user")
     private List<PostDetailedView> userPosts;
@@ -23,3 +25,4 @@ public class MyProfile {
     private List<Recipe> userRecipes;
     private ExcludedProductsList excludedProductsList;
 }
+

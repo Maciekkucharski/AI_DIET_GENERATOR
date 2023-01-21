@@ -70,7 +70,10 @@ public class ProfileService {
             currentUserProfile.setUserStats(userStatsRepository.findByuser(currentUser));
             currentUserProfile.setUserRecipes(recipeRepository.findByuser(currentUser));
             currentUserProfile.setExcludedProductsList(excludedProductsListRepository.findByuser(currentUser));
-            currentUserProfile.setUserExtras(userExtrasRepository.findByuser(currentUser));
+            UserExtras userExtras = userExtrasRepository.findByuser(currentUser);
+            currentUserProfile.setUserExtras(userExtras);
+            currentUserProfile.setSocials(new SocialsView(userExtras.getFacebook(),
+                    userExtras.getTwitter(), userExtras.getInstagram(), userExtras.getTelegram(), userExtras.getYoutube(), userExtras.getDiscord()));
             response.setStatus(HttpStatus.OK.value());
             return currentUserProfile;
         } else {
@@ -91,6 +94,8 @@ public class ProfileService {
             }
             selectedUserProfile.setUser(selectedUser.get());
             selectedUserProfile.setUserExtras(userExtras);
+            selectedUserProfile.setSocials(new SocialsView(userExtras.getFacebook(),
+                    userExtras.getTwitter(), userExtras.getInstagram(), userExtras.getTelegram(), userExtras.getYoutube(), userExtras.getDiscord()));
             selectedUserProfile.setFollowerCount(userFollows.size());
             selectedUserProfile.setUserPosts(userPostsView);
             selectedUserProfile.setUserRecipes(recipeRepository.findByuser(selectedUser.get()));
