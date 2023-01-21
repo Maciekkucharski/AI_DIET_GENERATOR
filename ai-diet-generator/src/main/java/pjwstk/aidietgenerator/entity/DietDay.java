@@ -105,5 +105,4 @@ public class DietDay {
         }
         return protein;
     }
-
 }
