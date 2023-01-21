@@ -17,10 +17,10 @@ public class DietDay {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToMany
     @JsonIgnore
     @JoinColumn(name = "week_id")
-    private DietWeek dietWeek;
+    private List<DietWeek> dietWeek;
 
     @ManyToMany
     @JsonIgnoreProperties({"saltiness", "sourness", "sweetness", "bitterness", "fattiness", "spiciness", "instructions", "timestamp", "user"})
@@ -28,7 +28,7 @@ public class DietDay {
 
     public DietDay(){}
 
-    public DietDay(List<Recipe> recipesForToday, DietWeek dietWeek)
+    public DietDay(List<Recipe> recipesForToday, List<DietWeek> dietWeek)
     {
         this.recipesForToday = recipesForToday;
         this.dietWeek = dietWeek;
@@ -43,11 +43,11 @@ public class DietDay {
         this.id = id;
     }
 
-    public DietWeek getDietWeek() {
+    public List<DietWeek> getDietWeek() {
         return dietWeek;
     }
 
-    public void setDietWeek(DietWeek dietWeek) {
+    public void setDietWeek(List<DietWeek> dietWeek) {
         this.dietWeek = dietWeek;
     }
 

@@ -8,8 +8,9 @@ create table products (id bigint not null auto_increment, name varchar(255), pri
 create table recipe_comments (id bigint not null auto_increment, content varchar(255), created_at datetime, recipe_id bigint, creator_id bigint, primary key (id)) engine=InnoDB;
 create table recipe_likes (id bigint not null auto_increment, created_at datetime, recipe_id bigint, creator_id bigint, primary key (id)) engine=InnoDB;
 create table recipes (id bigint not null auto_increment, bitterness float, calories integer, carbs integer, dairy_free bit, fat integer, fattiness float, gluten_free bit, image varchar(255), instructions varchar(255), protein integer, ready_in_minutes integer, saltiness float, servings integer, sourness float, spiciness float, sweetness float, created_at datetime, title varchar(255), vegan bit, vegetarian bit, verified bit, very_healthy bit, user_id bigint, primary key (id)) engine=InnoDB;
-create table recipes_for_day (id bigint not null auto_increment, week_id bigint, primary key (id)) engine=InnoDB;
+create table recipes_for_day (id bigint not null auto_increment, primary key (id)) engine=InnoDB;
 create table recipes_for_day_recipes (recipes_for_day_id bigint not null, recipesForToday_id bigint not null) engine=InnoDB;
+create table recipes_for_day_recipes_for_week (recipes_for_day_id bigint not null, dietWeek_id bigint not null) engine=InnoDB;
 create table recipes_for_week (id bigint not null auto_increment, timestamp datetime, user_id bigint, primary key (id)) engine=InnoDB;
 create table recipes_for_week_recipes_for_day (recipes_for_week_id bigint not null, daysForWeekDiet_id bigint not null) engine=InnoDB;
 create table surveys (id bigint not null auto_increment, answer1 integer, answer10 integer, answer11 integer, answer12 integer, answer13 integer, answer2 integer, answer3 integer, answer4 integer, answer5 integer, answer6 integer, answer7 integer, answer8 integer, answer9 integer, exclusions varchar(255), created_at datetime, user_id bigint, primary key (id)) engine=InnoDB;
@@ -18,7 +19,6 @@ create table user_socials (id bigint not null auto_increment, discord varchar(25
 create table user_stats (id bigint not null auto_increment, age integer, bmi double precision, cal integer, gender integer, height integer, updated_at datetime, weight double precision, user_id bigint not null, primary key (id)) engine=InnoDB;
 create table users (id bigint not null auto_increment, authority varchar(255), email varchar(255), first_name varchar(255), image_path varchar(255), last_name varchar(255), login_password varchar(255), created_at datetime, primary key (id)) engine=InnoDB;
 alter table excluded_products_products add constraint UK_aq179or6l2h8ftj9iuxqqbj7l unique (listOfExcludedProducts_id);
-alter table recipes_for_week_recipes_for_day add constraint UK_7ih8krtn3t2uwk0p9vae01dna unique (daysForWeekDiet_id);
 alter table users add constraint UK_6dotkott2kjsp8vw4d0m25fb7 unique (email);
 alter table excluded_products add constraint FKgb1js7uidnmviora0jp3ddhuv foreign key (user_id) references users (id);
 alter table excluded_products_products add constraint FKq65nw6nlnle0a8u6sodpm3lw9 foreign key (listOfExcludedProducts_id) references products (id);
@@ -34,9 +34,10 @@ alter table recipe_comments add constraint FK5nv3a7m6bnb1q54ulapl8w5mp foreign k
 alter table recipe_likes add constraint FK123rwitbkijue4y39x2a9pqqb foreign key (recipe_id) references recipes (id);
 alter table recipe_likes add constraint FK5tjpee1krp7dmtp15b2co4vy5 foreign key (creator_id) references users (id);
 alter table recipes add constraint FKlc3x6yty3xsupx80hqbj9ayos foreign key (user_id) references users (id);
-alter table recipes_for_day add constraint FK55lnvrucfe0j2u2nbj1q02dkg foreign key (week_id) references recipes_for_week (id);
 alter table recipes_for_day_recipes add constraint FKl7re3dhk2bs7mv2012qrglg9u foreign key (recipesForToday_id) references recipes (id);
 alter table recipes_for_day_recipes add constraint FKl4kqk5p63c9j5pt2rtgyepwmu foreign key (recipes_for_day_id) references recipes_for_day (id);
+alter table recipes_for_day_recipes_for_week add constraint FK9w6knf7mnq3asrdo8y5vbljhq foreign key (dietWeek_id) references recipes_for_week (id);
+alter table recipes_for_day_recipes_for_week add constraint FKo3s4555vqc1oc01yyrq57lr9k foreign key (recipes_for_day_id) references recipes_for_day (id);
 alter table recipes_for_week add constraint FKtosnicydc3rhvvnpccxts4mq4 foreign key (user_id) references users (id);
 alter table recipes_for_week_recipes_for_day add constraint FK6fmmylkfdol0cnfcs2724yp6b foreign key (daysForWeekDiet_id) references recipes_for_day (id);
 alter table recipes_for_week_recipes_for_day add constraint FKootxeyl92toyw4ig7dg003wvl foreign key (recipes_for_week_id) references recipes_for_week (id);

@@ -396,6 +396,7 @@ public class DietService {
             }
         }
         dietDay.setRecipesForToday(recipesToday);
+        System.out.println("IM A GOOD DAY");
         return dietDay;
     }
     public Boolean doesRecipeHaveExcludedProduct(Recipe recipe, List<Product> excludedProducts){
@@ -684,16 +685,18 @@ public class DietService {
                                 if (!dietWeek.isEmpty() && dietRequest.getThreshold() <= 0.70) {
                                     List<DietDay> alreadyAddedDays = dietWeek;
                                     for (; i < 7; i++) {
-                                        DietDay dayToReuse = new DietDay();
 
                                         DietDay alreadyUsedDietDay = alreadyAddedDays.get((int) (Math.random() * (alreadyAddedDays.size() - 1)));
-                                        List<Recipe> usedDietDayRecipes = alreadyUsedDietDay.getRecipesForToday();
 
-                                        dayToReuse.setRecipesForToday(usedDietDayRecipes);
-                                        dayToReuse.setDietWeek(currentUserDiet);
+                                        List<DietWeek> dietWeeks = new ArrayList<>();
+                                        if(alreadyUsedDietDay.getDietWeek() != null) {
+                                            dietWeeks = alreadyUsedDietDay.getDietWeek();
+                                        }
+                                        dietWeeks.add(currentUserDiet);
+                                        alreadyUsedDietDay.setDietWeek(dietWeeks);
 
-                                        dayDietRepository.save(dayToReuse);
-                                        dietWeek.add(dayToReuse);
+                                        dayDietRepository.save(alreadyUsedDietDay);
+                                        dietWeek.add(alreadyUsedDietDay);
                                     }
 
                                     currentUserDiet.setDaysForWeekDiet(dietWeek);
@@ -704,15 +707,20 @@ public class DietService {
                                     return generateDiet(dietRequest, response);
                                 }
                             }
-
-                            dietDay.setDietWeek(currentUserDiet);
-
                             for (Long todaysRecipeId : dietDay.getTodaysRecipesIds()) {
                                 recommendedRecipesIds.remove(todaysRecipeId);
                                 if (!usedRecipesIds.contains(todaysRecipeId)) {
                                     usedRecipesIds.add(todaysRecipeId);
                                 }
                             }
+
+                            List<DietWeek> dietWeeks = new ArrayList<>();
+                            if(dietDay.getDietWeek() != null) {
+                                dietWeeks = dietDay.getDietWeek();
+                            }
+                            dietWeeks.add(currentUserDiet);
+                            dietDay.setDietWeek(dietWeeks);
+
                             dayDietRepository.save(dietDay);
                             dietWeek.add(dietDay);
                         }
