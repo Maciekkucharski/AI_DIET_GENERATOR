@@ -13,38 +13,39 @@ public class RecipeView {
 //    Recipe
     private Long id;
     private String title;
-    private int servings;
-    private int readyInMinutes;
+    private Integer servings;
+    private Integer readyInMinutes;
     private String imagePath;
     private String instructions;
-    private boolean vegetarian;
-    private boolean vegan;
-    private boolean glutenFree;
-    private boolean dairyFree;
-    private boolean veryHealthy;
-    private boolean verified;
+    private Boolean vegetarian;
+    private Boolean vegan;
+    private Boolean glutenFree;
+    private Boolean dairyFree;
+    private Boolean veryHealthy;
+    private Boolean verified;
     private Timestamp created_at;
     private User user;
 //    Nutrition
-    private int calories;
-    private int carbs;
-    private int fat;
-    private int protein;
+    private Integer calories;
+    private Integer carbs;
+    private Integer fat;
+    private Integer protein;
+
 //    Ingredients
     private List<Ingredient> ingredients;
 
     public RecipeView(Long id, String title,
-                      int servings,
-                      int readyInMinutes,
+                      Integer servings,
+                      Integer readyInMinutes,
                       String imagePath,
                       String instructions,
-                      boolean vegetarian, boolean vegan, boolean glutenFree, boolean dairyFree, boolean veryHealthy, boolean verified,
+                      Boolean vegetarian, Boolean vegan, Boolean glutenFree, Boolean dairyFree, Boolean veryHealthy, Boolean verified,
                       Timestamp created_at,
                       User user,
-                      int calories,
-                      int carbs,
-                      int fat,
-                      int protein,
+                      Integer calories,
+                      Integer carbs,
+                      Integer fat,
+                      Integer protein,
                       List<Ingredient> ingredients) {
         this.id = id;
         this.title = title;
@@ -83,19 +84,19 @@ public class RecipeView {
         this.title = title;
     }
 
-    public int getServings() {
+    public Integer getServings() {
         return servings;
     }
 
-    public void setServings(int servings) {
+    public void setServings(Integer servings) {
         this.servings = servings;
     }
 
-    public int getReadyInMinutes() {
+    public Integer getReadyInMinutes() {
         return readyInMinutes;
     }
 
-    public void setReadyInMinutes(int readyInMinutes) {
+    public void setReadyInMinutes(Integer readyInMinutes) {
         this.readyInMinutes = readyInMinutes;
     }
 
@@ -115,51 +116,51 @@ public class RecipeView {
         this.instructions = instructions;
     }
 
-    public boolean isVegetarian() {
+    public Boolean isVegetarian() {
         return vegetarian;
     }
 
-    public void setVegetarian(boolean vegetarian) {
+    public void setVegetarian(Boolean vegetarian) {
         this.vegetarian = vegetarian;
     }
 
-    public boolean isVegan() {
+    public Boolean isVegan() {
         return vegan;
     }
 
-    public void setVegan(boolean vegan) {
+    public void setVegan(Boolean vegan) {
         this.vegan = vegan;
     }
 
-    public boolean isGlutenFree() {
+    public Boolean isGlutenFree() {
         return glutenFree;
     }
 
-    public void setGlutenFree(boolean glutenFree) {
+    public void setGlutenFree(Boolean glutenFree) {
         this.glutenFree = glutenFree;
     }
 
-    public boolean isDairyFree() {
+    public Boolean isDairyFree() {
         return dairyFree;
     }
 
-    public void setDairyFree(boolean dairyFree) {
+    public void setDairyFree(Boolean dairyFree) {
         this.dairyFree = dairyFree;
     }
 
-    public boolean isVeryHealthy() {
+    public Boolean isVeryHealthy() {
         return veryHealthy;
     }
 
-    public void setVeryHealthy(boolean veryHealthy) {
+    public void setVeryHealthy(Boolean veryHealthy) {
         this.veryHealthy = veryHealthy;
     }
 
-    public boolean isVerified() {
+    public Boolean isVerified() {
         return verified;
     }
 
-    public void setVerified(boolean verified) {
+    public void setVerified(Boolean verified) {
         this.verified = verified;
     }
 
@@ -179,35 +180,35 @@ public class RecipeView {
         this.user = user;
     }
 
-    public int getCalories() {
+    public Integer getCalories() {
         return calories;
     }
 
-    public void setCalories(int calories) {
+    public void setCalories(Integer calories) {
         this.calories = calories;
     }
 
-    public int getCarbs() {
+    public Integer getCarbs() {
         return carbs;
     }
 
-    public void setCarbs(int carbs) {
+    public void setCarbs(Integer carbs) {
         this.carbs = carbs;
     }
 
-    public int getFat() {
+    public Integer getFat() {
         return fat;
     }
 
-    public void setFat(int fat) {
+    public void setFat(Integer fat) {
         this.fat = fat;
     }
 
-    public int getProtein() {
+    public Integer getProtein() {
         return protein;
     }
 
-    public void setProtein(int protein) {
+    public void setProtein(Integer protein) {
         this.protein = protein;
     }
 

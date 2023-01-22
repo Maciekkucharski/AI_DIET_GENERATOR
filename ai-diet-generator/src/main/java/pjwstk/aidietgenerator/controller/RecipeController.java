@@ -35,11 +35,20 @@ public class RecipeController {
         return recipeService.view(recipeId, response);
     }
 
+    @DeleteMapping("/{id}")
+    public void deleteRecipeById(@PathVariable(value = "id") long recipeId, HttpServletResponse response){
+        recipeService.delete(recipeId, response);
+    }
+
+    @PutMapping("/{id}")
+    public Recipe updatedExistingRecipe(@PathVariable(value = "id") long recipeId,@RequestBody RecipeRequest recipeRequest, HttpServletResponse response){
+        return recipeService.editRecipe(recipeId, recipeRequest, response);
+    }
+
     @GetMapping("/user/{userID}")
     public List<RecipeView> findUserRecipes(@PathVariable(value = "userID") long userID, HttpServletResponse response){
         return recipeService.getUserRecipes(userID, response);
     }
-
 
     @PostMapping("/add")
     @Transactional
