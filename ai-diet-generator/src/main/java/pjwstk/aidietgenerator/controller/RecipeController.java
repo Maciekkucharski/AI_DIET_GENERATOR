@@ -35,6 +35,16 @@ public class RecipeController {
         return recipeService.view(recipeId, response);
     }
 
+    @DeleteMapping("/{id}")
+    public void deleteRecipeById(@PathVariable(value = "id") long recipeId, HttpServletResponse response){
+        recipeService.delete(recipeId, response);
+    }
+
+    @PutMapping("/{id}")
+    public Recipe updatedExistingRecipe(@PathVariable(value = "id") long recipeId,@RequestBody RecipeRequest recipeRequest, HttpServletResponse response){
+        return recipeService.editRecipe(recipeId, recipeRequest, response);
+    }
+
     @PostMapping("/add")
     @Transactional
     public Recipe addRecipe(@RequestBody RecipeRequest recipeRequest, HttpServletResponse response){

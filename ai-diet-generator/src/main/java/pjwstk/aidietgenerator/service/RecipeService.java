@@ -48,22 +48,49 @@ public class RecipeService {
                 return null;
             } else {
                 Recipe newRecipe = new Recipe();
-                newRecipe.setTitle(recipeRequest.getTitle());
-                newRecipe.setServings(recipeRequest.getServings());
-                newRecipe.setReadyInMinutes(recipeRequest.getReadyInMinutes());
-                newRecipe.setImagePath(recipeRequest.getImagePath());
-                newRecipe.setInstructions(recipeRequest.getInstructions());
-                newRecipe.setVegetarian(recipeRequest.isVegetarian());
-                newRecipe.setVegan(recipeRequest.isVegan());
+                if(recipeRequest.getTitle() != null) {
+                    newRecipe.setTitle(recipeRequest.getTitle());
+                }
+                if(recipeRequest.getServings() != null) {
+                    newRecipe.setServings(recipeRequest.getServings());
+                }
+                if(recipeRequest.getReadyInMinutes() != null) {
+                    newRecipe.setReadyInMinutes(recipeRequest.getReadyInMinutes());
+                }
+                if(recipeRequest.getImagePath() != null) {
+                    newRecipe.setImagePath(recipeRequest.getImagePath());
+                }
+                if(recipeRequest.getInstructions() != null) {
+                    newRecipe.setInstructions(recipeRequest.getInstructions());
+                }
+                if(recipeRequest.isVegetarian() != null) {
+                    newRecipe.setVegetarian(recipeRequest.isVegetarian());
+                }
+                if(recipeRequest.isVegan() != null) {
+                    newRecipe.setVegan(recipeRequest.isVegan());
+                }
                 newRecipe.setVerified(false);
-                newRecipe.setGlutenFree(recipeRequest.isGlutenFree());
-                newRecipe.setGlutenFree(recipeRequest.isGlutenFree());
-                newRecipe.setDairyFree(recipeRequest.isDairyFree());
-                newRecipe.setVeryHealthy(recipeRequest.isVeryHealthy());
-                newRecipe.setCalories(recipeRequest.getCalories());
-                newRecipe.setCarbs(recipeRequest.getCarbs());
-                newRecipe.setFat(recipeRequest.getFat());
-                newRecipe.setProtein(recipeRequest.getProtein());
+                if(recipeRequest.isGlutenFree() != null) {
+                    newRecipe.setGlutenFree(recipeRequest.isGlutenFree());
+                }
+                if(recipeRequest.isDairyFree() != null) {
+                    newRecipe.setDairyFree(recipeRequest.isDairyFree());
+                }
+                if(recipeRequest.isVeryHealthy() != null) {
+                    newRecipe.setVeryHealthy(recipeRequest.isVeryHealthy());
+                }
+                if(recipeRequest.getCalories() != null) {
+                    newRecipe.setCalories(recipeRequest.getCalories());
+                }
+                if(recipeRequest.getCarbs() != null) {
+                    newRecipe.setCarbs(recipeRequest.getCarbs());
+                }
+                if(recipeRequest.getFat() != null) {
+                    newRecipe.setFat(recipeRequest.getFat());
+                }
+                if(recipeRequest.getProtein() != null) {
+                    newRecipe.setProtein(recipeRequest.getProtein());
+                }
                 newRecipe.setUser(currentUser);
                 newRecipe.setCreatedAt();
 
@@ -73,14 +100,16 @@ public class RecipeService {
                 recipeRepository.save(newRecipe);
                 List<Ingredient> newRecipeIngredients = recipeRequest.getIngredients();
 
-                for (Ingredient ingredient : newRecipeIngredients) {
-                    Ingredient newIngredient = new Ingredient();
-                    newIngredient.setName(ingredient.getName());
-                    newIngredient.setAmount(ingredient.getAmount());
-                    newIngredient.setUnit(ingredient.getUnit());
-                    newIngredient.setRecipe(newRecipe);
+                if(newRecipeIngredients != null) {
+                    for (Ingredient ingredient : newRecipeIngredients) {
+                        Ingredient newIngredient = new Ingredient();
+                        newIngredient.setName(ingredient.getName());
+                        newIngredient.setAmount(ingredient.getAmount());
+                        newIngredient.setUnit(ingredient.getUnit());
+                        newIngredient.setRecipe(newRecipe);
 
-                    ingredientRepository.save(newIngredient);
+                        ingredientRepository.save(newIngredient);
+                    }
                 }
 
                 response.setStatus(HttpStatus.CREATED.value());
@@ -171,49 +200,76 @@ public class RecipeService {
         }
     }
 
-    public RecipeRequest editRecipe(long recipeId, RecipeRequest editedRecipe, HttpServletResponse response) {
+    public Recipe editRecipe(long recipeId, RecipeRequest editedRecipe, HttpServletResponse response) {
         Recipe existingRecipe = recipeRepository.findById(recipeId)
                 .orElseThrow(() -> new ResourceNotFoundException("Recipe not found with id :" + recipeId));
-        List<Ingredient> existingRecipeIngredients = ingredientRepository.findByrecipe(existingRecipe);
 
         User currentUser = userDetailsService.findCurrentUser();
-        if (currentUser == null
-                || !currentUser.getAuthorities().contains("ROLE_DIETICIAN")
-                || !currentUser.getAuthorities().contains("ROLE_ADMIN")
-                || currentUser != existingRecipe.getUser()) {
+        if (currentUser == null || (!currentUser.getAuthorities().contains("ROLE_DIETICIAN") && !currentUser.getAuthorities().contains("ROLE_ADMIN") && currentUser != existingRecipe.getUser())) {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             return null;
 
         } else {
-            existingRecipe.setTitle(editedRecipe.getTitle());
-            existingRecipe.setServings(editedRecipe.getServings());
-            existingRecipe.setReadyInMinutes(editedRecipe.getReadyInMinutes());
-            existingRecipe.setImagePath(editedRecipe.getImagePath());
-            existingRecipe.setInstructions(editedRecipe.getInstructions());
-            existingRecipe.setVegetarian(editedRecipe.isVegetarian());
-            existingRecipe.setVegan(editedRecipe.isVegan());
-            existingRecipe.setGlutenFree(editedRecipe.isGlutenFree());
-            existingRecipe.setDairyFree(editedRecipe.isDairyFree());
-            existingRecipe.setVeryHealthy(editedRecipe.isVeryHealthy());
-            existingRecipe.setVerified(editedRecipe.isVerified());
-            existingRecipe.setCalories(editedRecipe.getCalories());
-            existingRecipe.setCarbs(editedRecipe.getCarbs());
-            existingRecipe.setFat(editedRecipe.getFat());
-            existingRecipe.setProtein(editedRecipe.getProtein());
+            if(editedRecipe.getTitle() != null) {
+                existingRecipe.setTitle(editedRecipe.getTitle());
+            }
+            if(editedRecipe.getServings() != null) {
+                existingRecipe.setServings(editedRecipe.getServings());
+            }
+            if(editedRecipe.getReadyInMinutes() != null) {
+                existingRecipe.setReadyInMinutes(editedRecipe.getReadyInMinutes());
+            }
+            if(editedRecipe.getImagePath() != null) {
+                existingRecipe.setImagePath(editedRecipe.getImagePath());
+            }
+            if(editedRecipe.getInstructions() != null) {
+                existingRecipe.setInstructions(editedRecipe.getInstructions());
+            }
+            if(editedRecipe.isVegetarian() != null) {
+                existingRecipe.setVegetarian(editedRecipe.isVegetarian());
+            }
+            if(editedRecipe.isVegan() != null) {
+                existingRecipe.setVegan(editedRecipe.isVegan());
+            }
+            if(editedRecipe.isGlutenFree() != null) {
+                existingRecipe.setGlutenFree(editedRecipe.isGlutenFree());
+            }
+            if(editedRecipe.isDairyFree() != null) {
+                existingRecipe.setDairyFree(editedRecipe.isDairyFree());
+            }
+            if(editedRecipe.isVeryHealthy() != null) {
+                existingRecipe.setVeryHealthy(editedRecipe.isVeryHealthy());
+            }
+            if(editedRecipe.isVerified() != null) {
+                existingRecipe.setVerified(editedRecipe.isVerified());
+            }
+            if(editedRecipe.getCalories() != null) {
+                existingRecipe.setCalories(editedRecipe.getCalories());
+            }
+            if(editedRecipe.getCarbs() != null) {
+                existingRecipe.setCarbs(editedRecipe.getCarbs());
+            }
+            if(editedRecipe.getFat() != null) {
+                existingRecipe.setFat(editedRecipe.getFat());
+            }
+            if(editedRecipe.getProtein() != null) {
+                existingRecipe.setProtein(editedRecipe.getProtein());
+            }
+
             existingRecipe.setCreatedAt();
-            recipeRepository.save(existingRecipe);
 
-            List<Ingredient> newIngredients = editedRecipe.getIngredients();
-            List<Ingredient> oldIngredients = ingredientRepository.findByrecipe(existingRecipe);
 
-            ingredientRepository.deleteAll(oldIngredients);
-
-            for (Ingredient newIngredient : newIngredients) {
-                newIngredient.setRecipe(existingRecipe);
-                ingredientRepository.save(newIngredient);
+            if(editedRecipe.getIngredients() != null) {
+                List<Ingredient> newIngredients = editedRecipe.getIngredients();
+                for (Ingredient newIngredient : newIngredients) {
+                    newIngredient.setRecipe(existingRecipe);
+                    ingredientRepository.save(newIngredient);
+                }
+                List<Ingredient> oldIngredients = ingredientRepository.findByrecipe(existingRecipe);
+                ingredientRepository.deleteAll(oldIngredients);
             }
             response.setStatus(HttpStatus.OK.value());
-            return editedRecipe;
+            return recipeRepository.save(existingRecipe);
         }
     }
 

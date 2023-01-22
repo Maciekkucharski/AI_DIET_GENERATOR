@@ -7,19 +7,12 @@ import java.util.List;
 public class RecipeReplaceRequest {
     private Long dayDietId;
     private Long recipeToReplaceId;
-
     private List<Product> excludedProductsList;
-
     private Boolean vegetarian;
-
     private Boolean vegan;
-
     private Boolean glutenFree;
-
     private Boolean dairyFree;
-
     private Boolean veryHealthy;
-
     private Boolean verified;
 
 
