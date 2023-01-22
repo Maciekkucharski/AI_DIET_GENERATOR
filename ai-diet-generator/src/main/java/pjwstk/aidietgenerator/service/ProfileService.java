@@ -10,9 +10,7 @@ import pjwstk.aidietgenerator.view.*;
 import pjwstk.aidietgenerator.request.ProfileInfoRequest;
 
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -357,6 +355,30 @@ public class ProfileService {
             }
         } else {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
+        }
+    }
+
+    public List<ProfileSearchView> searchUser(String searchField, HttpServletResponse response) {
+        List<ProfileSearchView> profileSearchViewList = new ArrayList<>();
+        if(searchField != null){
+            String[] words = searchField.split(" ");
+            List<User> firstSearch = userRepository.findByFirstNameOrLastName(words[0], words[1]);
+            List<User> secondSearch = userRepository.findByFirstNameOrLastName(words[1], words[0]);
+
+            Set<User> searchResult = new HashSet<>(firstSearch);
+            searchResult.addAll(secondSearch);
+            for(User user : searchResult){
+                ProfileSearchView newSearchView = new ProfileSearchView();
+                newSearchView.setID(user.getId());
+                newSearchView.setFirstName(user.getFirstName());
+                newSearchView.setLastName(user.getLastName());
+                newSearchView.setImagePath(user.getImagePath());
+                profileSearchViewList.add(newSearchView);
+            }
+            return profileSearchViewList;
+        } else {
+            response.setStatus(HttpStatus.BAD_REQUEST.value());
+            return null;
         }
     }
 }

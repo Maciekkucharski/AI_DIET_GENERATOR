@@ -54,18 +54,13 @@ public class UserDetailsService implements org.springframework.security.core.use
 
     public User findCurrentUser() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return  ((User) principal);
+        if (principal instanceof User) {
+            return ((User) principal);
+        } else {
+            return null;
+        }
     }
 
-//    public User findCurrentUserx() {
-//        User currentUser = null;
-//        try {
-//            currentUser = userRepository.findByemail(getCurrentUserEmail());
-//        } catch (NoResultException e) {
-//            System.out.println(e.getMessage());
-//        }
-//        return currentUser;
-//    }
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
@@ -78,10 +73,10 @@ public class UserDetailsService implements org.springframework.security.core.use
                 new ArrayList<>());
     }
 
-    public boolean patternMatches(String emailAddress) {
+    public boolean patternMatches(String email) {
         return Pattern.compile("^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@"
                         + "[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$")
-                .matcher(emailAddress)
+                .matcher(email)
                 .matches();
     }
 }
