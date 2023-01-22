@@ -17,6 +17,7 @@ public class DietWeek {
     private Long id;
 
     @ManyToMany
+    @Cascade({ org.hibernate.annotations.CascadeType.SAVE_UPDATE, org.hibernate.annotations.CascadeType.MERGE, org.hibernate.annotations.CascadeType.PERSIST})
     private List<DietDay> daysForWeekDiet;
 
     @OneToOne
