@@ -1,6 +1,7 @@
 package pjwstk.aidietgenerator.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
@@ -19,6 +20,7 @@ public class DietWeek {
     private List<DietDay> daysForWeekDiet;
 
     @OneToOne
+    @Cascade(org.hibernate.annotations.CascadeType.ALL)
     @JoinColumn(name = "user_id")
     @JsonIgnoreProperties({"firstName", "lastName", "password", "authorities", "email"})
     private User user;
