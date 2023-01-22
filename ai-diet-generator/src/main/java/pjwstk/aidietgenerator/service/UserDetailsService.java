@@ -52,25 +52,20 @@ public class UserDetailsService implements org.springframework.security.core.use
         return userRepository.findByemail(email);
     }
 
-    public String getCurrentUserEmail() {
+    public User findCurrentUser() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (principal instanceof User) {
-            String email = ((User) principal).getEmail();
-            return email;
-        } else {
-            return principal.toString();
-        }
+        return  ((User) principal);
     }
 
-    public User findCurrentUser() {
-        User currentUser = null;
-        try {
-            currentUser = userRepository.findByemail(getCurrentUserEmail());
-        } catch (NoResultException e) {
-            System.out.println(e.getMessage());
-        }
-        return currentUser;
-    }
+//    public User findCurrentUserx() {
+//        User currentUser = null;
+//        try {
+//            currentUser = userRepository.findByemail(getCurrentUserEmail());
+//        } catch (NoResultException e) {
+//            System.out.println(e.getMessage());
+//        }
+//        return currentUser;
+//    }
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
