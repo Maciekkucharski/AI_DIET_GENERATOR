@@ -8,6 +8,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Getter
 public class RecipeRatingRequest {
-    private Integer id;
-    private Integer value;
+    private Long id;
+    private Integer score;
 }

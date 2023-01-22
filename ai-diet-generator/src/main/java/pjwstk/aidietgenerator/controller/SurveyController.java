@@ -1,6 +1,7 @@
 package pjwstk.aidietgenerator.controller;
 
 import org.springframework.web.bind.annotation.*;
+import pjwstk.aidietgenerator.entity.Rating;
 import pjwstk.aidietgenerator.entity.Survey;
 import pjwstk.aidietgenerator.repository.SurveyRepository;
 import pjwstk.aidietgenerator.repository.UserRepository;
@@ -45,8 +46,8 @@ public class SurveyController {
     }
 
     @PostMapping("/rating")
-    public void addUserRecipesRatings(@RequestBody SurveyRatingRequest request, HttpServletResponse response){
-        surveyService.saveUserRecipeRatings(request, response);
+    public List<Rating> addUserRecipesRatings(@RequestBody SurveyRatingRequest request, HttpServletResponse response){
+        return surveyService.saveUserRecipeRatings(request, response);
     }
 
 }

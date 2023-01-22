@@ -2,13 +2,12 @@ package pjwstk.aidietgenerator.service;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import pjwstk.aidietgenerator.entity.Question;
-import pjwstk.aidietgenerator.entity.Recipe;
-import pjwstk.aidietgenerator.entity.Survey;
-import pjwstk.aidietgenerator.entity.User;
+import pjwstk.aidietgenerator.entity.*;
+import pjwstk.aidietgenerator.repository.RatingRepository;
 import pjwstk.aidietgenerator.repository.RecipeRepository;
 import pjwstk.aidietgenerator.repository.SurveyRepository;
 import pjwstk.aidietgenerator.repository.UserRepository;
+import pjwstk.aidietgenerator.request.RecipeRatingRequest;
 import pjwstk.aidietgenerator.request.SurveyRatingRequest;
 import pjwstk.aidietgenerator.request.SurveyRequest;
 import pjwstk.aidietgenerator.view.RecipeSurveyView;
@@ -26,13 +25,16 @@ public class SurveyService {
     private final SurveyRepository surveyRepository;
     private final UserDetailsService userDetailsService;
     private final RecipeRepository recipeRepository;
+    private final RatingRepository ratingRepository;
 
     public SurveyService(SurveyRepository surveyRepository,
                          UserDetailsService userDetailsService,
-                         RecipeRepository recipeRepository) {
+                         RecipeRepository recipeRepository,
+                         RatingRepository ratingRepository) {
         this.surveyRepository = surveyRepository;
         this.userDetailsService = userDetailsService;
         this.recipeRepository = recipeRepository;
+        this.ratingRepository = ratingRepository;
     }
 
     public Survey saveSurvey(SurveyRequest surveyRequest, HttpServletResponse response) {
@@ -82,6 +84,26 @@ public class SurveyService {
         return recipesToRate;
     }
 
-    public void saveUserRecipeRatings(SurveyRatingRequest request, HttpServletResponse response) {
+    public List<Rating> saveUserRecipeRatings(SurveyRatingRequest request, HttpServletResponse response) {
+        User currentUser = userDetailsService.findCurrentUser();
+        List<Rating> recipeList = new ArrayList<>();
+        if(currentUser != null) {
+            if(request.getRatingList() != null) {
+                for (RecipeRatingRequest rating : request.getRatingList()) {
+                    Rating newRating = new Rating();
+                    newRating.setUser(currentUser);
+                    newRating.setScore(rating.getScore());
+                    newRating.setRecipe(recipeRepository.findById(rating.getId()).get());
+                    recipeList.add(ratingRepository.save(newRating));
+                }
+                response.setStatus(HttpStatus.OK.value());
+                return recipeList;
+            } else {
+                response.setStatus(HttpStatus.BAD_REQUEST.value());
+            }
+        } else {
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+        }
+        return null;
     }
 }

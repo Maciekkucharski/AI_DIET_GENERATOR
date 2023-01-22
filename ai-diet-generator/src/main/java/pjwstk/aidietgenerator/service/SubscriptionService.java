@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.stereotype.Service;
+import pjwstk.aidietgenerator.entity.Recipe;
 import pjwstk.aidietgenerator.entity.Subscription;
 import pjwstk.aidietgenerator.entity.User;
 import pjwstk.aidietgenerator.repository.SubscriptionRepository;
@@ -15,6 +16,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -114,6 +116,7 @@ public class SubscriptionService {
     }
 
     public void checkSubscriptionsStatus() {
+        //https://developer.paypal.com/docs/api/subscriptions/v1/#subscriptions_patch sprawdzanie statusu
         List<Subscription> allSubscriptions = subscriptionRepository.findAll();
         Date currentDate = new Date();
         for(Subscription subscription : allSubscriptions){
