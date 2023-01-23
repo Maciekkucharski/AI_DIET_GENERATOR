@@ -126,4 +126,11 @@ public class Recipe {
     public void setCreatedAt(){
         this.timestamp = new Timestamp(System.currentTimeMillis());
     }
+
+    public String getRecipeCreatorImage() {
+        if(user != null) {
+            return user.getImagePath();
+        }
+        return null;
+    }
 }
