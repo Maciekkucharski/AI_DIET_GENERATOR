@@ -3,6 +3,9 @@ package pjwstk.aidietgenerator.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pjwstk.aidietgenerator.repository.*;
+import pjwstk.aidietgenerator.view.FeedView;
+
+import javax.servlet.http.HttpServletResponse;
 
 @Service
 public class DashboardService {
@@ -36,5 +39,11 @@ public class DashboardService {
         this.recipeCommentsRepository = recipeCommentsRepository;
         this.recipeService = recipeService;
         this.followRepository = followRepository;
+    }
+
+    public FeedView loadFeed(HttpServletResponse response) {
+        FeedView newFeed = new FeedView();
+
+        return newFeed;
     }
 }

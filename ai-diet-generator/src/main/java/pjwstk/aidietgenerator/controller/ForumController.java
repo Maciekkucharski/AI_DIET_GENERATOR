@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import pjwstk.aidietgenerator.entity.Post;
 import pjwstk.aidietgenerator.entity.PostComment;
-import pjwstk.aidietgenerator.entity.PostLike;
 import pjwstk.aidietgenerator.entity.Recipe;
 import pjwstk.aidietgenerator.request.CommentRequest;
 import pjwstk.aidietgenerator.request.PostRequest;
@@ -13,7 +12,6 @@ import pjwstk.aidietgenerator.view.PostDetailedView;
 import pjwstk.aidietgenerator.view.PostSimplifiedView;
 import pjwstk.aidietgenerator.view.RecipeDetailedView;
 import pjwstk.aidietgenerator.view.RecipeSimplifiedView;
-
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
 import java.util.List;
@@ -46,7 +44,7 @@ public class ForumController {
         return forumService.addPostComment(postId, request, response);
     }
 
-    @DeleteMapping("/post/comment/delete/{commentID)")
+    @DeleteMapping("/post/comment/delete/{commentID})")
     @Transactional
     public void deletePostComment(@PathVariable(value = "commentID") long commentID, HttpServletResponse response) {
         forumService.removePostComment(commentID, response);
@@ -81,17 +79,17 @@ public class ForumController {
     }
 
     @GetMapping("/recipe")
-    public List<List<RecipeSimplifiedView>> viewAllSimplifiedRecipes(HttpServletResponse response, String option){
+    public List<List<RecipeSimplifiedView>> viewAllSimplifiedRecipes(HttpServletResponse response){
         return forumService.findSimplifiedRecipes(response, "all");
     }
 
     @GetMapping("/recipe/verified")
-    public List<List<RecipeSimplifiedView>> viewVerifiedRecipes(HttpServletResponse response, String option){
+    public List<List<RecipeSimplifiedView>> viewVerifiedRecipes(HttpServletResponse response){
         return forumService.findSimplifiedRecipes(response, "verified");
     }
 
     @GetMapping("/recipe/notVerified")
-    public List<List<RecipeSimplifiedView>> viewNotVerifiedRecipes(HttpServletResponse response, String option){
+    public List<List<RecipeSimplifiedView>> viewNotVerifiedRecipes(HttpServletResponse response){
         return forumService.findSimplifiedRecipes(response, "notVerified");
     }
 
@@ -113,7 +111,7 @@ public class ForumController {
         forumService.addRecipeComment(recipeID, request, response);
     }
 
-    @DeleteMapping("/recipe/comment/delete/{commentID)")
+    @DeleteMapping("/recipe/comment/delete/{commentID}")
     @Transactional
     public void deleteMealComment(@PathVariable(value = "commentID") long commentID, HttpServletResponse response) {
         forumService.removeRecipeComment(commentID, response);
