@@ -369,8 +369,8 @@ public class ProfileService {
                 word = word.replaceAll("\\s", "");
             }
             if(words.length == 2) {
-                firstSearch = userRepository.findByFirstNameOrLastName(words[0], words[1]);
-                secondSearch = userRepository.findByFirstNameOrLastName(words[1], words[0]);
+                firstSearch = userRepository.findByFirstNameAndLastName(words[0], words[1]);
+                secondSearch = userRepository.findByFirstNameAndLastName(words[1], words[0]);
             } else {
                 firstSearch = userRepository.findByFirstNameOrLastName(words[0], words[0]);
                 secondSearch = firstSearch;
