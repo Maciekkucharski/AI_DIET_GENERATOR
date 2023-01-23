@@ -205,7 +205,7 @@ public class RecipeService {
                 .orElseThrow(() -> new ResourceNotFoundException("Recipe not found with id :" + recipeId));
 
         User currentUser = userDetailsService.findCurrentUser();
-        if (currentUser == null || (!currentUser.getAuthorities().contains("ROLE_DIETICIAN") && !currentUser.getAuthorities().contains("ROLE_ADMIN") && currentUser != existingRecipe.getUser())) {
+        if (currentUser == null || (!currentUser.getAuthorities().contains("ROLE_DIETITIAN") && !currentUser.getAuthorities().contains("ROLE_ADMIN") && currentUser != existingRecipe.getUser())) {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             return null;
 

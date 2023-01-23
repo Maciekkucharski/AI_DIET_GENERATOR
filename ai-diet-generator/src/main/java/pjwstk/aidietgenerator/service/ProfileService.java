@@ -5,6 +5,7 @@ import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import pjwstk.aidietgenerator.entity.*;
 import pjwstk.aidietgenerator.repository.*;
+import pjwstk.aidietgenerator.request.SearchRequest;
 import pjwstk.aidietgenerator.request.UserExtrasRequest;
 import pjwstk.aidietgenerator.view.*;
 import pjwstk.aidietgenerator.request.ProfileInfoRequest;
@@ -358,13 +359,22 @@ public class ProfileService {
         }
     }
 
-    public List<ProfileSearchView> searchUser(String searchField, HttpServletResponse response) {
+    public List<ProfileSearchView> searchUser(SearchRequest request, HttpServletResponse response) {
         List<ProfileSearchView> profileSearchViewList = new ArrayList<>();
-        if(searchField != null){
-            String[] words = searchField.split(" ");
-            List<User> firstSearch = userRepository.findByFirstNameOrLastName(words[0], words[1]);
-            List<User> secondSearch = userRepository.findByFirstNameOrLastName(words[1], words[0]);
-
+        if(request.getSearch() != null){
+            List<User> firstSearch = new ArrayList<>();
+            List<User> secondSearch = new ArrayList<>();
+            String[] words = request.getSearch().split(" ");
+            for(String word : words){
+                word = word.replaceAll("\\s", "");
+            }
+            if(words.length == 2) {
+                firstSearch = userRepository.findByFirstNameOrLastName(words[0], words[1]);
+                secondSearch = userRepository.findByFirstNameOrLastName(words[1], words[0]);
+            } else {
+                firstSearch = userRepository.findByFirstNameOrLastName(words[0], words[0]);
+                secondSearch = firstSearch;
+            }
             Set<User> searchResult = new HashSet<>(firstSearch);
             searchResult.addAll(secondSearch);
             for(User user : searchResult){
