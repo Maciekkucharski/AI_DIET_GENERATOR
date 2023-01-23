@@ -55,6 +55,16 @@ public class ProfileController {
         profileService.deleteUserStatsWeightEntry(ids, response);
     }
 
+    @GetMapping("/extras")
+    public UserExtras getUserExtras(HttpServletResponse response){
+        return profileService.currentUserExtras(response);
+    }
+
+    @GetMapping("/extras/{userID}")
+    public UserExtras getUserExtras(@PathVariable (value = "userID") Long userID, HttpServletResponse response){
+        return profileService.givenUserExtras(userID, response);
+    }
+
     @PostMapping("/extras")
     public UserExtras createUserExtras(@RequestBody UserExtrasRequest userExtrasRequest, HttpServletResponse response){
         return profileService.saveUserExtras(userExtrasRequest, response);

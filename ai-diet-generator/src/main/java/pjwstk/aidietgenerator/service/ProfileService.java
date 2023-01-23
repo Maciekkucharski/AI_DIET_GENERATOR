@@ -381,4 +381,38 @@ public class ProfileService {
             return null;
         }
     }
+
+    public UserExtras currentUserExtras(HttpServletResponse response) {
+        User currentUser = userDetailsService.findCurrentUser();
+        if (currentUser != null) {
+            UserExtras existingExtras = userExtrasRepository.findByuser(currentUser);
+            if (existingExtras != null) {
+                response.setStatus(HttpStatus.OK.value());
+                return existingExtras;
+            } else {
+                response.setStatus(HttpStatus.NOT_FOUND.value());
+                return null;
+            }
+        } else {
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            return null;
+        }
+    }
+
+    public UserExtras givenUserExtras(Long userID, HttpServletResponse response) {
+        Optional<User> existingUser = userRepository.findById(userID);
+        if (existingUser.isPresent()) {
+            UserExtras existingExtras = userExtrasRepository.findByuser(existingUser.get());
+            if (existingExtras != null) {
+                response.setStatus(HttpStatus.OK.value());
+                return existingExtras;
+            } else {
+                response.setStatus(HttpStatus.NOT_FOUND.value());
+                return null;
+            }
+        } else {
+            response.setStatus(HttpStatus.NOT_FOUND.value());
+            return null;
+        }
+    }
 }
