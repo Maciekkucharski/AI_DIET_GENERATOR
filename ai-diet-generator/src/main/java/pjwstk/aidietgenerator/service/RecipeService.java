@@ -2,6 +2,7 @@ package pjwstk.aidietgenerator.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 import pjwstk.aidietgenerator.entity.*;
 import pjwstk.aidietgenerator.exception.ResourceNotFoundException;
@@ -275,7 +276,9 @@ public class RecipeService {
 
     public Recipe verifyRecipe(Long recipeId, HttpServletResponse response) {
         User currentUser = userDetailsService.findCurrentUser();
-        if (currentUser == null || !currentUser.getAuthorities().contains("ROLE_DIETITIAN") || !currentUser.getAuthorities().contains("ROLE_ADMIN")) {
+        if (currentUser == null ||
+                !currentUser.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN")) ||
+                !currentUser.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_DIETITIAN"))) {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
         } else {
             Recipe existingRecipe = recipeRepository.findById(recipeId)

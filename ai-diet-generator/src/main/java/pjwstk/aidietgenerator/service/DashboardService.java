@@ -1,6 +1,7 @@
 package pjwstk.aidietgenerator.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 import pjwstk.aidietgenerator.entity.Post;
 import pjwstk.aidietgenerator.entity.Recipe;
@@ -46,7 +47,8 @@ public class DashboardService {
 
         List<User> allUser = userRepository.findAll();
         for(User user: allUser){
-            if(user.getAuthorities().contains("ROLE_DIETITIAN") || user.getAuthorities().contains("ROLE_INFLUENCER")){
+            if(user.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_INFLUENCER")) ||
+                    user.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_DIETITIAN"))){
                 UserProfile newProfile = profileService.getSelectedUserProfile(user.getId(), response);
                 dietInflu.add(newProfile);
             }
@@ -55,7 +57,8 @@ public class DashboardService {
 
         List<Recipe> allRecipesWithUser = recipeRepository.findByUserNotNull();
         for(Recipe recipe: allRecipesWithUser){
-            if(recipe.getUser().getAuthorities().contains("ROLE_DIETITIAN") || recipe.getUser().getAuthorities().contains("ROLE_INFLUENCER")){
+            if(recipe.getUser().getAuthorities().contains(new SimpleGrantedAuthority("ROLE_INFLUENCER")) ||
+                    recipe.getUser().getAuthorities().contains(new SimpleGrantedAuthority("ROLE_DIETITIAN"))){
                 RecipeDetailedView newDetailedView = forumService.viewRecipe(recipe.getId(), response);
                 recipeViewList.add(newDetailedView);
             }
