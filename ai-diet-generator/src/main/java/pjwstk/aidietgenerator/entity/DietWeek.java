@@ -29,12 +29,20 @@ public class DietWeek {
     @Column(name = "timestamp")
     private Timestamp timestamp;
 
+    @Column(name = "goal")
+    private DietGoal dietGoal;
+
+    @Column(name = "start_weight")
+    private Double startingWeight;
+
     public DietWeek(){}
 
-    public DietWeek(List<DietDay> daysForWeekDiet, Timestamp timestamp, User user){
+    public DietWeek(List<DietDay> daysForWeekDiet, Timestamp timestamp, User user, DietGoal dietGoal, Double startingWeight){
         this.daysForWeekDiet = daysForWeekDiet;
         this.timestamp = timestamp;
         this.user = user;
+        this.dietGoal = dietGoal;
+        this.startingWeight = startingWeight;
     }
 
     public Long getId() {
@@ -84,5 +92,21 @@ public class DietWeek {
 
     public void setTimestamp(Timestamp timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public DietGoal getDietGoal() {
+        return dietGoal;
+    }
+
+    public void setDietGoal(DietGoal dietGoal) {
+        this.dietGoal = dietGoal;
+    }
+
+    public Double getStartingWeight() {
+        return startingWeight;
+    }
+
+    public void setStartingWeight(Double startingWeight) {
+        this.startingWeight = startingWeight;
     }
 }

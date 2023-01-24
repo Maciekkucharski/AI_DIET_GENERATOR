@@ -3,6 +3,11 @@ package pjwstk.aidietgenerator.service;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
+import pjwstk.aidietgenerator.repository.*;
+import pjwstk.aidietgenerator.view.MyProfile;
+import pjwstk.aidietgenerator.entity.User;
+import pjwstk.aidietgenerator.view.UserProfile;
+import pjwstk.aidietgenerator.entity.UserStats;
 import pjwstk.aidietgenerator.entity.*;
 import pjwstk.aidietgenerator.repository.*;
 import pjwstk.aidietgenerator.request.SearchRequest;
@@ -22,6 +27,7 @@ public class ProfileService {
     private final UserDetailsService userDetailsService;
     private final PostRepository postRepository;
     private final UserStatsService userStatsService;
+    private final WeekDietRepository weekDietRepository;
     private final UserExtrasRepository userExtrasRepository;
     private final RecipeRepository recipeRepository;
     private final ExcludedProductsListRepository excludedProductsListRepository;
@@ -34,6 +40,7 @@ public class ProfileService {
                           UserDetailsService userDetailsService,
                           PostRepository postRepository,
                           UserStatsService userStatsService,
+                          WeekDietRepository weekDietRepository) {
                           UserExtrasRepository userExtrasRepository,
                           RecipeRepository recipeRepository,
                           ExcludedProductsListRepository excludedProductsListRepository,
@@ -45,6 +52,7 @@ public class ProfileService {
         this.userDetailsService = userDetailsService;
         this.postRepository = postRepository;
         this.userStatsService = userStatsService;
+        this.weekDietRepository = weekDietRepository;
         this.userExtrasRepository = userExtrasRepository;
         this.recipeRepository = recipeRepository;
         this.excludedProductsListRepository = excludedProductsListRepository;
@@ -67,12 +75,21 @@ public class ProfileService {
             currentUserProfile.setProfileImagePath(currentUser.getImagePath());
             currentUserProfile.setUserSubscriptions(subscriptionRepository.findByUser(currentUser));
             currentUserProfile.setUserStats(userStatsRepository.findByuser(currentUser));
+
+            currentUserProfile.setSocials(socialsRepository.findByuser(currentUser));
+            currentUserProfile.setUserPosts(postRepository.findByuser(currentUser));
+            currentUserProfile.setDailyCalGoal(userStatsRepository.findByuser(currentUser).get(userStatsRepository.findByuser(currentUser).size() - 1).getCal());
+            currentUserProfile.setDietGoal(weekDietRepository.findByuser(currentUser).getDietGoal());
+            currentUserProfile.setWeightAtDietGeneration(weekDietRepository.findByuser(currentUser).getStartingWeight());
+            currentUserProfile.setMealsPerDay(weekDietRepository.findByuser(currentUser).getDaysForWeekDiet().get(0).getRecipesForToday().size());
+            
             currentUserProfile.setUserRecipes(recipeRepository.findByuser(currentUser));
             currentUserProfile.setExcludedProductsList(excludedProductsListRepository.findByuser(currentUser));
             UserExtras userExtras = userExtrasRepository.findByuser(currentUser);
             currentUserProfile.setUserExtras(userExtras);
             currentUserProfile.setSocials(new SocialsView(userExtras.getFacebook(),
                     userExtras.getTwitter(), userExtras.getInstagram(), userExtras.getTelegram(), userExtras.getYoutube(), userExtras.getDiscord()));
+
             response.setStatus(HttpStatus.OK.value());
             return currentUserProfile;
         } else {

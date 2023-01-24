@@ -95,7 +95,7 @@ public class RecipeService {
                 newRecipe.setUser(currentUser);
                 newRecipe.setCreatedAt();
 
-                if (currentUser.getAuthorities().contains("ROLE_DIETITIAN")) {
+                if (currentUser.getAuthorities().contains(new SimpleGrantedAuthority(Authority.DIETITIAN.role))) {
                     newRecipe.setVerified(true);
                 }
                 recipeRepository.save(newRecipe);
@@ -276,9 +276,8 @@ public class RecipeService {
 
     public Recipe verifyRecipe(Long recipeId, HttpServletResponse response) {
         User currentUser = userDetailsService.findCurrentUser();
-        if (currentUser == null ||
-                !currentUser.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN")) ||
-                !currentUser.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_DIETITIAN"))) {
+        
+        if (currentUser == null || !currentUser.getAuthorities().contains(new SimpleGrantedAuthority(Authority.DIETITIAN.role)) || !currentUser.getAuthorities().contains(new SimpleGrantedAuthority(Authority.ADMIN.role))) {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
         } else {
             Recipe existingRecipe = recipeRepository.findById(recipeId)
@@ -298,13 +297,36 @@ public class RecipeService {
         if (existingRecipe == null) {
             response.setStatus(HttpStatus.NOT_FOUND.value());
         } else {
-            if (currentUser != null && (currentUser.getId() == existingRecipe.getUser().getId() || currentUser.getAuthorities().contains("ROLE_ADMIN"))) {
-                List<Ingredient> existingRecipesIngredients = ingredientRepository.findByrecipe(existingRecipe);
-                for (Ingredient ingredient : existingRecipesIngredients) {
-                    ingredientRepository.delete(ingredient);
-                }
-                recipeRepository.delete(existingRecipe);
-                response.setStatus(HttpStatus.ACCEPTED.value());
+            if (currentUser != null){
+                User recipeAuthor = existingRecipe.getUser();
+
+                    if(currentUser.getAuthorities().contains(new SimpleGrantedAuthority(Authority.ADMIN.role))){
+
+                        List<Ingredient> existingRecipesIngredients = ingredientRepository.findByrecipe(existingRecipe);
+                        for (Ingredient ingredient : existingRecipesIngredients) {
+                            ingredientRepository.delete(ingredient);
+                        }
+                        recipeRepository.delete(existingRecipe);
+                        response.setStatus(HttpStatus.ACCEPTED.value());
+
+                    } else {
+                        if(recipeAuthor != null) {
+                            if(currentUser.getId() == recipeAuthor.getId()) {
+
+                                List<Ingredient> existingRecipesIngredients = ingredientRepository.findByrecipe(existingRecipe);
+                                for (Ingredient ingredient : existingRecipesIngredients) {
+                                    ingredientRepository.delete(ingredient);
+                                }
+                                recipeRepository.delete(existingRecipe);
+                                response.setStatus(HttpStatus.ACCEPTED.value());
+
+                            } else {
+                                response.setStatus(HttpStatus.UNAUTHORIZED.value());
+                            }
+                        } else {
+                            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+                        }
+                    }
             } else {
                 response.setStatus(HttpStatus.UNAUTHORIZED.value());
             }

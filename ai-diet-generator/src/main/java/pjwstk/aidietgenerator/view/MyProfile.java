@@ -23,6 +23,14 @@ public class MyProfile {
     private List<PostDetailedView> userPosts;
     @JsonIgnoreProperties("user")
     private List<Recipe> userRecipes;
+    // wykluczenia
+
+    private DietGoal dietGoal;
+    private Double weightAtDietGeneration;
+    private Integer dailyCalGoal;
+    private Integer mealsPerDay;
+
     private ExcludedProductsList excludedProductsList;
+
 }
 
