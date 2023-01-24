@@ -718,6 +718,7 @@ public class DietService {
                             if(dietDay.getDietWeek() != null) {
                                 dietWeeks = dietDay.getDietWeek();
                             }
+
                             dietWeeks.add(currentUserDiet);
                             dietDay.setDietWeek(dietWeeks);
 
@@ -728,6 +729,8 @@ public class DietService {
                         currentUserDiet.setCreatedAt();
 
                         response.setStatus(HttpStatus.CREATED.value());
+                        currentUserDiet.setDietGoal(dietGoal);
+                        currentUserDiet.setStartingWeight(lastUserStats.getWeight());
 
                         return weekDietRepository.save(currentUserDiet);
                     } else {

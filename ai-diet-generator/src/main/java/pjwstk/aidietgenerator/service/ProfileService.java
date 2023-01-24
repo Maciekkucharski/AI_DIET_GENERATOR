@@ -2,14 +2,11 @@ package pjwstk.aidietgenerator.service;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import pjwstk.aidietgenerator.repository.*;
 import pjwstk.aidietgenerator.view.MyProfile;
 import pjwstk.aidietgenerator.entity.User;
 import pjwstk.aidietgenerator.view.UserProfile;
 import pjwstk.aidietgenerator.entity.UserStats;
-import pjwstk.aidietgenerator.repository.PostRepository;
-import pjwstk.aidietgenerator.repository.SocialsRepository;
-import pjwstk.aidietgenerator.repository.UserRepository;
-import pjwstk.aidietgenerator.repository.UserStatsRepository;
 import pjwstk.aidietgenerator.request.ProfileInfoRequest;
 import pjwstk.aidietgenerator.view.ProfileInfoView;
 import pjwstk.aidietgenerator.view.WeightView;
@@ -29,19 +26,22 @@ public class ProfileService {
     private final UserDetailsService userDetailsService;
     private final PostRepository postRepository;
     private final UserStatsService userStatsService;
+    private final WeekDietRepository weekDietRepository;
 
     public ProfileService(UserRepository userRepository,
                           SocialsRepository socialsRepository,
                           UserStatsRepository userStatsRepository,
                           UserDetailsService userDetailsService,
                           PostRepository postRepository,
-                          UserStatsService userStatsService) {
+                          UserStatsService userStatsService,
+                          WeekDietRepository weekDietRepository) {
         this.userRepository = userRepository;
         this.socialsRepository = socialsRepository;
         this.userStatsRepository = userStatsRepository;
         this.userDetailsService = userDetailsService;
         this.postRepository = postRepository;
         this.userStatsService = userStatsService;
+        this.weekDietRepository = weekDietRepository;
     }
 
     public MyProfile getLoggedUserProfile(HttpServletResponse response){
@@ -53,6 +53,11 @@ public class ProfileService {
             currentUserProfile.setUserStats(userStatsRepository.findByuser(currentUser));
             currentUserProfile.setSocials(socialsRepository.findByuser(currentUser));
             currentUserProfile.setUserPosts(postRepository.findByuser(currentUser));
+            currentUserProfile.setDailyCalGoal(userStatsRepository.findByuser(currentUser).get(userStatsRepository.findByuser(currentUser).size() - 1).getCal());
+            currentUserProfile.setDietGoal(weekDietRepository.findByuser(currentUser).getDietGoal());
+            currentUserProfile.setWeightAtDietGeneration(weekDietRepository.findByuser(currentUser).getStartingWeight());
+            currentUserProfile.setMealsPerDay(weekDietRepository.findByuser(currentUser).getDaysForWeekDiet().get(0).getRecipesForToday().size());
+
             response.setStatus(HttpStatus.OK.value());
             return currentUserProfile;
         } else {
