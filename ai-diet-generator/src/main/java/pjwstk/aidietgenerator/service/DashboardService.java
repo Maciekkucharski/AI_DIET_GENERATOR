@@ -59,20 +59,13 @@ public class DashboardService {
         }
         newFeed.setCreators(dietInflu);
 
-        List<Recipe> allRecipes = recipeRepository.findByUserNotNull();
-        for(Recipe recipe: allRecipes){
-            User recipeUser = recipe.getUser();
-            RecipeDetailedView newDetailedView = forumService.viewRecipeByRecipe(recipe);
-            if(recipeUser != null ) {
-                if (recipe.getUser().getAuthorities().contains(new SimpleGrantedAuthority("ROLE_INFLUENCER")) ||
-                        recipe.getUser().getAuthorities().contains(new SimpleGrantedAuthority("ROLE_DIETITIAN"))) {
-                    recipesWithCreator.add(newDetailedView);
-
-                }
+        List<Recipe> recipesWithUser = recipeRepository.findByUserNotNull();
+        for(Recipe recipe: recipesWithUser){
+                if(!recipe.getUser().getAuthorities().contains(new SimpleGrantedAuthority("ROLE_INFLUENCER")) ||
+                    !recipe.getUser().getAuthorities().contains(new SimpleGrantedAuthority("ROLE_DIETITIAN")))
+                    recipesWithUser.remove(recipe);
             }
-            if(recipesWithCreator.size() == 10) break;
-        }
-        newFeed.setCreatorRecipes(recipesWithCreator);
+        newFeed.setCreatorRecipes(recipesWithUser);
 
         List<Post> allPosts = postRepository.findFirst3ByOrderByIdDesc();
         Collections.reverse(allPosts);
@@ -83,9 +76,9 @@ public class DashboardService {
         newFeed.setNewPosts(postViewList);
 
         List<Long> bestRecipesID = recipeRepository.findTopTenLikedRecipes();
-        List<RecipeDetailedView> bestRecipes = new ArrayList<>();
+        List<Recipe> bestRecipes = new ArrayList<>();
         for(Long id : bestRecipesID){
-            bestRecipes.add(forumService.viewRecipe(id, response));
+            bestRecipes.add(recipeRepository.findById(id).get());
         }
         newFeed.setRecipesSortedByLikes(bestRecipes);
         return newFeed;
