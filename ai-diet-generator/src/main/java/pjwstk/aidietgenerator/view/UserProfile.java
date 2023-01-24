@@ -17,12 +17,13 @@ import java.util.List;
 @Setter
 @Getter
 public class UserProfile {
-    @JsonIgnoreProperties({"password", "email", "authority", "authorities", "username"})
+    @JsonIgnoreProperties({"password", "email", "authority", "authorities", "username" ,"subscribed"})
     private User user;
     private String userImagePath;
     @JsonIgnoreProperties({"discord", "facebook", "instagram", "telegram", "facebook", "twitter", "youtube"})
     private UserExtras userExtras;
     private SocialsView socials;
+    @JsonIgnoreProperties({"user"})
     private List<Follow> followingList;
     @JsonIgnoreProperties({"author", "user"})
     private List<PostDetailedView> userPosts;
