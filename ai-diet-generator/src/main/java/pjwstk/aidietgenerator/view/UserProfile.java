@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import pjwstk.aidietgenerator.entity.Follow;
 import pjwstk.aidietgenerator.entity.Recipe;
 import pjwstk.aidietgenerator.entity.User;
 import pjwstk.aidietgenerator.entity.UserExtras;
@@ -22,7 +23,7 @@ public class UserProfile {
     @JsonIgnoreProperties({"discord", "facebook", "instagram", "telegram", "facebook", "twitter", "youtube"})
     private UserExtras userExtras;
     private SocialsView socials;
-    private int followerCount;
+    private List<Follow> followingList;
     @JsonIgnoreProperties({"author", "user"})
     private List<PostDetailedView> userPosts;
     @JsonIgnoreProperties({"author", "user"})

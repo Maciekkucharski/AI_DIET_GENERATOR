@@ -92,10 +92,18 @@ public class ProfileService {
                 userPostsView.add(forumService.viewPost(post.getId(), response));
             }
             selectedUserProfile.setUser(selectedUser.get());
-            selectedUserProfile.setUserExtras(userExtras);
-            selectedUserProfile.setSocials(new SocialsView(userExtras.getFacebook(),
-                    userExtras.getTwitter(), userExtras.getInstagram(), userExtras.getTelegram(), userExtras.getYoutube(), userExtras.getDiscord()));
-            selectedUserProfile.setFollowerCount(userFollows.size());
+            if(userExtras != null) {
+                selectedUserProfile.setUserExtras(userExtras);
+                SocialsView userSocials = new SocialsView();
+                userSocials.setFacebook(userExtras.getFacebook());
+                userSocials.setDiscord(userExtras.getDiscord());
+                userSocials.setInstagram(userExtras.getInstagram());
+                userSocials.setTwitter(userExtras.getTwitter());
+                userSocials.setYoutube(userExtras.getYoutube());
+                userSocials.setTelegram(userExtras.getTelegram());
+                selectedUserProfile.setSocials(userSocials);
+            }
+            selectedUserProfile.setFollowingList(userFollows);
             selectedUserProfile.setUserPosts(userPostsView);
             selectedUserProfile.setUserRecipes(recipeRepository.findByuser(selectedUser.get()));
             selectedUserProfile.setUserImagePath(selectedUser.get().getImagePath());
