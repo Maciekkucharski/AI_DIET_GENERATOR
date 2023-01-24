@@ -40,7 +40,7 @@ public class ProfileService {
                           UserDetailsService userDetailsService,
                           PostRepository postRepository,
                           UserStatsService userStatsService,
-                          WeekDietRepository weekDietRepository) {
+                          WeekDietRepository weekDietRepository,
                           UserExtrasRepository userExtrasRepository,
                           RecipeRepository recipeRepository,
                           ExcludedProductsListRepository excludedProductsListRepository,
@@ -75,9 +75,7 @@ public class ProfileService {
             currentUserProfile.setProfileImagePath(currentUser.getImagePath());
             currentUserProfile.setUserSubscriptions(subscriptionRepository.findByUser(currentUser));
             currentUserProfile.setUserStats(userStatsRepository.findByuser(currentUser));
-
-            currentUserProfile.setSocials(socialsRepository.findByuser(currentUser));
-            currentUserProfile.setUserPosts(postRepository.findByuser(currentUser));
+            currentUserProfile.setUserPosts(userPostsView);
             currentUserProfile.setDailyCalGoal(userStatsRepository.findByuser(currentUser).get(userStatsRepository.findByuser(currentUser).size() - 1).getCal());
             currentUserProfile.setDietGoal(weekDietRepository.findByuser(currentUser).getDietGoal());
             currentUserProfile.setWeightAtDietGeneration(weekDietRepository.findByuser(currentUser).getStartingWeight());

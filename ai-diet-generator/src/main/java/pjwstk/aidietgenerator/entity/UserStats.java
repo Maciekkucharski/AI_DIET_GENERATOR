@@ -1,5 +1,6 @@
 package pjwstk.aidietgenerator.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -42,7 +43,7 @@ public class UserStats {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
-    @JsonIgnoreProperties({"firstName", "lastName", "password", "authorities", "email"})
+    @JsonIgnore
     private User user;
 
     public UserStats(double weight, int height, int age, double bmi, int cal, Gender gender) {

@@ -11,6 +11,7 @@ import pjwstk.aidietgenerator.request.CommentRequest;
 import pjwstk.aidietgenerator.request.PostRequest;
 import pjwstk.aidietgenerator.view.*;
 
+import javax.persistence.NoResultException;
 import javax.servlet.http.HttpServletResponse;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -31,6 +32,7 @@ public class ForumService {
     private final RecipeCommentsRepository recipeCommentsRepository;
     private final RecipeService recipeService;
     private final FollowRepository followRepository;
+    private final IngredientRepository ingredientRepository;
 
     @Autowired
     public ForumService(PostRepository postRepository,
@@ -42,7 +44,8 @@ public class ForumService {
                         RecipeLikesRepository recipeLikesRepository,
                         RecipeCommentsRepository recipeCommentsRepository,
                         RecipeService recipeService,
-                        FollowRepository followRepository) {
+                        FollowRepository followRepository,
+                        IngredientRepository ingredientRepository) {
         this.postRepository = postRepository;
         this.userDetailsService = userDetailsService;
         this.userRepository = userRepository;
@@ -53,6 +56,7 @@ public class ForumService {
         this.recipeCommentsRepository = recipeCommentsRepository;
         this.recipeService = recipeService;
         this.followRepository = followRepository;
+        this.ingredientRepository = ingredientRepository;
     }
 
     public List<List<PostSimplifiedView>> findAllSimplifiedPosts(HttpServletResponse response) {
@@ -127,6 +131,31 @@ public class ForumService {
                     postCommentsView,
                     likes);
         }
+    }
+
+    public PostDetailedView viewPostByPost(Post post) {
+            List<CommentView> postCommentsView = new ArrayList<>();
+            for (PostComment comment : postCommentsRepository.findBypost(post)) {
+                CommentView newCommentView = new CommentView(
+                        comment.getId(),
+                        comment.getContent(),
+                        comment.getTimestamp(),
+                        comment.getUser(),
+                        comment.getUser().getImagePath()
+                );
+                postCommentsView.add(newCommentView);
+            }
+            List<PostLike> likes = postLikesRepository.findBypost(post);
+            return new PostDetailedView(post.getId(),
+                    post.getTitle(),
+                    post.getDescription(),
+                    post.getTimestamp(),
+                    post.getImagePath(),
+                    post.getUser(),
+                    post.getUser().getImagePath(),
+                    postCommentsView,
+                    likes);
+
     }
 
     public Post createPost(PostRequest post, HttpServletResponse response) {
@@ -330,6 +359,95 @@ public class ForumService {
             response.setStatus(HttpStatus.OK.value());
             return detailedRecipe;
         }
+    }
+    public RecipeView buildRecipeView(Recipe recipe) {
+            List ingredients = new ArrayList<Ingredient>();
+            try {
+                ingredients = ingredientRepository.findByrecipe(recipe);
+            } catch (NoResultException e) {
+                e.printStackTrace();
+            }
+            RecipeView currentRecipeView = new RecipeView();
+            if(recipe.getId() != null) {
+                currentRecipeView.setId(recipe.getId());
+            }
+            if(recipe.getTitle() != null){
+                currentRecipeView.setTitle(recipe.getTitle());
+            }
+            if(recipe.getReadyInMinutes() != null){
+                currentRecipeView.setReadyInMinutes(recipe.getReadyInMinutes());
+            }
+            if(recipe.getImagePath() != null){
+                currentRecipeView.setImagePath(recipe.getImagePath());
+            }
+            if(recipe.getInstructions() != null){
+                currentRecipeView.setInstructions(recipe.getInstructions());
+            }
+            if(recipe.getVegetarian() != null){
+                currentRecipeView.setVegetarian(recipe.getVegetarian());
+            }
+            if(recipe.getVegan() != null){
+                currentRecipeView.setVegan(recipe.getVegan());
+            }
+            if(recipe.getGlutenFree() != null){
+                currentRecipeView.setGlutenFree(recipe.getGlutenFree());
+            }
+            if(recipe.getDairyFree() != null){
+                currentRecipeView.setDairyFree(recipe.getDairyFree());
+            }
+            if(recipe.getVeryHealthy() != null){
+                currentRecipeView.setVeryHealthy(recipe.getVeryHealthy());
+            }
+            if(recipe.getVerified() != null){
+                currentRecipeView.setVerified(recipe.getVerified());
+            }
+            if(recipe.getTimestamp() != null){
+                currentRecipeView.setCreated_at(recipe.getTimestamp());
+            }
+            if(recipe.getUser() != null){
+                currentRecipeView.setUser(recipe.getUser());
+            }
+            if(recipe.getCalories() != null){
+                currentRecipeView.setCalories(recipe.getCalories());
+            }
+            if(recipe.getCarbs() != null){
+                currentRecipeView.setCarbs(recipe.getCarbs());
+            }
+            if(recipe.getFat() != null){
+                currentRecipeView.setFat(recipe.getFat());
+            }
+            if(recipe.getProtein() != null){
+                currentRecipeView.setProtein(recipe.getProtein());
+            }
+            if(ingredients != null){
+                currentRecipeView.setIngredients(ingredients);
+            }
+            return currentRecipeView;
+    }
+
+    public RecipeDetailedView viewRecipeByRecipe(Recipe recipe) {
+        RecipeDetailedView detailedRecipe = new RecipeDetailedView();
+        RecipeView view = buildRecipeView(recipe);
+        detailedRecipe.setRecipeView(view);
+        detailedRecipe.setRecipeImagePath(recipe.getImagePath());
+        if (recipe.getUser() != null) {
+            detailedRecipe.setAuthor(recipe.getUser());
+            detailedRecipe.setUserImagePath(recipe.getUser().getImagePath());
+        }
+        detailedRecipe.setRecipeLikes(recipeLikesRepository.findByrecipe(recipe));
+        List<CommentView> recipeCommentsView = new ArrayList<>();
+        for (RecipeComment comment : recipeCommentsRepository.findByrecipe(recipe)) {
+            CommentView newCommentView = new CommentView(
+                    comment.getId(),
+                    comment.getContent(),
+                    comment.getTimestamp(),
+                    comment.getUser(),
+                    comment.getUser().getImagePath()
+            );
+            recipeCommentsView.add(newCommentView);
+            detailedRecipe.setRecipeComments(recipeCommentsView);
+        }
+        return detailedRecipe;
     }
 
     public void likeRecipe(HttpServletResponse response, long recipeID) {

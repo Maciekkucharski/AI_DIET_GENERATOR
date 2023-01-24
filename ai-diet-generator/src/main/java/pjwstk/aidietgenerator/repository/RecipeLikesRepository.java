@@ -10,4 +10,5 @@ import java.util.List;
 public interface RecipeLikesRepository extends JpaRepository<RecipeLike, Long> {
     List<RecipeLike> findByrecipe(Recipe recipe);
     RecipeLike findByUserAndRecipe(User user, Recipe recipe);
+    Long countRecipeLikeByRecipe(Recipe recipe);
 }

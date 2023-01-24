@@ -5,6 +5,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 import pjwstk.aidietgenerator.entity.Post;
 import pjwstk.aidietgenerator.entity.Recipe;
+import pjwstk.aidietgenerator.entity.RecipeLike;
 import pjwstk.aidietgenerator.entity.User;
 import pjwstk.aidietgenerator.repository.*;
 import pjwstk.aidietgenerator.view.FeedView;
@@ -25,24 +26,28 @@ public class DashboardService {
     private final RecipeRepository recipeRepository;
     private final ProfileService profileService;
     private final ForumService forumService;
+    private final RecipeLikesRepository recipeLikesRepository;
+
     @Autowired
     public DashboardService(PostRepository postRepository,
                             UserRepository userRepository,
                             RecipeRepository recipeRepository,
                             ProfileService profileService,
-                            ForumService forumService) {
+                            ForumService forumService,
+                            RecipeLikesRepository recipeLikesRepository) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
         this.recipeRepository = recipeRepository;
         this.profileService = profileService;
         this.forumService = forumService;
+        this.recipeLikesRepository = recipeLikesRepository;
     }
 
     public FeedView loadFeed(HttpServletResponse response) {
         List<UserProfile> dietInflu = new ArrayList<>();
         List<PostDetailedView> postViewList = new ArrayList<>();
-        List<RecipeDetailedView> recipeViewList = new ArrayList<>();
-        List<RecipeDetailedView> bestRecipes = new ArrayList<>();
+        List<RecipeDetailedView> recipesWithCreator = new ArrayList<>();
+        List<RecipeDetailedView> allViewList = new ArrayList<>();
         FeedView newFeed = new FeedView();
 
         List<User> allUser = userRepository.findAll();
@@ -55,36 +60,29 @@ public class DashboardService {
         }
         newFeed.setCreators(dietInflu);
 
-        List<Recipe> allRecipesWithUser = recipeRepository.findByUserNotNull();
-        for(Recipe recipe: allRecipesWithUser){
-            if(recipe.getUser().getAuthorities().contains(new SimpleGrantedAuthority("ROLE_INFLUENCER")) ||
-                    recipe.getUser().getAuthorities().contains(new SimpleGrantedAuthority("ROLE_DIETITIAN"))){
-                RecipeDetailedView newDetailedView = forumService.viewRecipe(recipe.getId(), response);
-                recipeViewList.add(newDetailedView);
+        List<Recipe> allRecipes = recipeRepository.findFirst10ByUserNotNull();
+        for(Recipe recipe: allRecipes){
+            User recipeUser = recipe.getUser();
+            RecipeDetailedView newDetailedView = forumService.viewRecipeByRecipe(recipe);
+            if(recipeUser != null ) {
+                if (recipe.getUser().getAuthorities().contains(new SimpleGrantedAuthority("ROLE_INFLUENCER")) ||
+                        recipe.getUser().getAuthorities().contains(new SimpleGrantedAuthority("ROLE_DIETITIAN"))) {
+                    recipesWithCreator.add(newDetailedView);
+                }
+                allViewList.add(newDetailedView);
             }
         }
-        newFeed.setCreatorRecipes(recipeViewList);
+        newFeed.setCreatorRecipes(recipesWithCreator);
 
-        List<Post> allPosts = postRepository.findAll();
+        List<Post> allPosts = postRepository.findFirst3ByOrderByIdDesc();
         Collections.reverse(allPosts);
         for(Post post: allPosts){
-            PostDetailedView postDetailedView = forumService.viewPost(post.getId(), response);
+            PostDetailedView postDetailedView = forumService.viewPostByPost(post);
             postViewList.add(postDetailedView);
         }
         newFeed.setNewPosts(postViewList);
 
-//        List<Recipe> allRecipes = recipeRepository.findAll();
-//        for(Recipe recipe: allRecipes){
-//                RecipeDetailedView newDetailedView = forumService.viewRecipe(recipe.getId(), response);
-//                bestRecipes.add(newDetailedView);
-//        }
-//
-//        Collections.sort(bestRecipes, new Comparator<RecipeDetailedView>(){
-//            public int compare(RecipeDetailedView o1, RecipeDetailedView o2){
-//                return o1.getRecipeLikes().size() - o2.getRecipeLikes().size();
-//            }
-//        });
-        newFeed.setRecipesSortedByLikes(recipeViewList);
+
         return newFeed;
     }
 }
