@@ -22,13 +22,31 @@ public class UserExtras {
     private Long id;
 
     @Column(name = "background_image")
-    private String background_image;
+    private String backgroundImagePath;
 
     @Column(name = "about_me")
     private String about_me;
 
     @Column(name = "profession")
     private String profession;
+
+    @Column(name = "facebook")
+    private String facebook;
+
+    @Column(name = "twitter")
+    private String twitter;
+
+    @Column(name = "instagram")
+    private String instagram;
+
+    @Column(name = "telegram")
+    private String telegram;
+
+    @Column(name = "youtube")
+    private String youtube;
+
+    @Column(name = "discord")
+    private String discord;
 
     @OneToOne
     @JoinColumn(name = "creator_id")

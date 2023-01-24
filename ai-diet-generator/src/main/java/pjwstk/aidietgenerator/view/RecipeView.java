@@ -1,5 +1,6 @@
 package pjwstk.aidietgenerator.view;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.NoArgsConstructor;
 import pjwstk.aidietgenerator.entity.Ingredient;
 import pjwstk.aidietgenerator.entity.User;
@@ -24,6 +25,7 @@ public class RecipeView {
     private Boolean veryHealthy;
     private Boolean verified;
     private Timestamp created_at;
+    @JsonIgnoreProperties({"authorities", "username", "email", "authority", "subscribed"})
     private User user;
 //    Nutrition
     private Integer calories;

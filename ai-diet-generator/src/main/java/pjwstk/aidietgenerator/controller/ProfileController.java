@@ -1,16 +1,17 @@
 package pjwstk.aidietgenerator.controller;
 
+import com.google.api.Http;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pjwstk.aidietgenerator.view.MyProfile;
-import pjwstk.aidietgenerator.view.UserProfile;
+import pjwstk.aidietgenerator.entity.UserExtras;
+import pjwstk.aidietgenerator.request.SearchRequest;
+import pjwstk.aidietgenerator.request.UserExtrasRequest;
+import pjwstk.aidietgenerator.view.*;
 import org.springframework.web.bind.annotation.*;
 import pjwstk.aidietgenerator.request.ProfileInfoRequest;
 import pjwstk.aidietgenerator.service.ProfileService;
-import pjwstk.aidietgenerator.view.ProfileInfoView;
-import pjwstk.aidietgenerator.view.WeightView;
 
 
 import javax.servlet.http.HttpServletResponse;
@@ -53,5 +54,35 @@ public class ProfileController {
     @DeleteMapping("/info/weights")
     public void deleteUserStatsWeightEntry(@RequestBody List<Long> ids, HttpServletResponse response){
         profileService.deleteUserStatsWeightEntry(ids, response);
+    }
+
+    @GetMapping("/extras")
+    public UserExtras getUserExtras(HttpServletResponse response){
+        return profileService.currentUserExtras(response);
+    }
+
+    @GetMapping("/extras/{userID}")
+    public UserExtras getUserExtras(@PathVariable (value = "userID") Long userID, HttpServletResponse response){
+        return profileService.givenUserExtras(userID, response);
+    }
+
+    @PostMapping("/extras")
+    public UserExtras createUserExtras(@RequestBody UserExtrasRequest userExtrasRequest, HttpServletResponse response){
+        return profileService.saveUserExtras(userExtrasRequest, response);
+    }
+
+    @PutMapping("/extras")
+    public UserExtras updateExtras(@RequestBody UserExtrasRequest userExtrasRequest, HttpServletResponse response){
+        return profileService.updateUserExtras(userExtrasRequest, response);
+    }
+
+    @DeleteMapping("/extras")
+    public void deleteExtras(HttpServletResponse response){
+        profileService.deleteUserExtras(response);
+    }
+
+    @PostMapping("/search")
+    public List<ProfileSearchView> search(@RequestBody SearchRequest request, HttpServletResponse response){
+        return profileService.searchUser(request, response);
     }
 }
