@@ -76,7 +76,7 @@ public class ImageService {
                     }
                     case "Background": {
                         UserExtras existingUserExtras = userExtrasRepository.findByuser(currentUser);
-                        existingUserExtras.setBackground_image(newURL);
+                        existingUserExtras.setBackgroundImagePath(newURL);
                         userExtrasRepository.save(existingUserExtras);
                         response.setStatus(HttpStatus.OK.value());
                         return "Background image updated.";
@@ -139,13 +139,13 @@ public class ImageService {
             }
             case "Background": {
                 UserExtras existingUserExtras = userExtrasRepository.findByuser(currentUser);
-                String imagePath = existingUserExtras.getBackground_image();
+                String imagePath = existingUserExtras.getBackgroundImagePath();
                 if (imagePath != null && imagePath.contains("https://storage.cloud.google.com/foodie-images/")) {
                     String fileName = imagePath.replace("https://storage.cloud.google.com/foodie-images/", "");
                     BlobId blobId = BlobId.of(bucketName, fileName);
                     deleted = storage.delete(blobId);
                     if (deleted) {
-                        existingUserExtras.setBackground_image(null);
+                        existingUserExtras.setBackgroundImagePath(null);
                         userExtrasRepository.save(existingUserExtras);
                     }
                 }

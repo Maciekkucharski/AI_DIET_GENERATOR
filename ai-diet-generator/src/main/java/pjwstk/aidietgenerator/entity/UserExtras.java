@@ -22,7 +22,7 @@ public class UserExtras {
     private Long id;
 
     @Column(name = "background_image")
-    private String background_image;
+    private String backgroundImagePath;
 
     @Column(name = "about_me")
     private String about_me;

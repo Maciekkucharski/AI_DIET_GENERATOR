@@ -288,7 +288,7 @@ public class ProfileService {
             if(existingUserExtras == null) {
                 UserExtras newUserExtras = new UserExtras();
                 newUserExtras.setUser(currentUser);
-                newUserExtras.setBackground_image(userExtrasRequest.getBackgroundImagePath());
+                newUserExtras.setBackgroundImagePath(userExtrasRequest.getBackgroundImagePath());
                 newUserExtras.setProfession(userExtrasRequest.getProfession());
                 newUserExtras.setAbout_me(userExtrasRequest.getAbout_me());
                 newUserExtras.setDiscord(userExtrasRequest.getDiscord());
@@ -315,7 +315,7 @@ public class ProfileService {
             UserExtras existingExtras = userExtrasRepository.findByuser(currentUser);
             if(existingExtras != null) {
                 if(request != null)
-                    existingExtras.setBackground_image(request.getBackgroundImagePath());
+                    existingExtras.setBackgroundImagePath(request.getBackgroundImagePath());
                 if(request.getProfession() != null)
                     existingExtras.setProfession(request.getProfession());
                 if(request.getAbout_me() != null)
