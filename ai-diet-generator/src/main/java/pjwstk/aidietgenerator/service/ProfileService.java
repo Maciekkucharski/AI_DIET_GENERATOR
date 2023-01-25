@@ -75,8 +75,9 @@ public class ProfileService {
             currentUserProfile.setProfileImagePath(currentUser.getImagePath());
             currentUserProfile.setUserSubscriptions(subscriptionRepository.findByUser(currentUser));
             currentUserProfile.setUserStats(userStatsRepository.findByuser(currentUser));
-            if (userStatsRepository.findByuser(currentUser) != null && !userStatsRepository.findByuser(currentUser).isEmpty()) {
-                currentUserProfile.setDailyCalGoal(userStatsRepository.findByuser(currentUser).get(userStatsRepository.findByuser(currentUser).size() - 1).getCal());
+            List<UserStats> currentUserStats = userStatsRepository.findByuser(currentUser);
+            if (currentUser != null && !currentUserStats.isEmpty()) {
+                currentUserProfile.setDailyCalGoal(currentUserStats.get(currentUserStats.size() - 1).getCal());
             } else {
                 currentUserProfile.setDailyCalGoal(0);
             }
