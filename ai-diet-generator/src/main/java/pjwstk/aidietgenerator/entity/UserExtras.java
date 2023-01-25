@@ -48,7 +48,7 @@ public class UserExtras {
     @Column(name = "discord")
     private String discord;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "creator_id")
     @JsonIgnore
     private User user;

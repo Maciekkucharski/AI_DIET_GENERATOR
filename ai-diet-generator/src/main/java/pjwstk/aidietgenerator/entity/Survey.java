@@ -6,6 +6,8 @@ import com.sun.istack.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Cascade;
+
 import javax.persistence.*;
 import java.sql.Timestamp;
 
@@ -79,6 +81,7 @@ public class Survey {
 
     @ManyToOne
     @NotNull
+    @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
     @JoinColumn(name = "user_id")
     @JsonIgnore
     private User user;

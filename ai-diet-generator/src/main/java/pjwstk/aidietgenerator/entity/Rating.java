@@ -6,6 +6,7 @@ import com.sun.istack.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
 
@@ -26,6 +27,7 @@ public class Rating {
 
     @ManyToOne
     @JoinColumn(name = "recipe_id")
+    @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
     @JsonIgnoreProperties({"saltiness",
             "sourness",
             "sweetness",
@@ -52,6 +54,7 @@ public class Rating {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
+    @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
     @JsonIgnoreProperties({"username", "email", "authority","authorities", "subscribed"})
     private User user;
 }

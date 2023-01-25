@@ -5,6 +5,7 @@ import com.sun.istack.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Cascade;
 
 import javax.persistence.Entity;
 import javax.persistence.*;
@@ -39,6 +40,7 @@ public class Post {
 
 
     @ManyToOne
+    @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
     @JoinColumn(name = "creator_id")
     @JsonIgnoreProperties({"firstName", "lastName", "password", "authorities", "username"})
     private User user;

@@ -34,6 +34,7 @@ public class RecipeLike {
     private Recipe recipe;
 
     @ManyToOne
+    @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
     @NotNull
     @JoinColumn(name = "creator_id")
     @JsonIgnoreProperties({"password", "authorities", "username", "email", "enabled", "authority",

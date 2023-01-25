@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Cascade;
+
 import javax.persistence.Entity;
 import javax.persistence.*;
 import java.sql.Timestamp;
@@ -42,6 +44,7 @@ public class UserStats {
     private Timestamp timestamp;
 
     @ManyToOne
+    @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
     @JoinColumn(name = "user_id", nullable = false)
     @JsonIgnore
     private User user;

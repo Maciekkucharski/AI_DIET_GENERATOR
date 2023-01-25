@@ -6,6 +6,8 @@ import com.sun.istack.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Cascade;
+
 import javax.persistence.*;
 import java.sql.Timestamp;
 
@@ -31,11 +33,13 @@ public class RecipeComment {
 
     @ManyToOne
     @JoinColumn(name = "creator_id")
+    @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
     @JsonIgnoreProperties({"password", "authorities", "username", "email", "authority"})
     private User user;
 
     @ManyToOne
     @JsonIgnore
+    @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
     @JoinColumn(name = "recipe_id")
     private Recipe recipe;
 
