@@ -1,47 +1,64 @@
 package pjwstk.aidietgenerator.service;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import pjwstk.aidietgenerator.repository.*;
 import pjwstk.aidietgenerator.view.MyProfile;
 import pjwstk.aidietgenerator.entity.User;
 import pjwstk.aidietgenerator.view.UserProfile;
 import pjwstk.aidietgenerator.entity.UserStats;
+import pjwstk.aidietgenerator.entity.*;
+import pjwstk.aidietgenerator.repository.*;
+import pjwstk.aidietgenerator.request.SearchRequest;
+import pjwstk.aidietgenerator.request.UserExtrasRequest;
+import pjwstk.aidietgenerator.view.*;
 import pjwstk.aidietgenerator.request.ProfileInfoRequest;
-import pjwstk.aidietgenerator.view.ProfileInfoView;
-import pjwstk.aidietgenerator.view.WeightView;
 
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 public class ProfileService {
 
     private final UserRepository userRepository;
-    private final SocialsRepository socialsRepository;
     private final UserStatsRepository userStatsRepository;
     private final UserDetailsService userDetailsService;
     private final PostRepository postRepository;
     private final UserStatsService userStatsService;
     private final WeekDietRepository weekDietRepository;
+    private final UserExtrasRepository userExtrasRepository;
+    private final RecipeRepository recipeRepository;
+    private final ExcludedProductsListRepository excludedProductsListRepository;
+    private final ForumService forumService;
+    private final FollowRepository followRepository;
+    private final SubscriptionRepository subscriptionRepository;
 
     public ProfileService(UserRepository userRepository,
-                          SocialsRepository socialsRepository,
                           UserStatsRepository userStatsRepository,
                           UserDetailsService userDetailsService,
                           PostRepository postRepository,
                           UserStatsService userStatsService,
-                          WeekDietRepository weekDietRepository) {
+                          WeekDietRepository weekDietRepository,
+                          UserExtrasRepository userExtrasRepository,
+                          RecipeRepository recipeRepository,
+                          ExcludedProductsListRepository excludedProductsListRepository,
+                          ForumService forumService,
+                          FollowRepository followRepository,
+                          SubscriptionRepository subscriptionRepository) {
         this.userRepository = userRepository;
-        this.socialsRepository = socialsRepository;
         this.userStatsRepository = userStatsRepository;
         this.userDetailsService = userDetailsService;
         this.postRepository = postRepository;
         this.userStatsService = userStatsService;
         this.weekDietRepository = weekDietRepository;
+        this.userExtrasRepository = userExtrasRepository;
+        this.recipeRepository = recipeRepository;
+        this.excludedProductsListRepository = excludedProductsListRepository;
+        this.forumService = forumService;
+        this.followRepository = followRepository;
+        this.subscriptionRepository = subscriptionRepository;
     }
 
     public MyProfile getLoggedUserProfile(HttpServletResponse response){
@@ -50,13 +67,26 @@ public class ProfileService {
         if(currentUser != null){
             currentUserProfile.setUser(currentUser);
             currentUserProfile.setProfileImagePath(currentUser.getImagePath());
+            List<PostDetailedView> userPostsView = new ArrayList<>();
+            for(Post post : postRepository.findByuser(currentUser)){
+                userPostsView.add(forumService.viewPost(post.getId(), response));
+            }
+            currentUserProfile.setUserPosts(userPostsView);
+            currentUserProfile.setProfileImagePath(currentUser.getImagePath());
+            currentUserProfile.setUserSubscriptions(subscriptionRepository.findByUser(currentUser));
             currentUserProfile.setUserStats(userStatsRepository.findByuser(currentUser));
-            currentUserProfile.setSocials(socialsRepository.findByuser(currentUser));
-            currentUserProfile.setUserPosts(postRepository.findByuser(currentUser));
+            currentUserProfile.setUserPosts(userPostsView);
             currentUserProfile.setDailyCalGoal(userStatsRepository.findByuser(currentUser).get(userStatsRepository.findByuser(currentUser).size() - 1).getCal());
             currentUserProfile.setDietGoal(weekDietRepository.findByuser(currentUser).getDietGoal());
             currentUserProfile.setWeightAtDietGeneration(weekDietRepository.findByuser(currentUser).getStartingWeight());
             currentUserProfile.setMealsPerDay(weekDietRepository.findByuser(currentUser).getDaysForWeekDiet().get(0).getRecipesForToday().size());
+            
+            currentUserProfile.setUserRecipes(recipeRepository.findByuser(currentUser));
+            currentUserProfile.setExcludedProductsList(excludedProductsListRepository.findByuser(currentUser));
+            UserExtras userExtras = userExtrasRepository.findByuser(currentUser);
+            currentUserProfile.setUserExtras(userExtras);
+            currentUserProfile.setSocials(new SocialsView(userExtras.getFacebook(),
+                    userExtras.getTwitter(), userExtras.getInstagram(), userExtras.getTelegram(), userExtras.getYoutube(), userExtras.getDiscord()));
 
             response.setStatus(HttpStatus.OK.value());
             return currentUserProfile;
@@ -69,11 +99,29 @@ public class ProfileService {
     public UserProfile getSelectedUserProfile(Long userID, HttpServletResponse response){
         UserProfile selectedUserProfile = new UserProfile();
         Optional<User> selectedUser = userRepository.findById(userID);
-        if(!selectedUser.isEmpty()){
+        if(selectedUser.isPresent()){
+            UserExtras userExtras = userExtrasRepository.findByuser(selectedUser.get());
+            List<Follow> userFollows = followRepository.findByUser(selectedUser.get());
+            List<PostDetailedView> userPostsView = new ArrayList<>();
+            for(Post post : postRepository.findByuser(selectedUser.get())){
+                userPostsView.add(forumService.viewPost(post.getId(), response));
+            }
             selectedUserProfile.setUser(selectedUser.get());
-            selectedUserProfile.setImagePath(selectedUser.get().getImagePath());
-            selectedUserProfile.setSocials(socialsRepository.findByuser(selectedUser.get()));
-            selectedUserProfile.setUserPosts(postRepository.findByuser(selectedUser.get()));
+            if(userExtras != null) {
+                selectedUserProfile.setUserExtras(userExtras);
+                SocialsView userSocials = new SocialsView();
+                userSocials.setFacebook(userExtras.getFacebook());
+                userSocials.setDiscord(userExtras.getDiscord());
+                userSocials.setInstagram(userExtras.getInstagram());
+                userSocials.setTwitter(userExtras.getTwitter());
+                userSocials.setYoutube(userExtras.getYoutube());
+                userSocials.setTelegram(userExtras.getTelegram());
+                selectedUserProfile.setSocials(userSocials);
+            }
+            selectedUserProfile.setFollowingList(userFollows);
+            selectedUserProfile.setUserPosts(userPostsView);
+            selectedUserProfile.setUserRecipes(recipeRepository.findByuser(selectedUser.get()));
+            selectedUserProfile.setUserImagePath(selectedUser.get().getImagePath());
             response.setStatus(HttpStatus.OK.value());
             return selectedUserProfile;
         }else {
@@ -253,6 +301,151 @@ public class ProfileService {
                 }
                 response.setStatus(HttpStatus.ACCEPTED.value());
             }
+        }
+    }
+
+    public UserExtras saveUserExtras(UserExtrasRequest userExtrasRequest, HttpServletResponse response) {
+        User currentUser = userDetailsService.findCurrentUser();
+        if(currentUser != null){
+            UserExtras existingUserExtras = userExtrasRepository.findByuser(currentUser);
+            if(existingUserExtras == null) {
+                UserExtras newUserExtras = new UserExtras();
+                newUserExtras.setUser(currentUser);
+                newUserExtras.setBackgroundImagePath(userExtrasRequest.getBackgroundImagePath());
+                newUserExtras.setProfession(userExtrasRequest.getProfession());
+                newUserExtras.setAbout_me(userExtrasRequest.getAbout_me());
+                newUserExtras.setDiscord(userExtrasRequest.getDiscord());
+                newUserExtras.setFacebook(userExtrasRequest.getFacebook());
+                newUserExtras.setInstagram(userExtrasRequest.getInstagram());
+                newUserExtras.setTelegram(userExtrasRequest.getTelegram());
+                newUserExtras.setTwitter(userExtrasRequest.getTwitter());
+                newUserExtras.setYoutube(userExtrasRequest.getYoutube());
+                response.setStatus(HttpStatus.OK.value());
+                return userExtrasRepository.save(newUserExtras);
+
+            } else {
+                return updateUserExtras(userExtrasRequest, response);
+            }
+        } else {
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            return null;
+        }
+    }
+
+    public UserExtras updateUserExtras(UserExtrasRequest request, HttpServletResponse response){
+        User currentUser = userDetailsService.findCurrentUser();
+        if(currentUser != null){
+            UserExtras existingExtras = userExtrasRepository.findByuser(currentUser);
+            if(existingExtras != null) {
+                if(request != null)
+                    existingExtras.setBackgroundImagePath(request.getBackgroundImagePath());
+                if(request.getProfession() != null)
+                    existingExtras.setProfession(request.getProfession());
+                if(request.getAbout_me() != null)
+                    existingExtras.setAbout_me(request.getAbout_me());
+                if(request.getDiscord() != null)
+                    existingExtras.setDiscord(request.getDiscord());
+                if(request.getFacebook() != null)
+                    existingExtras.setFacebook(request.getFacebook());
+                if(request.getInstagram() != null)
+                    existingExtras.setInstagram(request.getInstagram());
+                if(request.getTelegram() != null)
+                    existingExtras.setTelegram(request.getTelegram());
+                if(request.getTwitter() != null)
+                    existingExtras.setTwitter(request.getTwitter());
+                if(request.getYoutube() != null)
+                    existingExtras.setYoutube(request.getYoutube());
+                response.setStatus(HttpStatus.OK.value());
+                return userExtrasRepository.save(existingExtras);
+            } else {
+                response.setStatus(HttpStatus.NOT_FOUND.value());
+                return null;
+            }
+        } else {
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            return null;
+        }
+    }
+
+    public void deleteUserExtras(HttpServletResponse response){
+        User currentUser = userDetailsService.findCurrentUser();
+        if(currentUser != null){
+            UserExtras existingExtras = userExtrasRepository.findByuser(currentUser);
+            if(existingExtras != null) {
+                userExtrasRepository.delete(existingExtras);
+                response.setStatus(HttpStatus.OK.value());
+            } else {
+                response.setStatus(HttpStatus.NOT_FOUND.value());
+            }
+        } else {
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+        }
+    }
+
+    public List<ProfileSearchView> searchUser(SearchRequest request, HttpServletResponse response) {
+        List<ProfileSearchView> profileSearchViewList = new ArrayList<>();
+        if(request.getSearch() != null){
+            List<User> firstSearch = new ArrayList<>();
+            List<User> secondSearch = new ArrayList<>();
+            String[] words = request.getSearch().split(" ");
+            for(String word : words){
+                word = word.replaceAll("\\s", "");
+            }
+            if(words.length == 2) {
+                firstSearch = userRepository.findByFirstNameAndLastName(words[0], words[1]);
+                secondSearch = userRepository.findByFirstNameAndLastName(words[1], words[0]);
+            } else {
+                firstSearch = userRepository.findByFirstNameOrLastName(words[0], words[0]);
+                secondSearch = firstSearch;
+            }
+            Set<User> searchResult = new HashSet<>(firstSearch);
+            searchResult.addAll(secondSearch);
+            for(User user : searchResult){
+                ProfileSearchView newSearchView = new ProfileSearchView();
+                newSearchView.setID(user.getId());
+                newSearchView.setFirstName(user.getFirstName());
+                newSearchView.setLastName(user.getLastName());
+                newSearchView.setImagePath(user.getImagePath());
+                profileSearchViewList.add(newSearchView);
+            }
+            return profileSearchViewList;
+        } else {
+            response.setStatus(HttpStatus.BAD_REQUEST.value());
+            return null;
+        }
+    }
+
+    public UserExtras currentUserExtras(HttpServletResponse response) {
+        User currentUser = userDetailsService.findCurrentUser();
+        if (currentUser != null) {
+            UserExtras existingExtras = userExtrasRepository.findByuser(currentUser);
+            if (existingExtras != null) {
+                response.setStatus(HttpStatus.OK.value());
+                return existingExtras;
+            } else {
+                response.setStatus(HttpStatus.NOT_FOUND.value());
+                return null;
+            }
+        } else {
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            return null;
+        }
+    }
+
+    public UserExtras givenUserExtras(Long userID, HttpServletResponse response) {
+        Optional<User> existingUser = userRepository.findById(userID);
+        if (existingUser.isPresent()) {
+            UserExtras existingExtras = userExtrasRepository.findByuser(existingUser.get());
+            if (existingExtras != null) {
+                response.setStatus(HttpStatus.OK.value());
+                return existingExtras;
+            } else {
+                response.setStatus(HttpStatus.NOT_FOUND.value());
+                return null;
+            }
+        } else {
+            response.setStatus(HttpStatus.NOT_FOUND.value());
+            return null;
         }
     }
 }

@@ -47,7 +47,7 @@ def update_survey_answers_file(to_csv: bool = True,
     return df
 
 
-def convert_to_implicit_dataset(df: pd.DataFrame = None, survey_path: str = './src/rec_system/data/survey.csv',
+def convert_to_explicit_dataset(df: pd.DataFrame = None, survey_path: str = './src/rec_system/data/survey.csv',
                                 to_csv: bool = False,
                                 destination: str = "./src/rec_system/data/ratings.csv") -> pd.DataFrame:
     """Converts results to be compatible with recommendation model.

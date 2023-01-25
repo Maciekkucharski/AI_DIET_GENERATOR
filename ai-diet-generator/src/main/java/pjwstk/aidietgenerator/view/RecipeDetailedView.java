@@ -17,7 +17,7 @@ public class RecipeDetailedView {
     private RecipeView recipeView;
     private String recipeImagePath;
 
-    @JsonIgnoreProperties({"authorities", "username", "email", "authority"})
+    @JsonIgnoreProperties({"authorities", "username", "email", "authority", "subscribed"})
     private User author;
 
     private String userImagePath;
