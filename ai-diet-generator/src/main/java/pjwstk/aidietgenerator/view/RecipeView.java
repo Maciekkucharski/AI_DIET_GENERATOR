@@ -36,6 +36,8 @@ public class RecipeView {
 //    Ingredients
     private List<Ingredient> ingredients;
 
+    private String creatorImage;
+
     public RecipeView(Long id, String title,
                       Integer servings,
                       Integer readyInMinutes,
@@ -48,7 +50,8 @@ public class RecipeView {
                       Integer carbs,
                       Integer fat,
                       Integer protein,
-                      List<Ingredient> ingredients) {
+                      List<Ingredient> ingredients,
+                      String creatorImage) {
         this.id = id;
         this.title = title;
         this.servings = servings;
@@ -68,6 +71,7 @@ public class RecipeView {
         this.fat = fat;
         this.protein = protein;
         this.ingredients = ingredients;
+        this.creatorImage = creatorImage;
     }
 
     public Long getId() {
@@ -220,5 +224,37 @@ public class RecipeView {
 
     public void setIngredients(List<Ingredient> ingredients) {
         this.ingredients = ingredients;
+    }
+
+    public Boolean getVegetarian() {
+        return vegetarian;
+    }
+
+    public Boolean getVegan() {
+        return vegan;
+    }
+
+    public Boolean getGlutenFree() {
+        return glutenFree;
+    }
+
+    public Boolean getDairyFree() {
+        return dairyFree;
+    }
+
+    public Boolean getVeryHealthy() {
+        return veryHealthy;
+    }
+
+    public Boolean getVerified() {
+        return verified;
+    }
+
+    public String getCreatorImage() {
+        return creatorImage;
+    }
+
+    public void setCreatorImage(String creatorImage) {
+        this.creatorImage = creatorImage;
     }
 }
