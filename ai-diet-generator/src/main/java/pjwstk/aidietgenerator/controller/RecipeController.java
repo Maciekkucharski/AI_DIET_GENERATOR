@@ -31,8 +31,9 @@ public class RecipeController {
     }
 
     @GetMapping("/{id}")
-    public RecipeView findRecipeById(@PathVariable(value = "id") long recipeId, HttpServletResponse response){
-        return recipeService.view(recipeId, response);
+    public Recipe findRecipeById(@PathVariable(value = "id") long recipeId){
+        return recipeRepository.findById(recipeId)
+                .orElseThrow(() -> new ResourceNotFoundException("Recipe not found with id :" + recipeId));
     }
 
     @DeleteMapping("/{id}")
@@ -46,7 +47,7 @@ public class RecipeController {
     }
 
     @GetMapping("/user/{userID}")
-    public List<RecipeView> findUserRecipes(@PathVariable(value = "userID") long userID, HttpServletResponse response){
+    public List<Recipe> findUserRecipes(@PathVariable(value = "userID") long userID, HttpServletResponse response){
         return recipeService.getUserRecipes(userID, response);
     }
 

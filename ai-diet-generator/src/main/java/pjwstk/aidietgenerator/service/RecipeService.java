@@ -119,91 +119,6 @@ public class RecipeService {
         }
     }
 
-    public RecipeView view(long recipeId, HttpServletResponse response) {
-        Optional<Recipe> recipe = recipeRepository.findById(recipeId);
-
-        if (recipe.isEmpty()) {
-
-            response.setStatus(HttpStatus.NOT_FOUND.value());
-            return null;
-
-        } else {
-
-            List ingredients = new ArrayList<Ingredient>();
-
-            try {
-                ingredients = ingredientRepository.findByrecipe(recipe.get());
-            } catch (NoResultException e) {
-                e.printStackTrace();
-            }
-
-            RecipeView currentRecipeView = new RecipeView();
-
-            response.setStatus(HttpStatus.OK.value());
-
-            if(recipe.get().getId() != null) {
-                currentRecipeView.setId(recipe.get().getId());
-            }
-            if(recipe.get().getTitle() != null){
-                currentRecipeView.setTitle(recipe.get().getTitle());
-            }
-            if(recipe.get().getReadyInMinutes() != null){
-                currentRecipeView.setReadyInMinutes(recipe.get().getReadyInMinutes());
-            }
-            if(recipe.get().getImagePath() != null){
-                currentRecipeView.setImagePath(recipe.get().getImagePath());
-            }
-            if(recipe.get().getInstructions() != null){
-                currentRecipeView.setInstructions(recipe.get().getInstructions());
-            }
-            if(recipe.get().getVegetarian() != null){
-                currentRecipeView.setVegetarian(recipe.get().getVegetarian());
-            }
-            if(recipe.get().getVegan() != null){
-                currentRecipeView.setVegan(recipe.get().getVegan());
-            }
-            if(recipe.get().getGlutenFree() != null){
-                currentRecipeView.setGlutenFree(recipe.get().getGlutenFree());
-            }
-            if(recipe.get().getDairyFree() != null){
-                currentRecipeView.setDairyFree(recipe.get().getDairyFree());
-            }
-            if(recipe.get().getVeryHealthy() != null){
-                currentRecipeView.setVeryHealthy(recipe.get().getVeryHealthy());
-            }
-            if(recipe.get().getVerified() != null){
-                currentRecipeView.setVerified(recipe.get().getVerified());
-            }
-            if(recipe.get().getTimestamp() != null){
-                currentRecipeView.setCreated_at(recipe.get().getTimestamp());
-            }
-            if(recipe.get().getUser() != null){
-                currentRecipeView.setUser(recipe.get().getUser());
-            }
-            if(recipe.get().getRecipeCreatorImage() != null){
-                currentRecipeView.setCreatorImage(recipe.get().getRecipeCreatorImage());
-            }
-            if(recipe.get().getCalories() != null){
-                currentRecipeView.setCalories(recipe.get().getCalories());
-            }
-            if(recipe.get().getCarbs() != null){
-                currentRecipeView.setCarbs(recipe.get().getCarbs());
-            }
-            if(recipe.get().getFat() != null){
-                currentRecipeView.setFat(recipe.get().getFat());
-            }
-            if(recipe.get().getProtein() != null){
-                currentRecipeView.setProtein(recipe.get().getProtein());
-            }
-            if(ingredients != null){
-                currentRecipeView.setIngredients(ingredients);
-            }
-
-
-            return currentRecipeView;
-        }
-    }
-
     public Recipe editRecipe(long recipeId, RecipeRequest editedRecipe, HttpServletResponse response) {
         Recipe existingRecipe = recipeRepository.findById(recipeId)
                 .orElseThrow(() -> new ResourceNotFoundException("Recipe not found with id :" + recipeId));
@@ -341,16 +256,16 @@ public class RecipeService {
         }
     }
 
-    public List<RecipeView> getUserRecipes(long userID, HttpServletResponse response) {
+    public List<Recipe> getUserRecipes(long userID, HttpServletResponse response) {
         Optional<User> existingUser = userRepository.findById(userID);
         if(existingUser.isPresent()){
             List<Recipe> userRecipes = recipeRepository.findByuser(existingUser.get());
             if(userRecipes.size()>0) {
-                List<RecipeView> recipeViewList = new ArrayList<>();
+                List<Recipe> recipeList = new ArrayList<>();
                 for (Recipe recipe : userRecipes) {
-                    recipeViewList.add(view(recipe.getId(), response));
+                    recipeList.add(recipe);
                 }
-                return recipeViewList;
+                return recipeList;
             } else {
                 response.setStatus(HttpStatus.NOT_FOUND.value());
                 return null;
