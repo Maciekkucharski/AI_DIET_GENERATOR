@@ -1,7 +1,5 @@
 package pjwstk.aidietgenerator.controller;
 
-import lombok.Getter;
-import org.apache.tomcat.util.http.parser.HttpParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -9,9 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import pjwstk.aidietgenerator.entity.Subscription;
 import pjwstk.aidietgenerator.request.SubscriptionRequest;
 import pjwstk.aidietgenerator.service.SubscriptionService;
-
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.util.List;
 
 @EnableScheduling
@@ -36,7 +32,7 @@ public class SubscriptionController {
         return subscriptionService.createSubscription(request, response);
     }
     @GetMapping("/cancel")
-    public Subscription unsubscribe(HttpServletResponse response) throws IOException {
+    public Subscription unsubscribe(HttpServletResponse response){
         return subscriptionService.deleteSubscription(response);
     }
 
