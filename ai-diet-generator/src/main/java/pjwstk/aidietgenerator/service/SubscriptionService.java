@@ -1,9 +1,12 @@
 package pjwstk.aidietgenerator.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.http.*;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 import pjwstk.aidietgenerator.entity.Recipe;
 import pjwstk.aidietgenerator.entity.Subscription;
 import pjwstk.aidietgenerator.entity.User;
@@ -16,10 +19,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @EnableScheduling
 @Service
@@ -73,20 +73,25 @@ public class SubscriptionService {
             Subscription userSubscription = subscriptionRepository.findByUserAndStatus(currentUser, "ACTIVE");
             if(userSubscription != null){
                 String urlString = "https://api-m.sandbox.paypal.com/v1/billing/subscriptions/" + userSubscription.getSubscription_id() + "/cancel";
-                URL url = new URL (urlString);
-                HttpURLConnection con = (HttpURLConnection)url.openConnection();
-                con.setRequestMethod("POST");
-                con.setRequestProperty("Content-Type", "application/json");
-                con.setRequestProperty("Authorization", "Basic ARmk2ZR1YkM6uHxsqnE4IC3DqaSazz7MFO2lJsA3eKl4vFbgDqBsbpHZefq2FWzkGskDq77CVrrebypy:EIWIQsYghcbsm_EwAEV_BuYJCQN_D6slPIvkf_T38zQ7lzOga2KQ5hqbEd_ZUCgQ1p6lygFeZfQaTiAX");
-                con.setDoOutput(true);
-                String jsonInputString = "{\"Reason\":\"Not satisfied with the service\"}";
-                try(OutputStream os = con.getOutputStream()) {
-                    byte[] input = jsonInputString.getBytes(StandardCharsets.UTF_8);
-                    os.write(input, 0, input.length);
-                }
+                RestTemplate restTemplate = new RestTemplate();
+                HttpHeaders headers = new HttpHeaders();
+                headers.setContentType(MediaType.APPLICATION_JSON);
+                String plainCreds = "ARmk2ZR1YkM6uHxsqnE4IC3DqaSazz7MFO2lJsA3eKl4vFbgDqBsbpHZefq2FWzkGskDq77CVrrebypy:EIWIQsYghcbsm_EwAEV_BuYJCQN_D6slPIvkf_T38zQ7lzOga2KQ5hqbEd_ZUCgQ1p6lygFeZfQaTiAX";
+                byte[] plainCredsBytes = plainCreds.getBytes();
+                byte[] base64CredsBytes = Base64.getEncoder().encode(plainCredsBytes);
+                String base64Creds = new String(base64CredsBytes);
+                headers.add("Authorization", "Basic " + base64Creds);
+                UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(urlString)
+                        .queryParam("Reason","Not satisfied with the service");
+                HttpEntity<?> entity = new HttpEntity<>(headers);
+                HttpEntity<String> response2 = restTemplate.exchange(
+                        builder.toUriString(),
+                        HttpMethod.POST,
+                        entity,
+                        String.class);
+
                 userSubscription.setStatus("CANCELED");
-                currentUser.setSubscribed(false);
-                userRepository.save(currentUser);
+                response.setStatus(HttpStatus.OK.value());
                 return subscriptionRepository.save(userSubscription);
             } else {
                 response.setStatus(HttpStatus.NOT_FOUND.value());
@@ -121,9 +126,12 @@ public class SubscriptionService {
         Date currentDate = new Date();
         for(Subscription subscription : allSubscriptions){
             if(currentDate.after(subscription.getValid_till())){
-                if(Objects.equals(subscription.getStatus(), "ACTIVE") && currentDate.before(new Date(subscription.getFinal_payment_time().getTime() + (1000L * 60 * 60 * 24 * 30)))){
+                if(Objects.equals(subscription.getStatus(), "ACTIVE") && currentDate.before(new Date(subscription.getFinal_payment_time().getTime() + (1000L * 60 * 60 * 24 * 30)))) {
                     subscription.setValid_till(new Date(subscription.getValid_till().getTime() + (1000L * 60 * 60 * 24 * 30))); // plus 30 days
                     subscriptionRepository.save(subscription);
+                } else if(Objects.equals(subscription.getStatus(), "CANCELED")) {
+                    subscription.getUser().setSubscribed(false);
+                    userRepository.save(subscription.getUser());
                 } else if (currentDate.after(new Date(subscription.getFinal_payment_time().getTime() + (1000L * 60 * 60 * 24 * 30)))){
                     subscription.setStatus("CANCELED");
                     User user = subscription.getUser();
