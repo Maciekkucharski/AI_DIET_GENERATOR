@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import pjwstk.aidietgenerator.entity.*;
-
 import java.util.List;
 
 @Getter
@@ -14,18 +13,23 @@ import java.util.List;
 public class MyProfile {
     @JsonIgnoreProperties({"password"})
     private User user;
-    private List<UserStats> userStats;
-    private Socials socials;
     private String profileImagePath;
-    private List<Post> userPosts;
+    private List<Subscription> userSubscriptions;
+    @JsonIgnoreProperties({"discord", "facebook", "instagram", "telegram", "facebook", "twitter", "youtube"})
+    private UserExtras userExtras;
+    private SocialsView socials;
+    private List<UserStats> userStats;
+    @JsonIgnoreProperties("user")
+    private List<PostDetailedView> userPosts;
+    @JsonIgnoreProperties("user")
     private List<Recipe> userRecipes;
-    // wykluczenia
 
     private DietGoal dietGoal;
     private Double weightAtDietGeneration;
     private Integer dailyCalGoal;
     private Integer mealsPerDay;
 
+    private ExcludedProductsList excludedProductsList;
+
 }
 
-//profil dietetyk: about me, tytuł

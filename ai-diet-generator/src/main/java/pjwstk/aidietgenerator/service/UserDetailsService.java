@@ -28,7 +28,7 @@ public class UserDetailsService implements org.springframework.security.core.use
         this.passwordEncoder = passwordEncoder;
     }
 
-    public void saveUser(User user){
+    public User saveUser(User user){
         var userEntity = new User();
         userEntity.setFirstName(user.getFirstName());
         userEntity.setLastName(user.getLastName());
@@ -36,7 +36,7 @@ public class UserDetailsService implements org.springframework.security.core.use
         userEntity.setPassword (passwordEncoder.encode(user.getPassword()));
         userEntity.setAuthority(String.join(",", user.getAuthority()));
         userEntity.setCreatedAt();
-        userRepository.save(userEntity);
+        return userRepository.save(userEntity);
     }
 
     public boolean doesUserExist (String email){
@@ -52,25 +52,15 @@ public class UserDetailsService implements org.springframework.security.core.use
         return userRepository.findByemail(email);
     }
 
-    public String getCurrentUserEmail() {
+    public User findCurrentUser() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (principal instanceof User) {
-            String email = ((User) principal).getEmail();
-            return email;
+            return ((User) principal);
         } else {
-            return principal.toString();
+            return null;
         }
     }
 
-    public User findCurrentUser() {
-        User currentUser = null;
-        try {
-            currentUser = userRepository.findByemail(getCurrentUserEmail());
-        } catch (NoResultException e) {
-            System.out.println(e.getMessage());
-        }
-        return currentUser;
-    }
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
@@ -83,10 +73,10 @@ public class UserDetailsService implements org.springframework.security.core.use
                 new ArrayList<>());
     }
 
-    public boolean patternMatches(String emailAddress) {
+    public boolean patternMatches(String email) {
         return Pattern.compile("^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@"
                         + "[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$")
-                .matcher(emailAddress)
+                .matcher(email)
                 .matches();
     }
 }

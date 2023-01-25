@@ -284,6 +284,7 @@ public class RecipeService {
 
     public Recipe verifyRecipe(Long recipeId, HttpServletResponse response) {
         User currentUser = userDetailsService.findCurrentUser();
+        
         if (currentUser == null || !currentUser.getAuthorities().contains(new SimpleGrantedAuthority(Authority.DIETITIAN.role)) || !currentUser.getAuthorities().contains(new SimpleGrantedAuthority(Authority.ADMIN.role))) {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
         } else {
@@ -337,6 +338,26 @@ public class RecipeService {
             } else {
                 response.setStatus(HttpStatus.UNAUTHORIZED.value());
             }
+        }
+    }
+
+    public List<RecipeView> getUserRecipes(long userID, HttpServletResponse response) {
+        Optional<User> existingUser = userRepository.findById(userID);
+        if(existingUser.isPresent()){
+            List<Recipe> userRecipes = recipeRepository.findByuser(existingUser.get());
+            if(userRecipes.size()>0) {
+                List<RecipeView> recipeViewList = new ArrayList<>();
+                for (Recipe recipe : userRecipes) {
+                    recipeViewList.add(view(recipe.getId(), response));
+                }
+                return recipeViewList;
+            } else {
+                response.setStatus(HttpStatus.NOT_FOUND.value());
+                return null;
+            }
+        } else {
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            return null;
         }
     }
 }

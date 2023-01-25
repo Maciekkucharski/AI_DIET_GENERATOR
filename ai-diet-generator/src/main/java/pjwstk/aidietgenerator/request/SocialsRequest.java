@@ -1,16 +1,14 @@
 package pjwstk.aidietgenerator.request;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
+@AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-public class UserExtrasRequest {
-    private String backgroundImagePath;
-    private String about_me;
-    private String profession;
+public class SocialsRequest {
     private String facebook;
     private String twitter;
     private String instagram;

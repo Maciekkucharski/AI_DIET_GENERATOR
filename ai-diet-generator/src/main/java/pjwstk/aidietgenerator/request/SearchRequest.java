@@ -3,12 +3,12 @@ package pjwstk.aidietgenerator.request;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import pjwstk.aidietgenerator.entity.Question;
-import java.util.List;
+import lombok.Setter;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-public class SurveyRequest {
-    private List<Question> answers;
+@Setter
+public class SearchRequest {
+    private String search;
 }
