@@ -44,7 +44,7 @@ public class RecipeService {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             return null;
         } else {
-            if (recipeRequest.getTitle() == null || recipeRequest.getInstructions() == null || recipeRequest.getIngredients().isEmpty()) {
+            if (recipeRequest.getTitle() == null || recipeRequest.getInstructions() == null || recipeRequest.getIngredients() == null) {
                 response.setStatus(HttpStatus.BAD_REQUEST.value());
                 return null;
             } else {
@@ -261,13 +261,14 @@ public class RecipeService {
 
 
             if(editedRecipe.getIngredients() != null) {
+                List<Ingredient> oldIngredients = ingredientRepository.findByrecipe(existingRecipe);
+                ingredientRepository.deleteAll(oldIngredients);
+
                 List<Ingredient> newIngredients = editedRecipe.getIngredients();
                 for (Ingredient newIngredient : newIngredients) {
                     newIngredient.setRecipe(existingRecipe);
                     ingredientRepository.save(newIngredient);
                 }
-                List<Ingredient> oldIngredients = ingredientRepository.findByrecipe(existingRecipe);
-                ingredientRepository.deleteAll(oldIngredients);
             }
             response.setStatus(HttpStatus.OK.value());
             return recipeRepository.save(existingRecipe);
