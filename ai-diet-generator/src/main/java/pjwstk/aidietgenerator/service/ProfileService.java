@@ -64,7 +64,7 @@ public class ProfileService {
     public MyProfile getLoggedUserProfile(HttpServletResponse response){
         MyProfile currentUserProfile = new MyProfile();
         User currentUser = userDetailsService.findCurrentUser();
-        if(currentUser != null){
+        if(currentUser != null) {
             currentUserProfile.setUser(currentUser);
             currentUserProfile.setProfileImagePath(currentUser.getImagePath());
             List<PostDetailedView> userPostsView = new ArrayList<>();
@@ -75,6 +75,22 @@ public class ProfileService {
             currentUserProfile.setProfileImagePath(currentUser.getImagePath());
             currentUserProfile.setUserSubscriptions(subscriptionRepository.findByUser(currentUser));
             currentUserProfile.setUserStats(userStatsRepository.findByuser(currentUser));
+            currentUserProfile.setSocials(socialsRepository.findByuser(currentUser));
+            currentUserProfile.setUserPosts(postRepository.findByuser(currentUser));
+            if (userStatsRepository.findByuser(currentUser) != null && !userStatsRepository.findByuser(currentUser).isEmpty()) {
+                currentUserProfile.setDailyCalGoal(userStatsRepository.findByuser(currentUser).get(userStatsRepository.findByuser(currentUser).size() - 1).getCal());
+            } else {
+                currentUserProfile.setDailyCalGoal(0);
+            }
+            if (weekDietRepository.findByuser(currentUser) != null) {
+                currentUserProfile.setDietGoal(weekDietRepository.findByuser(currentUser).getDietGoal());
+                currentUserProfile.setWeightAtDietGeneration(weekDietRepository.findByuser(currentUser).getStartingWeight());
+                currentUserProfile.setMealsPerDay(weekDietRepository.findByuser(currentUser).getDaysForWeekDiet().get(0).getRecipesForToday().size());
+            } else {
+                currentUserProfile.setDietGoal(null);
+                currentUserProfile.setWeightAtDietGeneration(0.0);
+                currentUserProfile.setMealsPerDay(0);
+            }
             currentUserProfile.setUserPosts(userPostsView);
             currentUserProfile.setDailyCalGoal(userStatsRepository.findByuser(currentUser).get(userStatsRepository.findByuser(currentUser).size() - 1).getCal());
             currentUserProfile.setDietGoal(weekDietRepository.findByuser(currentUser).getDietGoal());
