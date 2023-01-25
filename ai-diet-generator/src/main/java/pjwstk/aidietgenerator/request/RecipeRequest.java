@@ -30,7 +30,7 @@ public class RecipeRequest {
     private Integer fat;
     private Integer protein;
     //    Ingredients
-    private List<Ingredient> ingredients;
+    private List<Ingredient> recipesIngredients;
 
     public RecipeRequest(String title,
                       Integer servings,
@@ -44,7 +44,7 @@ public class RecipeRequest {
                       Integer carbs,
                       Integer fat,
                       Integer protein,
-                      List<Ingredient> ingredients) {
+                      List<Ingredient> recipesIngredients) {
         this.title = title;
         this.servings = servings;
         this.readyInMinutes = readyInMinutes;
@@ -62,7 +62,7 @@ public class RecipeRequest {
         this.carbs = carbs;
         this.fat = fat;
         this.protein = protein;
-        this.ingredients = ingredients;
+        this.recipesIngredients = recipesIngredients;
     }
 
     public String getTitle() {
@@ -133,8 +133,8 @@ public class RecipeRequest {
         return protein;
     }
 
-    public List<Ingredient> getIngredients() {
-        return ingredients;
+    public List<Ingredient> getRecipesIngredients() {
+        return recipesIngredients;
     }
 
 

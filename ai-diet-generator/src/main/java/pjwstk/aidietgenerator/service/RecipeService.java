@@ -42,7 +42,7 @@ public class RecipeService {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             return null;
         } else {
-            if (recipeRequest.getTitle() == null || recipeRequest.getInstructions() == null || recipeRequest.getIngredients() == null) {
+            if (recipeRequest.getTitle() == null || recipeRequest.getInstructions() == null || recipeRequest.getRecipesIngredients() == null) {
                 response.setStatus(HttpStatus.BAD_REQUEST.value());
                 return null;
             } else {
@@ -97,7 +97,7 @@ public class RecipeService {
                     newRecipe.setVerified(true);
                 }
                 recipeRepository.save(newRecipe);
-                List<Ingredient> newRecipeIngredients = recipeRequest.getIngredients();
+                List<Ingredient> newRecipeIngredients = recipeRequest.getRecipesIngredients();
 
                 if(newRecipeIngredients != null) {
                     for (Ingredient ingredient : newRecipeIngredients) {
@@ -176,11 +176,11 @@ public class RecipeService {
                 existingRecipe.setCreatedAt();
 
 
-                if (editedRecipe.getIngredients() != null) {
+                if (editedRecipe.getRecipesIngredients() != null) {
                     List<Ingredient> oldIngredients = ingredientRepository.findByrecipe(existingRecipe);
                     ingredientRepository.deleteAll(oldIngredients);
 
-                    List<Ingredient> newIngredients = editedRecipe.getIngredients();
+                    List<Ingredient> newIngredients = editedRecipe.getRecipesIngredients();
                     for (Ingredient newIngredient : newIngredients) {
                         newIngredient.setRecipe(existingRecipe);
                         ingredientRepository.save(newIngredient);
