@@ -58,14 +58,13 @@ public class RegisterController {
                 }
                 GrantedAuthority defaultAuthority = () -> "ROLE_USER";
                 newUser.addAuthority(defaultAuthority);
-                newUser.setSubscribed(false);
-                newUser.setFirstName("User");
-                response.setStatus(HttpStatus.CREATED.value());
                 User savedUser = userDetailsService.saveUser(newUser);
                 savedUser.setLastName(savedUser.getId().toString());
+                savedUser.setFirstName("User");
                 savedUser.setSubscribed(false);
                 savedUser.setRating(false);
                 savedUser.setSurvey(false);
+                response.setStatus(HttpStatus.CREATED.value());
                 return userRepository.save(savedUser);
             }
         }
