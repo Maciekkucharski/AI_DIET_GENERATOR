@@ -26,15 +26,18 @@ public class SurveyService {
     private final UserDetailsService userDetailsService;
     private final RecipeRepository recipeRepository;
     private final RatingRepository ratingRepository;
+    private final UserRepository userRepository;
 
     public SurveyService(SurveyRepository surveyRepository,
                          UserDetailsService userDetailsService,
                          RecipeRepository recipeRepository,
-                         RatingRepository ratingRepository) {
+                         RatingRepository ratingRepository,
+                         UserRepository userRepository) {
         this.surveyRepository = surveyRepository;
         this.userDetailsService = userDetailsService;
         this.recipeRepository = recipeRepository;
         this.ratingRepository = ratingRepository;
+        this.userRepository = userRepository;
     }
 
     public Survey saveSurvey(SurveyRequest surveyRequest, HttpServletResponse response) {
@@ -61,6 +64,8 @@ public class SurveyService {
                 survey.setTimestamp(new Timestamp(System.currentTimeMillis()));
                 survey.setUser(currentUser);
                 response.setStatus(HttpStatus.OK.value());
+                currentUser.setSurvey(true);
+                userRepository.save(currentUser);
                 return surveyRepository.save(survey);
             } else {
                 response.setStatus(HttpStatus.BAD_REQUEST.value());
@@ -97,6 +102,8 @@ public class SurveyService {
                     recipeList.add(ratingRepository.save(newRating));
                 }
                 response.setStatus(HttpStatus.OK.value());
+                currentUser.setRating(true);
+                userRepository.save(currentUser);
                 return recipeList;
             } else {
                 response.setStatus(HttpStatus.BAD_REQUEST.value());

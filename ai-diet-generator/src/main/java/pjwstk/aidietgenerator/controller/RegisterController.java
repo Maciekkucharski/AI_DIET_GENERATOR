@@ -64,6 +64,8 @@ public class RegisterController {
                 User savedUser = userDetailsService.saveUser(newUser);
                 savedUser.setLastName(savedUser.getId().toString());
                 savedUser.setSubscribed(false);
+                savedUser.setRating(false);
+                savedUser.setSurvey(false);
                 return userRepository.save(savedUser);
             }
         }

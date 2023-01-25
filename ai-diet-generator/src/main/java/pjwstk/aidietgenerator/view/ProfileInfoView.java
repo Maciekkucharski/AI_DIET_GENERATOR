@@ -16,6 +16,8 @@ public class ProfileInfoView {
     private Gender gender;
     private double BMI;
     private int kCal;
+    private Boolean completedSurvey;
+    private Boolean completedRatings;
 
     List<String> authorities;
 
@@ -33,7 +35,9 @@ public class ProfileInfoView {
                            Gender gender,
                            double BMI,
                            int kCal,
-                           List<String> authorities) {
+                           List<String> authorities,
+                           Boolean completedSurvey,
+                           Boolean completedRatings) {
         this.id = id;
         this.profileImagePath = profilePicturePath;
         this.firstName = firstName;
@@ -46,6 +50,8 @@ public class ProfileInfoView {
         this.BMI = BMI;
         this.kCal = kCal;
         this.authorities = authorities;
+        this.completedRatings = completedRatings;
+        this.completedSurvey = completedSurvey;
     }
 
     public Long getId() {
@@ -142,5 +148,21 @@ public class ProfileInfoView {
 
     public void setAuthorities(List<String> authorities) {
         this.authorities = authorities;
+    }
+
+    public Boolean getCompletedSurvey() {
+        return completedSurvey;
+    }
+
+    public void setCompletedSurvey(Boolean completedSurvey) {
+        this.completedSurvey = completedSurvey;
+    }
+
+    public Boolean getCompletedRatings() {
+        return completedRatings;
+    }
+
+    public void setCompletedRatings(Boolean completedRatings) {
+        this.completedRatings = completedRatings;
     }
 }

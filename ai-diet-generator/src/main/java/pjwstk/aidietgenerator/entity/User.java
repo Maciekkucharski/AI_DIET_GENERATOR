@@ -50,6 +50,12 @@ public class User implements UserDetails {
     @Column(name = "subscribed")
     private Boolean subscribed;
 
+    @Column(name = "survey")
+    private Boolean survey;
+
+    @Column(name = "rating")
+    private Boolean rating;
+
     public User() {
 
     }
@@ -182,5 +188,19 @@ public class User implements UserDetails {
         this.authority = remainingAuthorities;
     }
 
+    public Boolean getSurvey() {
+        return survey;
+    }
 
+    public void setSurvey(Boolean survey) {
+        this.survey = survey;
+    }
+
+    public Boolean getRating() {
+        return rating;
+    }
+
+    public void setRating(Boolean rating) {
+        this.rating = rating;
+    }
 }
