@@ -48,7 +48,7 @@ public class ImageService {
 
     public String uploadImage(ImageRequest imageRequest, String folder, HttpServletResponse response) throws IOException, StorageException {
         String fileName = "images/" + folder + "/" + UUID.randomUUID();
-        String URL = "https://storage.cloud.google.com/foodie-images/" + fileName;
+        String URL = "https://storage.googleapis.com/foodie-images/" + fileName;
         BlobId blobId = BlobId.of(bucketName, fileName);
         BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("multipart").build();
         try {
@@ -66,7 +66,7 @@ public class ImageService {
         if (deleted) {
             String newURL = uploadImage(imageRequest, folder, response);
             User currentUser = userDetailsService.findCurrentUser();
-            if (newURL.contains("https://storage.cloud.google.com/foodie-images/")) {
+            if (newURL.contains("https://storage.googleapis.com/foodie-images/")) {
                 switch (folder) {
                     case "Profile": {
                         currentUser.setImagePath(newURL);
@@ -126,8 +126,8 @@ public class ImageService {
         switch (folder) {
             case "Profile": {
                 String imagePath = currentUser.getImagePath();
-                if (imagePath != null && imagePath.contains("https://storage.cloud.google.com/foodie-images/")) {
-                    String fileName = imagePath.replace("https://storage.cloud.google.com/foodie-images/", "");
+                if (imagePath != null && imagePath.contains("https://storage.googleapis.com/foodie-images/")) {
+                    String fileName = imagePath.replace("https://storage.googleapis.com/foodie-images/", "");
                     BlobId blobId = BlobId.of(bucketName, fileName);
                     deleted = storage.delete(blobId);
                     if (deleted) {
@@ -140,8 +140,8 @@ public class ImageService {
             case "Background": {
                 UserExtras existingUserExtras = userExtrasRepository.findByuser(currentUser);
                 String imagePath = existingUserExtras.getBackgroundImagePath();
-                if (imagePath != null && imagePath.contains("https://storage.cloud.google.com/foodie-images/")) {
-                    String fileName = imagePath.replace("https://storage.cloud.google.com/foodie-images/", "");
+                if (imagePath != null && imagePath.contains("https://storage.googleapis.com/foodie-images/")) {
+                    String fileName = imagePath.replace("https://storage.googleapis.com/foodie-images/", "");
                     BlobId blobId = BlobId.of(bucketName, fileName);
                     deleted = storage.delete(blobId);
                     if (deleted) {
@@ -155,8 +155,8 @@ public class ImageService {
                 Optional<Post> existingPost = postRepository.findById(ID);
                 if (existingPost.isPresent()) {
                     String imagePath = existingPost.get().getImagePath();
-                    if (imagePath != null && imagePath.contains("https://storage.cloud.google.com/foodie-images/") && existingPost.get().getUser() == currentUser) {
-                        String fileName = imagePath.replace("https://storage.cloud.google.com/foodie-images/", "");
+                    if (imagePath != null && imagePath.contains("https://storage.googleapis.com/foodie-images/") && existingPost.get().getUser() == currentUser) {
+                        String fileName = imagePath.replace("https://storage.googleapis.com/foodie-images/", "");
                         BlobId blobId = BlobId.of(bucketName, fileName);
                         deleted = storage.delete(blobId);
                         if (deleted) {
@@ -170,8 +170,8 @@ public class ImageService {
                 Optional<Recipe> existingRecipe = recipeRepository.findById(ID);
                 if (existingRecipe.isPresent()) {
                     String imagePath = existingRecipe.get().getImagePath();
-                    if (imagePath != null && imagePath.contains("https://storage.cloud.google.com/foodie-images/") && existingRecipe.get().getUser() == currentUser) {
-                        String fileName = imagePath.replace("https://storage.cloud.google.com/foodie-images/", "");
+                    if (imagePath != null && imagePath.contains("https://storage.googleapis.com/foodie-images/") && existingRecipe.get().getUser() == currentUser) {
+                        String fileName = imagePath.replace("https://storage.googleapis.com/foodie-images/", "");
                         BlobId blobId = BlobId.of(bucketName, fileName);
                         deleted = storage.delete(blobId);
                         if (deleted) {

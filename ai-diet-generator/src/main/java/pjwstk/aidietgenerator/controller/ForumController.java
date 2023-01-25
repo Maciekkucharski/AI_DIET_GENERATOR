@@ -18,6 +18,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/forum")
+@CrossOrigin(exposedHeaders = "*")
 public class ForumController {
 
     private final ForumService forumService;

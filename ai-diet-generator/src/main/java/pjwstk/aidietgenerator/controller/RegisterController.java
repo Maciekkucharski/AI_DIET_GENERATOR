@@ -13,6 +13,7 @@ import javax.transaction.Transactional;
 
 @RestController
 @RequestMapping("/account")
+@CrossOrigin(exposedHeaders = "*")
 public class RegisterController {
 
     private final UserDetailsService userDetailsService;

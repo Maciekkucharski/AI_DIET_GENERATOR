@@ -20,6 +20,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/account/stats")
+@CrossOrigin(exposedHeaders = "*")
 public class UserStatsController {
     private final UserStatsRepository userStatsRepository;
     private final UserDetailsService userDetailsService;

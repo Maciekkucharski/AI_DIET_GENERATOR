@@ -13,6 +13,7 @@ import java.util.List;
 @EnableScheduling
 @RestController
 @RequestMapping("/account/subscription")
+@CrossOrigin(exposedHeaders = "*")
 public class SubscriptionController {
 
     private final SubscriptionService subscriptionService;

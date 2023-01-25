@@ -16,6 +16,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/diet")
+@CrossOrigin(exposedHeaders = "*")
 public class DietController {
 
     private final DietService dietService;

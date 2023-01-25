@@ -1,7 +1,6 @@
 package pjwstk.aidietgenerator.service;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import pjwstk.aidietgenerator.repository.*;
 import pjwstk.aidietgenerator.view.MyProfile;
@@ -9,12 +8,10 @@ import pjwstk.aidietgenerator.entity.User;
 import pjwstk.aidietgenerator.view.UserProfile;
 import pjwstk.aidietgenerator.entity.UserStats;
 import pjwstk.aidietgenerator.entity.*;
-import pjwstk.aidietgenerator.repository.*;
 import pjwstk.aidietgenerator.request.SearchRequest;
 import pjwstk.aidietgenerator.request.UserExtrasRequest;
 import pjwstk.aidietgenerator.view.*;
 import pjwstk.aidietgenerator.request.ProfileInfoRequest;
-
 import javax.servlet.http.HttpServletResponse;
 import java.util.*;
 import java.util.stream.Collectors;

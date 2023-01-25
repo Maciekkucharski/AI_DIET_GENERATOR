@@ -16,6 +16,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/account/survey")
+@CrossOrigin(exposedHeaders = "*")
 public class SurveyController {
 
     private final SurveyRepository surveyRepository;

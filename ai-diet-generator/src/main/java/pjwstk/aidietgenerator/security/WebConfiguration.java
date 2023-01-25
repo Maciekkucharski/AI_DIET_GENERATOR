@@ -11,9 +11,11 @@ public class WebConfiguration implements WebMvcConfigurer {
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**")
+        registry.addMapping("/*")
                 .allowedMethods("*")
-                .allowedOrigins("*", "http://localhost:3000/", "http://localhost:3000")
-                .allowedHeaders("*");
+                .allowedOriginPatterns("https://diet-generator-3f510.web.app/", "https://diet-generator-3f510.web.app/*", "https://diet-generator-3f510.web.app/**")
+                .allowedHeaders("*")
+                .exposedHeaders("Access-Control-Allow-Origin")
+                .allowCredentials(true);
     }
 }

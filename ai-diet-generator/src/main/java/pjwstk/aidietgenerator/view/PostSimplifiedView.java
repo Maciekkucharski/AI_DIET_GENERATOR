@@ -9,9 +9,7 @@ import pjwstk.aidietgenerator.entity.User;
 
 import java.sql.Timestamp;
 
-
 @NoArgsConstructor
-@AllArgsConstructor
 @Setter
 @Getter
 public class PostSimplifiedView {
@@ -21,7 +19,6 @@ public class PostSimplifiedView {
     private Timestamp timestamp;
     @JsonIgnoreProperties({"authorities", "username", "email", "authority"})
     private User author;
-
     private String userProfilePicture;
     private int commentsCount;
     private int likesCount;

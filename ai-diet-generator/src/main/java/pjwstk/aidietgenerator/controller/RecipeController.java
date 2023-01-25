@@ -17,6 +17,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/recipe")
+@CrossOrigin(exposedHeaders = "*")
 public class RecipeController {
 
     private final RecipeService recipeService;

@@ -19,6 +19,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/account/profile")
+@CrossOrigin(exposedHeaders = "*")
 public class ProfileController {
 
     private final ProfileService profileService;

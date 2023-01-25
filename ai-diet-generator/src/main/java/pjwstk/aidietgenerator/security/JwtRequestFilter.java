@@ -42,7 +42,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
         if(requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")){
             jwtToken = requestTokenHeader.substring(7);
-
             try {
                 email = jwtTokenUtil.getUsernameFromToken(jwtToken);
             } catch (IllegalArgumentException e) {
@@ -50,7 +49,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             } catch (ExpiredJwtException e) {
                 System.out.println("JWT Token has expired");
             } catch (Exception e) {
-//?
+
             }
         } else {
             logger.warn("JWT Token does not begin with Bearer String");
@@ -70,7 +69,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
             }
         }
-
         chain.doFilter(request, response);
     }
 }

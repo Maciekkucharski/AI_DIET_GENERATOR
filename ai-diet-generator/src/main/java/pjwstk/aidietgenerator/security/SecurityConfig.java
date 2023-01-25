@@ -57,36 +57,7 @@ public class SecurityConfig{
                 .and()
                 .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-//                        .antMatchers(HttpMethod.GET, "/api/**").hasRole("ADMIN")
-//                        .antMatchers(HttpMethod.GET, "/account/socials/**").permitAll()
-//                        .antMatchers(HttpMethod.PUT, "/account/socials/").hasRole("USER")
-//                        .antMatchers("/account/subscription").permitAll()
-//                        .antMatchers(HttpMethod.POST, "/account/socials/").hasRole("USER")
-//                        .antMatchers( "/userStats").hasRole("USER")
-//                        .anyRequest().authenticated()
-//                .oauth2Login()
-//                .defaultSuccessUrl("/account/loginSuccess")
-//                .failureUrl("/account/loginFailure")
-//                .authorizationEndpoint()
-//                .baseUri("/oauth2/authorize-client")
-//                .authorizationRequestRepository(authorizationRequestRepository());
         httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
         return httpSecurity.build();
     }
-
-    @Bean
-    CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("*", "http://localhost:3000/", "http://localhost:3000"));
-        configuration.setAllowedMethods(Arrays.asList("*"));
-        configuration.setAllowedHeaders(Arrays.asList("*"));
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
-    }
-
-//    @Bean
-//    public WebSecurityCustomizer webSecurityCustomizer() {
-//        return (web) -> web.ignoring().antMatchers();
-//    }
 }

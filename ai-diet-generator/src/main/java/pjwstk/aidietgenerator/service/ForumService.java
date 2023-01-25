@@ -360,6 +360,7 @@ public class ForumService {
             return detailedRecipe;
         }
     }
+
     public RecipeView buildRecipeView(Recipe recipe) {
             List ingredients = new ArrayList<Ingredient>();
             try {
