@@ -12,7 +12,6 @@ import pjwstk.aidietgenerator.request.PostRequest;
 import pjwstk.aidietgenerator.service.ForumService;
 import pjwstk.aidietgenerator.view.PostDetailedView;
 import pjwstk.aidietgenerator.view.PostSimplifiedView;
-import pjwstk.aidietgenerator.view.RecipeDetailedView;
 import pjwstk.aidietgenerator.view.RecipeSimplifiedView;
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;

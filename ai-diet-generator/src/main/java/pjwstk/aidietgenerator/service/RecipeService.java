@@ -10,9 +10,7 @@ import pjwstk.aidietgenerator.repository.IngredientRepository;
 import pjwstk.aidietgenerator.repository.RecipeRepository;
 import pjwstk.aidietgenerator.repository.UserRepository;
 import pjwstk.aidietgenerator.request.RecipeRequest;
-import pjwstk.aidietgenerator.view.RecipeView;
 
-import javax.persistence.NoResultException;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;

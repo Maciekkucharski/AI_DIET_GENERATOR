@@ -2,14 +2,12 @@ package pjwstk.aidietgenerator.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import pjwstk.aidietgenerator.entity.Ingredient;
 import pjwstk.aidietgenerator.entity.Recipe;
 import pjwstk.aidietgenerator.exception.ResourceNotFoundException;
 import pjwstk.aidietgenerator.repository.IngredientRepository;
 import pjwstk.aidietgenerator.repository.RecipeRepository;
 import pjwstk.aidietgenerator.request.RecipeRequest;
 import pjwstk.aidietgenerator.service.RecipeService;
-import pjwstk.aidietgenerator.view.RecipeView;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
