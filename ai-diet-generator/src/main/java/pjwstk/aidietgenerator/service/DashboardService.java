@@ -5,18 +5,15 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 import pjwstk.aidietgenerator.entity.Post;
 import pjwstk.aidietgenerator.entity.Recipe;
-import pjwstk.aidietgenerator.entity.RecipeLike;
 import pjwstk.aidietgenerator.entity.User;
 import pjwstk.aidietgenerator.repository.*;
 import pjwstk.aidietgenerator.view.FeedView;
 import pjwstk.aidietgenerator.view.PostDetailedView;
-import pjwstk.aidietgenerator.view.RecipeDetailedView;
 import pjwstk.aidietgenerator.view.UserProfile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -46,7 +43,6 @@ public class DashboardService {
     public FeedView loadFeed(HttpServletResponse response) {
         List<UserProfile> dietInflu = new ArrayList<>();
         List<PostDetailedView> postViewList = new ArrayList<>();
-        List<RecipeDetailedView> recipesWithCreator = new ArrayList<>();
         FeedView newFeed = new FeedView();
 
         List<User> allUser = userRepository.findAll();

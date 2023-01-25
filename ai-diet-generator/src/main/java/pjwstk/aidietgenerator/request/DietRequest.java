@@ -13,19 +13,12 @@ public class DietRequest {
     private DietGoal dietGoal;
     private int mealsPerDay;
     private List<Product> excludedProductsList;
-
     private Boolean vegetarian;
-
     private Boolean vegan;
-
     private Boolean glutenFree;
-
     private Boolean dairyFree;
-
     private Boolean veryHealthy;
-
     private Boolean verified;
-
     private double threshold = 0.8;
 
     public DietRequest(){}

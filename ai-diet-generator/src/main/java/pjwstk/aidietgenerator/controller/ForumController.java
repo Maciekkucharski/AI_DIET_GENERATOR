@@ -5,12 +5,13 @@ import org.springframework.web.bind.annotation.*;
 import pjwstk.aidietgenerator.entity.Post;
 import pjwstk.aidietgenerator.entity.PostComment;
 import pjwstk.aidietgenerator.entity.Recipe;
+import pjwstk.aidietgenerator.exception.ResourceNotFoundException;
+import pjwstk.aidietgenerator.repository.RecipeRepository;
 import pjwstk.aidietgenerator.request.CommentRequest;
 import pjwstk.aidietgenerator.request.PostRequest;
 import pjwstk.aidietgenerator.service.ForumService;
 import pjwstk.aidietgenerator.view.PostDetailedView;
 import pjwstk.aidietgenerator.view.PostSimplifiedView;
-import pjwstk.aidietgenerator.view.RecipeDetailedView;
 import pjwstk.aidietgenerator.view.RecipeSimplifiedView;
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
@@ -22,10 +23,12 @@ import java.util.List;
 public class ForumController {
 
     private final ForumService forumService;
+    private final RecipeRepository recipeRepository;
 
     @Autowired
-    public ForumController(ForumService forumService) {
+    public ForumController(ForumService forumService, RecipeRepository recipeRepository) {
         this.forumService = forumService;
+        this.recipeRepository = recipeRepository;
     }
 
     @GetMapping("/post")
@@ -95,11 +98,10 @@ public class ForumController {
     }
 
     @GetMapping("/recipe/{recipeID}")
-    public RecipeDetailedView viewDetailedRecipe(@PathVariable(value = "recipeID") long recipeID, HttpServletResponse response) {
-        return forumService.viewRecipe(recipeID, response);
+    public Recipe viewDetailedRecipe(@PathVariable(value = "recipeID") long recipeID) {
+        return recipeRepository.findById(recipeID)
+                .orElseThrow(() -> new ResourceNotFoundException("Recipe not found with id :" + recipeID));
     }
-
-
     @GetMapping("/recipe/like/{recipeID}")
     @Transactional
     public void likeMeal(@PathVariable(value = "recipeID") long recipeID, HttpServletResponse response) {
