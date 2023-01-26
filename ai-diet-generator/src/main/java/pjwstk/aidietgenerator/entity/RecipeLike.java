@@ -6,6 +6,7 @@ import com.sun.istack.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
@@ -26,12 +27,14 @@ public class RecipeLike {
     private Timestamp timestamp;
 
     @ManyToOne
+    @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
     @NotNull
     @JsonIgnore
     @JoinColumn(name = "recipe_id")
     private Recipe recipe;
 
     @ManyToOne
+    @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
     @NotNull
     @JoinColumn(name = "creator_id")
     @JsonIgnoreProperties({"password", "authorities", "username", "email", "enabled", "authority",

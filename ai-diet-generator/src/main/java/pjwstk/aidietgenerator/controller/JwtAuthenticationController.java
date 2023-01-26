@@ -32,6 +32,7 @@ public class JwtAuthenticationController {
         this.jwtInMemoryUserDetailsService = jwtInMemoryUserDetailsService;
     }
 
+    @CrossOrigin(exposedHeaders = "*")
     @PostMapping("/authenticate")
     public ResponseEntity<?> generateAuthenticationToken(@RequestBody JwtRequest authenticationRequest) throws Exception {
         authenticate(authenticationRequest.getEmail(), authenticationRequest.getPassword());

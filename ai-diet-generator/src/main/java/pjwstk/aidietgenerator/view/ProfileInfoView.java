@@ -2,9 +2,11 @@ package pjwstk.aidietgenerator.view;
 
 import pjwstk.aidietgenerator.entity.Gender;
 
+import java.util.List;
+
 public class ProfileInfoView {
     private Long id;
-    private String profilePicturePath;
+    private String profileImagePath;
     private String firstName;
     private String lastName;
     private String email;
@@ -14,6 +16,10 @@ public class ProfileInfoView {
     private Gender gender;
     private double BMI;
     private int kCal;
+    private Boolean completedSurvey;
+    private Boolean completedRatings;
+
+    List<String> authorities;
 
     public ProfileInfoView(){
 
@@ -28,9 +34,12 @@ public class ProfileInfoView {
                            int height,
                            Gender gender,
                            double BMI,
-                           int kCal) {
+                           int kCal,
+                           List<String> authorities,
+                           Boolean completedSurvey,
+                           Boolean completedRatings) {
         this.id = id;
-        this.profilePicturePath = profilePicturePath;
+        this.profileImagePath = profilePicturePath;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
@@ -40,6 +49,9 @@ public class ProfileInfoView {
         this.gender = gender;
         this.BMI = BMI;
         this.kCal = kCal;
+        this.authorities = authorities;
+        this.completedRatings = completedRatings;
+        this.completedSurvey = completedSurvey;
     }
 
     public Long getId() {
@@ -50,12 +62,12 @@ public class ProfileInfoView {
         this.id = id;
     }
 
-    public String getProfilePicturePath() {
-        return profilePicturePath;
+    public String getProfileImagePath() {
+        return profileImagePath;
     }
 
-    public void setProfilePicturePath(String profilePicturePath) {
-        this.profilePicturePath = profilePicturePath;
+    public void setProfileImagePath(String profileImagePath) {
+        this.profileImagePath = profileImagePath;
     }
 
     public String getFirstName() {
@@ -128,5 +140,29 @@ public class ProfileInfoView {
 
     public void setkCal(int kCal) {
         this.kCal = kCal;
+    }
+
+    public List<String> getAuthorities() {
+        return authorities;
+    }
+
+    public void setAuthorities(List<String> authorities) {
+        this.authorities = authorities;
+    }
+
+    public Boolean getCompletedSurvey() {
+        return completedSurvey;
+    }
+
+    public void setCompletedSurvey(Boolean completedSurvey) {
+        this.completedSurvey = completedSurvey;
+    }
+
+    public Boolean getCompletedRatings() {
+        return completedRatings;
+    }
+
+    public void setCompletedRatings(Boolean completedRatings) {
+        this.completedRatings = completedRatings;
     }
 }

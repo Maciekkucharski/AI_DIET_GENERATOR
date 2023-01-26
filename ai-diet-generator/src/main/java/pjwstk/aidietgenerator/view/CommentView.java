@@ -18,6 +18,5 @@ public class CommentView {
     private Timestamp timestamp;
     @JsonIgnoreProperties({"password", "authorities", "username", "email", "authority"})
     private User user;
-    // TODO
     private String userImagePath;
 }

@@ -9,6 +9,7 @@ import pjwstk.aidietgenerator.entity.User;
 import pjwstk.aidietgenerator.entity.UserStats;
 import pjwstk.aidietgenerator.exception.ResourceNotFoundException;
 import pjwstk.aidietgenerator.repository.UserStatsRepository;
+import pjwstk.aidietgenerator.request.ImagePathRequest;
 import pjwstk.aidietgenerator.request.UserStatsRequest;
 import pjwstk.aidietgenerator.service.UserDetailsService;
 import pjwstk.aidietgenerator.service.UserStatsService;
@@ -19,6 +20,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/account/stats")
+@CrossOrigin(exposedHeaders = "*")
 public class UserStatsController {
     private final UserStatsRepository userStatsRepository;
     private final UserDetailsService userDetailsService;
@@ -78,5 +80,10 @@ public class UserStatsController {
                 orElseThrow(() -> new ResourceNotFoundException("UserDetails not found with id :" + userDetailsId));
         userStatsRepository.delete(existingUserStats);
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/image")
+    public void setUserImage(@RequestBody ImagePathRequest request, HttpServletResponse response){
+        userStatsService.setUserImage(request, response);
     }
 }

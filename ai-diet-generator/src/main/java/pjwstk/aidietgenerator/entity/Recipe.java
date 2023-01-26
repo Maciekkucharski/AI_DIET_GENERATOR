@@ -1,10 +1,14 @@
 package pjwstk.aidietgenerator.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Cascade;
+
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.List;
 
 @Entity
 @Table(name = "recipes")
@@ -45,7 +49,7 @@ public class Recipe {
     private Integer readyInMinutes;
 
     @Column(name = "image")
-    private String image;
+    private String imagePath;
 
     @Column(name = "instructions")
     private String instructions;
@@ -84,10 +88,22 @@ public class Recipe {
     private Integer protein;
 
     @ManyToOne
+    @JsonIgnoreProperties({"email", "authority", "subscribed", "username"})
+    @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
     @JoinColumn(name = "user_id")
     private User user;
 
-    public Recipe(String title, Float saltiness, Float sourness, Float sweetness, Float bitterness, Float spiciness, Float fattiness, Integer servings, Integer readyInMinutes, String image, String instructions, Boolean vegetarian, Boolean vegan, Boolean glutenFree, Boolean dairyFree, Boolean veryHealthy, Boolean verified, Timestamp timestamp, Integer calories, Integer carbs, Integer fat, Integer protein, User user) {
+    @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Ingredient> recipesIngredients;
+
+    @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RecipeLike> recipeLikes;
+
+    @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RecipeComment>  recipeComments;
+
+    public Recipe(String title, Float saltiness, Float sourness, Float sweetness, Float bitterness, Float spiciness, Float fattiness, Integer servings, Integer readyInMinutes, String image, String instructions, Boolean vegetarian, Boolean vegan, Boolean glutenFree, Boolean dairyFree, Boolean veryHealthy, Boolean verified, Timestamp timestamp, Integer calories, Integer carbs, Integer fat, Integer protein, User user, List<Ingredient> ingredients, List<RecipeLike> recipeLikes, List<RecipeComment> recipeComments) {
+
         this.title = title;
         this.saltiness = saltiness;
         this.sourness = sourness;
@@ -97,7 +113,7 @@ public class Recipe {
         this.fattiness = fattiness;
         this.servings = servings;
         this.readyInMinutes = readyInMinutes;
-        this.image = image;
+        this.imagePath = image;
         this.instructions = instructions;
         this.vegetarian = vegetarian;
         this.vegan = vegan;
@@ -111,9 +127,19 @@ public class Recipe {
         this.fat = fat;
         this.protein = protein;
         this.user = user;
+        this.recipesIngredients = ingredients;
+        this.recipeLikes = recipeLikes;
+        this.recipeComments = recipeComments;
     }
 
     public void setCreatedAt(){
         this.timestamp = new Timestamp(System.currentTimeMillis());
+    }
+
+    public String getRecipeCreatorImage() {
+        if(user != null) {
+            return user.getImagePath();
+        }
+        return null;
     }
 }

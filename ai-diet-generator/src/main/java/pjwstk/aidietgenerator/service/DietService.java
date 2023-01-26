@@ -1,23 +1,53 @@
 package pjwstk.aidietgenerator.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import pjwstk.aidietgenerator.entity.DietGoal;
-import pjwstk.aidietgenerator.entity.Gender;
-import pjwstk.aidietgenerator.entity.PhysicalActivity;
+import pjwstk.aidietgenerator.entity.*;
+import pjwstk.aidietgenerator.repository.*;
+import pjwstk.aidietgenerator.request.DietRequest;
+import pjwstk.aidietgenerator.request.RecipeReplaceRequest;
 import pjwstk.aidietgenerator.service.Utils.ApiConstants;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 import static pjwstk.aidietgenerator.entity.Gender.FEMALE;
 import static pjwstk.aidietgenerator.entity.Gender.MALE;
 
 @Service
 public class DietService {
+
+    private int numberOfCalls = 0;
+    private final UserDetailsService userDetailsService;
+    private final ProductRepository productRepository;
+    private final ExcludedProductsListRepository excludedProductsListRepository;
+    private final DayDietRepository dayDietRepository;
+    private final WeekDietRepository weekDietRepository;
+    private final UserStatsRepository userStatsRepository;
+    private final RecipeRepository recipeRepository;
+    private final IngredientRepository ingredientRepository;
+
+    @Autowired
+    public DietService(UserDetailsService userDetailsService, ProductRepository productRepository, ExcludedProductsListRepository excludedProductsListRepository,
+                       DayDietRepository dayDietRepository, WeekDietRepository weekDietRepository, UserStatsRepository userStatsRepository, RecipeRepository recipeRepository,
+                       IngredientRepository ingredientRepository){
+        this.userDetailsService = userDetailsService;
+        this.productRepository = productRepository;
+        this.excludedProductsListRepository = excludedProductsListRepository;
+        this.dayDietRepository = dayDietRepository;
+        this.weekDietRepository = weekDietRepository;
+        this.userStatsRepository = userStatsRepository;
+        this.recipeRepository = recipeRepository;
+        this.ingredientRepository = ingredientRepository;
+    }
 
 //    Harris-Benedict Formula
     public double dailyBMR(double bodyWeight, int bodyHeight, int age, Gender gender, PhysicalActivity physicalActivity){
@@ -34,7 +64,7 @@ public class DietService {
         double kcalIntake = bmr;
 
         switch(dietGoal){
-            case LOOSE:
+            case LOSE:
                 kcalIntake = bmr - 500;
                 if(kcalIntake <= 1200 && gender == FEMALE){
                     kcalIntake = 1200;
@@ -60,7 +90,7 @@ public class DietService {
         return kcalIntake;
     }
 
-    public String[] getRecommendedIds(Long UserId) throws IOException {
+    public List<Long> getRecommendedIds(Long UserId, Double threshold) throws IOException {
         URL url = new URL (ApiConstants.GENERATOR);
         HttpURLConnection con = (HttpURLConnection)url.openConnection();
         con.setRequestMethod("POST");
@@ -68,56 +98,657 @@ public class DietService {
         con.setRequestProperty("Accept", "application/json");
         con.setDoOutput(true);
         String jsonInputString = "{\"user_id\": " + UserId.toString() + ", " +
-                "\"items_to_recommend\": 50}";
+                "\"correlation_threshold\": " + threshold + "}";
+
+        List<Long> recommendedIds = new ArrayList<>();
 
 
         try(OutputStream os = con.getOutputStream()) {
-            byte[] input = jsonInputString.getBytes("utf-8");
+            byte[] input = jsonInputString.getBytes(StandardCharsets.UTF_8);
             os.write(input, 0, input.length);
         }
 
         try(BufferedReader br = new BufferedReader(
-                new InputStreamReader(con.getInputStream(), "utf-8"))) {
+                new InputStreamReader(con.getInputStream(), StandardCharsets.UTF_8))) {
             StringBuilder response = new StringBuilder();
             String responseLine = null;
             while ((responseLine = br.readLine()) != null) {
                 response.append(responseLine.trim());
             }
-            String[] recommendedIds = response.substring(1, response.length() - 1).split(",");
+            String[] idList = response.substring(1, response.length() - 1).split(",");
+
+            for(String id : idList){
+                if(!id.isEmpty()) {
+                    recommendedIds.add(Long.valueOf(id));
+                }
+            }
 
             return recommendedIds;
         }
     }
 
-    public String[] getRecommendedReplacementIds(Long RecipeId) throws IOException {
+    public List<Long> getRecommendedReplacementIds(Long recipeId, Double threshold) throws IOException {
         URL url = new URL (ApiConstants.REPLACER);
         HttpURLConnection con = (HttpURLConnection)url.openConnection();
         con.setRequestMethod("POST");
         con.setRequestProperty("Content-Type", "application/json");
         con.setRequestProperty("Accept", "application/json");
         con.setDoOutput(true);
-        String jsonInputString = "{\"dish_id\": " + RecipeId + ", " +
-                "\"items_to_recommend\": 10}";
+        String jsonInputString = "{\"dish_id\": " + recipeId + ", " +
+                "\"correlation_threshold\": " + threshold + "}";
 
+        List<Long> replacementsIds = new ArrayList<>();
 
         try(OutputStream os = con.getOutputStream()) {
-            byte[] input = jsonInputString.getBytes("utf-8");
+            byte[] input = jsonInputString.getBytes(StandardCharsets.UTF_8);
             os.write(input, 0, input.length);
         }
 
         try(BufferedReader br = new BufferedReader(
-                new InputStreamReader(con.getInputStream(), "utf-8"))) {
+                new InputStreamReader(con.getInputStream(), StandardCharsets.UTF_8))) {
             StringBuilder response = new StringBuilder();
             String responseLine = null;
             while ((responseLine = br.readLine()) != null) {
                 response.append(responseLine.trim());
             }
 
-            String[] recommendedReplaceIds = response.substring(1, response.length() - 1).split(",");
+            String[] idList = response.substring(1, response.length() - 1).split(",");
 
-            return recommendedReplaceIds;
+            for(String id : idList){
+                if(!id.isEmpty()) {
+                    replacementsIds.add(Long.valueOf(id));
+                }
+            }
+
+            return replacementsIds;
         }
     }
 
-//    TODO
+    public ExcludedProductsList setExcludedProducts(HttpServletResponse response, List<Long> productIds){
+        User currentUser = userDetailsService.findCurrentUser();
+        if (currentUser == null) {
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            return null;
+        } else {
+            ExcludedProductsList excludedProductsList = excludedProductsListRepository.findByuser(currentUser);
+            List<Product> listOfProducts = productRepository.findAllById(productIds);
+
+            if(excludedProductsList == null) {
+                excludedProductsList = new ExcludedProductsList(listOfProducts, currentUser);
+            } else {
+                excludedProductsList.setListOfExcludedProducts(listOfProducts);
+            }
+
+            excludedProductsListRepository.save(excludedProductsList);
+            response.setStatus(HttpStatus.CREATED.value());
+
+            return excludedProductsList;
+        }
+    }
+
+    public Recipe getClosestRecipeToCaloriesNeed(List<Long> recipesIds, int mealsLeft, double remainingCalories, double accuracy){
+        Recipe closestRecipe = new Recipe();
+        double caloriesForAMeal = remainingCalories/mealsLeft;
+        double closestCaloriesDif = Double.POSITIVE_INFINITY;
+
+        for(Long recipeId : recipesIds){
+            Recipe currentRecipe = recipeRepository.findById(recipeId).get();
+            if(currentRecipe != null){
+                int currentRecipeCalories = currentRecipe.getCalories();
+                double caloriesDifference = Math.abs(caloriesForAMeal-currentRecipeCalories);
+
+                if(caloriesDifference < closestCaloriesDif){
+                    closestCaloriesDif = caloriesDifference;
+                    closestRecipe = currentRecipe;
+                }
+            }
+        }
+
+        if(closestRecipe.getCalories() != null) {
+            if (closestRecipe.getCalories() / caloriesForAMeal > 1 + accuracy || closestRecipe.getCalories() / caloriesForAMeal < 1 - accuracy) {
+                if (accuracy < 0.3) {
+                    return getClosestRecipeToCaloriesNeed(recipesIds, mealsLeft, remainingCalories, accuracy + 0.01);
+                } else {
+                    return null;
+                }
+            }
+        } else {
+            return null;
+        }
+        return closestRecipe;
+    }
+    public Recipe findRecipeWithLeastCalories(List<Long> recipeIds){
+        Recipe leastCalRecipe = new Recipe();
+        Double leastCal = Double.POSITIVE_INFINITY;
+
+        for(Long id : recipeIds){
+            Recipe currentRecipe = recipeRepository.findById(id).get();
+            if(currentRecipe != null){
+                if(currentRecipe.getCalories() < leastCal){
+                    leastCalRecipe = currentRecipe;
+                    leastCal = (double) currentRecipe.getCalories();
+                }
+            }
+        }
+        return leastCalRecipe;
+    }
+
+    public Recipe getExpandedSearchClosestRecipeToCaloriesNeed(List<Long> recipesListIds, int mealsLeft, double remainingCalories, double accuracy){
+        Recipe recommendedRecipe = getClosestRecipeToCaloriesNeed(recipesListIds, mealsLeft, remainingCalories * (1 + 0.2 * mealsLeft), accuracy);
+        if(recommendedRecipe == null){
+            recommendedRecipe = getClosestRecipeToCaloriesNeed(recipesListIds, mealsLeft, remainingCalories * (1 - 0.2 * mealsLeft), accuracy);
+        }
+
+        return recommendedRecipe;
+    }
+
+//    10-30% carbs, 30-40% fats, 40-50% protein lose weight
+//    45-65% carbs, 20-35% fats, 10-35% protein maintain
+//    50-60% carbs, 20-30% fats, 20% protein weight gain
+//    30-40% carbs, 30-40% fats, 30-40% protein muscle gain
+    public Boolean doRecipesFillMacroRequirements(List<Recipe> recipes, DietGoal dietGoal){
+        double todayProtein = 0;
+        double todayFat = 0;
+        double todayCarbs = 0;
+
+        for(Recipe recipe : recipes){
+            todayProtein += recipe.getProtein();
+            todayFat += recipe.getFat();
+            todayCarbs += recipe.getCarbs();
+        }
+
+        double todayMacro = todayProtein + todayFat + todayCarbs;
+        double carbsRatio = todayCarbs/todayMacro * 100;
+        double fatRatio = todayFat/todayMacro * 100;
+        double proteinRatio = todayProtein/todayMacro * 100;
+
+        switch (dietGoal){
+            case LOSE:
+                if(carbsRatio < 10 || carbsRatio > 30){
+                    return false;
+                }
+                if(fatRatio < 30 || fatRatio > 40) {
+                    return false;
+                }
+                if(proteinRatio < 40 || proteinRatio > 50) {
+                    return false;
+                }
+                break;
+            case MAINTAIN:
+                if(carbsRatio < 45 || carbsRatio > 65){
+                    return false;
+                }
+                if(fatRatio < 20 || fatRatio > 35) {
+                    return false;
+                }
+                if(proteinRatio < 10 || proteinRatio > 35) {
+                    return false;
+                }
+                break;
+            case GAIN:
+                if(carbsRatio < 50 || carbsRatio > 60){
+                    return false;
+                }
+                if(fatRatio < 20 || fatRatio > 30) {
+                    return false;
+                }
+                if(proteinRatio < 15 || proteinRatio > 25){
+                    return false;
+                }
+                break;
+            case MUSCLE:
+                if(carbsRatio < 30 || carbsRatio > 40){
+                    return false;
+                }
+                if(fatRatio < 30 || fatRatio > 40) {
+                    return false;
+                }
+                if(proteinRatio < 30 || proteinRatio > 40) {
+                    return false;
+                }
+                break;
+        }
+        return true;
+    }
+    public DietDay generateDietForDay(List<Long> startingRecommendedRecipesIds, double caloriesPerDay, int mealsPerDay, List<Long> startingUsedRecipesIds, DietGoal dietGoal){
+
+        DietDay dietDay = new DietDay();
+        double remainingCalories = caloriesPerDay;
+        List<Recipe> recipesToday = new ArrayList<>();
+
+        List<Long> recommendedRecipesIds = new ArrayList<>(startingRecommendedRecipesIds);
+        List<Long> usedRecipesIds = new ArrayList<>(startingUsedRecipesIds);
+
+        List<Long> allRecipeIds = new ArrayList<>();
+        allRecipeIds.addAll(recommendedRecipesIds);
+        allRecipeIds.addAll(usedRecipesIds);
+        boolean firstRecipe = true;
+        int firstRecipeIndex = 0;
+
+        for(int mealsLeft = mealsPerDay; mealsLeft>0;) {
+            Recipe recommendedRecipe = null;
+
+            if(firstRecipe){
+                dietDay = new DietDay();
+                recommendedRecipe = recipeRepository.findById(allRecipeIds.get(firstRecipeIndex)).get();
+                remainingCalories = caloriesPerDay;
+                mealsLeft = mealsPerDay;
+                firstRecipe = false;
+                recipesToday.clear();
+
+            } else {
+                recommendedRecipe = getClosestRecipeToCaloriesNeed(recommendedRecipesIds, mealsLeft, remainingCalories, 0.01);
+                if (recommendedRecipe == null) {
+                    if (!recommendedRecipesIds.isEmpty()) {
+                        if (mealsLeft > 1) {
+                            recommendedRecipe = getExpandedSearchClosestRecipeToCaloriesNeed(recommendedRecipesIds, mealsLeft, remainingCalories, 0.01);
+                        }
+                    }
+                }
+
+                if (recommendedRecipe == null) {
+                    if (!usedRecipesIds.isEmpty()) {
+                        recommendedRecipe = getClosestRecipeToCaloriesNeed(usedRecipesIds, mealsLeft, remainingCalories, 0.01);
+                        if (recommendedRecipe == null) {
+                            if (mealsLeft > 1) {
+                                recommendedRecipe = getExpandedSearchClosestRecipeToCaloriesNeed(usedRecipesIds, mealsLeft, remainingCalories, 0.01);
+                            }
+                        }
+                    }
+                }
+            }
+
+            if(recommendedRecipe != null) {
+                if(!recipesToday.contains(recommendedRecipe)) {
+                    recipesToday.add(recommendedRecipe);
+
+                    remainingCalories -= recommendedRecipe.getCalories();
+                    mealsLeft--;
+
+                    if (remainingCalories <= 0) {
+                        List<Long> allRecommendedRecipes = new ArrayList<>();
+                        allRecommendedRecipes.addAll(recommendedRecipesIds);
+                        allRecommendedRecipes.addAll(usedRecipesIds);
+
+                        remainingCalories = findRecipeWithLeastCalories(allRecommendedRecipes).getCalories();
+                    }
+
+                    if(mealsLeft == 0) {
+                        if(!doRecipesFillMacroRequirements(recipesToday, dietGoal)){
+                            firstRecipeIndex += 1;
+                            firstRecipe = true;
+                            mealsLeft = mealsPerDay;
+                            if(firstRecipeIndex >= allRecipeIds.size()-1) {
+                                return null;
+                            }
+                        }
+                    }
+                } else {
+                    usedRecipesIds.remove(recommendedRecipe.getId());
+                    recommendedRecipesIds.remove(recommendedRecipe.getId());
+                }
+            } else {
+                firstRecipeIndex += 1;
+                firstRecipe = true;
+                if(firstRecipeIndex >= allRecipeIds.size()-1){
+                    return null;
+                }
+            }
+        }
+        dietDay.setRecipesForToday(recipesToday);
+        System.out.println("IM A GOOD DAY");
+        return dietDay;
+    }
+    public Boolean doesRecipeHaveExcludedProduct(Recipe recipe, List<Product> excludedProducts){
+        List<Ingredient> currentRecipeIngredients = ingredientRepository.findByrecipe(recipe);
+
+        for(Product excludedProduct : excludedProducts) {
+            String currentProductName = excludedProduct.getName();
+            for (Ingredient currentIngredient : currentRecipeIngredients) {
+                if (currentProductName.equals(currentIngredient.getName())) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public Boolean doesRecipeMissRequirement(Recipe recipe, Boolean vegetarian, Boolean vegan, Boolean glutenFree, Boolean dairyFree, Boolean veryHealthy, Boolean verified){
+        if(vegetarian != null){
+            if(vegetarian){
+                if(recipe.getVegetarian() != null) {
+                    if (!recipe.getVegetarian()) return true;
+                } else {
+                    return true;
+                }
+            }
+        }
+        if(vegan != null){
+            if(vegan){
+                if(recipe.getVegan() != null) {
+                    if (!recipe.getVegan()) return true;
+                } else {
+                    return true;
+                }
+            }
+        }
+        if(glutenFree != null){
+            if(glutenFree){
+                if(recipe.getGlutenFree() != null) {
+                    if (!recipe.getGlutenFree()) return true;
+                } else {
+                    return true;
+                }
+            }
+        }
+        if(dairyFree != null){
+            if(dairyFree){
+                if(recipe.getDairyFree() != null) {
+                    if (!recipe.getDairyFree()) return true;
+                } else {
+                    return true;
+                }
+            }
+        }
+        if(veryHealthy != null){
+            if(veryHealthy){
+                if(recipe.getVeryHealthy() != null) {
+                    if (!recipe.getVeryHealthy()) return true;
+                } else {
+                    return true;
+                }
+            }
+        }
+        if(verified != null){
+            if(verified){
+                if(recipe.getVerified() != null) {
+                    if (!recipe.getVerified()) return true;
+                } else {
+                    return true;
+                }
+            }
+        }
+
+        if(recipe.getCalories() == null) return true;
+
+        return false;
+    }
+
+    public Long replaceRecipe(Long recipeToReplaceId, List<Product> excludedProductsList,
+                              Boolean vegetarian, Boolean vegan, Boolean glutenFree, Boolean dairyFree, Boolean veryHealthy, Boolean verified,
+                              double threshold) throws IOException {
+
+        boolean replaced = false;
+        Long returnId = null;
+
+        if(threshold < 0) {
+            return returnId;
+        }
+
+        List<Long> replacementIds = getRecommendedReplacementIds(recipeToReplaceId, threshold);
+
+        for(Long replacementId : replacementIds){
+            Optional<Recipe> suggestedRecipe = recipeRepository.findById(replacementId);
+
+
+            if(doesRecipeMissRequirement(suggestedRecipe.get(), vegetarian, vegan, glutenFree, dairyFree, veryHealthy, verified)) continue;
+            if(doesRecipeHaveExcludedProduct(suggestedRecipe.get(), excludedProductsList)) continue;
+
+            replaced = true;
+            returnId = replacementId;
+
+            if(replaced){
+                break;
+            }
+        }
+
+        return replaced ? returnId : replaceRecipe(recipeToReplaceId, excludedProductsList, vegetarian, vegan, glutenFree, dairyFree, veryHealthy, verified, threshold-0.1);
+    }
+
+    public DietWeek replaceRecipeFromADay(RecipeReplaceRequest recipeReplaceRequest, HttpServletResponse response) throws IOException {
+        User currentUser = userDetailsService.findCurrentUser();
+        if(currentUser != null) {
+            Optional<DietDay> dayToChange = dayDietRepository.findById(recipeReplaceRequest.getDayDietId());
+            DietWeek dietToChange = weekDietRepository.findByuser(currentUser);
+            if(dietToChange != null) {
+                if (dayToChange != null) {
+                    Long recipeToReplaceId = recipeReplaceRequest.getRecipeToReplaceId();
+                    Optional<Recipe> recipeToReplace = recipeRepository.findById(recipeToReplaceId);
+                    boolean changed = false;
+
+                    if (recipeToReplaceId != null) {
+                        if(recipeToReplace != null) {
+                            List<Recipe> allRecipes = recipeRepository.findAll();
+                            allRecipes.remove(recipeToReplace);
+                            int currentRecipeIndex = 0;
+
+                            while (!changed) {
+                                Recipe suggestedRecipe = allRecipes.get(currentRecipeIndex);
+                                if(doesRecipeHaveExcludedProduct(suggestedRecipe, recipeReplaceRequest.getExcludedProductsList())){
+                                    currentRecipeIndex++;
+                                    if(currentRecipeIndex >= allRecipes.size()){
+                                        response.setStatus(HttpStatus.NO_CONTENT.value());
+                                        return dietToChange;
+                                    }
+                                    continue;
+                                }
+                                if(doesRecipeMissRequirement(suggestedRecipe, recipeReplaceRequest.getVegetarian(), recipeReplaceRequest.getVegan(), recipeReplaceRequest.getGlutenFree(),
+                                        recipeReplaceRequest.getDairyFree(), recipeReplaceRequest.getVeryHealthy(), recipeReplaceRequest.getVerified())){
+                                    currentRecipeIndex++;
+                                    if(currentRecipeIndex >= allRecipes.size()){
+                                        response.setStatus(HttpStatus.NO_CONTENT.value());
+                                        return dietToChange;
+                                    }
+                                    continue;
+                                }
+
+                                if (suggestedRecipe != null) {
+                                    Integer oldRecipeCalories = recipeToReplace.get().getCalories();
+                                    Integer suggestedRecipeCalories = suggestedRecipe.getCalories();
+                                    if (oldRecipeCalories != null && suggestedRecipeCalories != null) {
+                                        int caloriesDifference = Math.abs(oldRecipeCalories - suggestedRecipeCalories);
+                                        if(caloriesDifference < 100){
+                                            List<Recipe> daysRecipes = dayToChange.get().getRecipesForToday();
+                                            daysRecipes.remove(recipeToReplace.get());
+                                            daysRecipes.add(suggestedRecipe);
+                                            dayToChange.get().setRecipesForToday(daysRecipes);
+                                            dayDietRepository.save(dayToChange.get());
+                                            weekDietRepository.save(dietToChange);
+                                            changed = true;
+                                        }
+                                    }
+                                }
+                                currentRecipeIndex++;
+                                if(currentRecipeIndex >= allRecipes.size()){
+                                    response.setStatus(HttpStatus.NO_CONTENT.value());
+                                    return dietToChange;
+                                }
+                            }
+                            response.setStatus(HttpStatus.OK.value());
+                            return dietToChange;
+                        } else {
+                            response.setStatus(HttpStatus.NO_CONTENT.value());
+                            return dietToChange;
+                        }
+                    } else {
+                        response.setStatus(HttpStatus.BAD_REQUEST.value());
+                        return dietToChange;
+                    }
+                } else {
+                    response.setStatus(HttpStatus.BAD_REQUEST.value());
+                    return dietToChange;
+                }
+            } else {
+                response.setStatus(HttpStatus.NO_CONTENT.value());
+                return null;
+            }
+        } else {
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            return null;
+        }
+    }
+    public List<Long> replaceRemovedRecipes(List<Long> removedRecipesIds, List<Product> excludedProductsList,
+                                            Boolean vegetarian, Boolean vegan, Boolean glutenFree, Boolean dairyFree, Boolean veryHealthy, Boolean verified) throws IOException {
+        List<Long> replacementRecipesIds = new ArrayList<>();
+        double threshold = 0.7;
+
+//        TO AVOID 502 RESPONSE FROM MACIEK'S API :)
+
+        for(Long removedRecipeId : removedRecipesIds){
+            numberOfCalls++;
+            System.out.println(numberOfCalls);
+            Long substituteRecipeId = replaceRecipe(removedRecipeId, excludedProductsList, vegetarian, vegan, glutenFree, dairyFree, veryHealthy, verified, threshold);
+
+            if(substituteRecipeId != null){
+                replacementRecipesIds.add(substituteRecipeId);
+            }
+        }
+
+        return replacementRecipesIds;
+    }
+    public List<Long> getFilteredRecommendedIds(List<Long> recommendedIds, List<Product> excludedProductsList,
+                                                Boolean vegetarian, Boolean vegan, Boolean glutenFree, Boolean dairyFree, Boolean veryHealthy, Boolean verified) throws IOException {
+        List<Recipe> recommendedRecipes = recipeRepository.findAllById(recommendedIds);
+        List<Long> removedIds = new ArrayList<>();
+
+        for(Recipe currentRecipe : recommendedRecipes){
+            if(doesRecipeMissRequirement(currentRecipe, vegetarian, vegan, glutenFree, dairyFree, veryHealthy, verified)){
+                removedIds.add(currentRecipe.getId());
+                continue;
+            }
+            if(doesRecipeHaveExcludedProduct(currentRecipe, excludedProductsList)){
+                removedIds.add(currentRecipe.getId());
+            }
+        }
+
+        recommendedIds.removeAll(removedIds);
+
+        List<Long> substitutesForRemovedIds = replaceRemovedRecipes(removedIds, excludedProductsList, vegetarian, vegan, glutenFree, dairyFree, veryHealthy, verified);
+        recommendedIds.addAll(substitutesForRemovedIds);
+
+        return recommendedIds;
+    }
+    public DietWeek generateDiet(DietRequest dietRequest, HttpServletResponse response) throws IOException {
+        User currentUser = userDetailsService.findCurrentUser();
+
+        PhysicalActivity physicalActivity = dietRequest.getPhysicalActivity();
+        DietGoal dietGoal = dietRequest.getDietGoal();
+        List<Product> excludedProductsList = new ArrayList<>();
+        if(dietRequest.getExcludedProductsList() != null) {
+            excludedProductsList = dietRequest.getExcludedProductsList();
+        }
+        int mealsPerDay = dietRequest.getMealsPerDay();
+
+        if(currentUser != null) {
+            List<UserStats> currentUserStatsHistory = userStatsRepository.findByuser(currentUser);
+
+            DietWeek currentUserDiet = weekDietRepository.findByuser(currentUser);
+
+            if (currentUserDiet == null) {
+                currentUserDiet = new DietWeek();
+                currentUserDiet.setUser(currentUser);
+            }
+
+            if(!currentUserStatsHistory.isEmpty()) {
+                UserStats lastUserStats = currentUserStatsHistory.get(currentUserStatsHistory.size() - 1);
+
+                double currentUserWeight = lastUserStats.getWeight();
+                int currentUserHeight = lastUserStats.getHeight();
+                int currentUserAge = lastUserStats.getAge();
+                Gender currentUserGender = lastUserStats.getGender();
+
+                if(currentUserWeight !=0 && currentUserHeight !=0 && currentUserAge !=0 && currentUserGender != null) {
+                    if(mealsPerDay >= 3 && mealsPerDay <= 5) {
+                        double caloriesPerDay = goalCalories(currentUserWeight, currentUserHeight, currentUserAge, currentUserGender, physicalActivity, dietGoal);
+                        lastUserStats.setCal((int) caloriesPerDay);
+                        List<Long> recommendedRecipesIds = getRecommendedIds(currentUser.getId(), dietRequest.getThreshold());
+                        recommendedRecipesIds = getFilteredRecommendedIds(recommendedRecipesIds, excludedProductsList,
+                                dietRequest.getVegetarian(), dietRequest.getVegan(), dietRequest.getGlutenFree(),
+                                dietRequest.getDairyFree(), dietRequest.getVeryHealthy(), dietRequest.getVerified());
+
+                        if (recommendedRecipesIds.isEmpty()) {
+                            response.setStatus(HttpStatus.NO_CONTENT.value());
+                            return null;
+                        }
+
+                        List<DietDay> dietWeek = new ArrayList<>();
+                        List<Long> usedRecipesIds = new ArrayList<>();
+
+                        for (int i = 0; i < 7; i++) {
+                            DietDay dietDay = generateDietForDay(recommendedRecipesIds, caloriesPerDay, mealsPerDay, usedRecipesIds, dietGoal);
+                            if (dietDay == null) {
+                                dietRequest.setThreshold(dietRequest.getThreshold() - 0.05);
+                                if (dietRequest.getThreshold() < 0.6) {
+                                    response.setStatus(HttpStatus.NO_CONTENT.value());
+                                    return null;
+                                }
+                                if (!dietWeek.isEmpty() && dietRequest.getThreshold() <= 0.70) {
+                                    List<DietDay> alreadyAddedDays = dietWeek;
+                                    for (; i < 7; i++) {
+
+                                        DietDay alreadyUsedDietDay = alreadyAddedDays.get((int) (Math.random() * (alreadyAddedDays.size() - 1)));
+
+                                        List<DietWeek> dietWeeks = new ArrayList<>();
+                                        if(alreadyUsedDietDay.getDietWeek() != null) {
+                                            dietWeeks = alreadyUsedDietDay.getDietWeek();
+                                        }
+                                        dietWeeks.add(currentUserDiet);
+                                        alreadyUsedDietDay.setDietWeek(dietWeeks);
+
+                                        dayDietRepository.save(alreadyUsedDietDay);
+                                        dietWeek.add(alreadyUsedDietDay);
+                                    }
+
+                                    currentUserDiet.setDaysForWeekDiet(dietWeek);
+                                    currentUserDiet.setCreatedAt();
+                                    response.setStatus(HttpStatus.CREATED.value());
+                                    return weekDietRepository.save(currentUserDiet);
+                                } else {
+                                    return generateDiet(dietRequest, response);
+                                }
+                            }
+                            for (Long todaysRecipeId : dietDay.getTodaysRecipesIds()) {
+                                recommendedRecipesIds.remove(todaysRecipeId);
+                                if (!usedRecipesIds.contains(todaysRecipeId)) {
+                                    usedRecipesIds.add(todaysRecipeId);
+                                }
+                            }
+
+                            List<DietWeek> dietWeeks = new ArrayList<>();
+                            if(dietDay.getDietWeek() != null) {
+                                dietWeeks = dietDay.getDietWeek();
+                            }
+
+                            dietWeeks.add(currentUserDiet);
+                            dietDay.setDietWeek(dietWeeks);
+
+                            dayDietRepository.save(dietDay);
+                            dietWeek.add(dietDay);
+                        }
+                        currentUserDiet.setDaysForWeekDiet(dietWeek);
+                        currentUserDiet.setCreatedAt();
+
+                        response.setStatus(HttpStatus.CREATED.value());
+                        currentUserDiet.setDietGoal(dietGoal);
+                        currentUserDiet.setStartingWeight(lastUserStats.getWeight());
+
+                        return weekDietRepository.save(currentUserDiet);
+                    } else {
+                        response.setStatus(HttpStatus.BAD_REQUEST.value());
+                        return null;
+                    }
+
+                } else {
+                    response.setStatus(HttpStatus.BAD_REQUEST.value());
+                    return null;
+                }
+            } else {
+                response.setStatus(HttpStatus.BAD_REQUEST.value());
+                return null;
+            }
+        } else {
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            return null;
+        }
+    }
 }

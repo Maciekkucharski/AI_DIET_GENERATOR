@@ -2,6 +2,7 @@ package pjwstk.aidietgenerator.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import pjwstk.aidietgenerator.entity.*;
 import pjwstk.aidietgenerator.exception.ResourceNotFoundException;
@@ -10,6 +11,7 @@ import pjwstk.aidietgenerator.request.CommentRequest;
 import pjwstk.aidietgenerator.request.PostRequest;
 import pjwstk.aidietgenerator.view.*;
 
+import javax.persistence.NoResultException;
 import javax.servlet.http.HttpServletResponse;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -29,6 +31,8 @@ public class ForumService {
     private final RecipeLikesRepository recipeLikesRepository;
     private final RecipeCommentsRepository recipeCommentsRepository;
     private final RecipeService recipeService;
+    private final FollowRepository followRepository;
+    private final IngredientRepository ingredientRepository;
 
     @Autowired
     public ForumService(PostRepository postRepository,
@@ -39,7 +43,9 @@ public class ForumService {
                         RecipeRepository recipeRepository,
                         RecipeLikesRepository recipeLikesRepository,
                         RecipeCommentsRepository recipeCommentsRepository,
-                        RecipeService recipeService) {
+                        RecipeService recipeService,
+                        FollowRepository followRepository,
+                        IngredientRepository ingredientRepository) {
         this.postRepository = postRepository;
         this.userDetailsService = userDetailsService;
         this.userRepository = userRepository;
@@ -49,10 +55,18 @@ public class ForumService {
         this.recipeLikesRepository = recipeLikesRepository;
         this.recipeCommentsRepository = recipeCommentsRepository;
         this.recipeService = recipeService;
+        this.followRepository = followRepository;
+        this.ingredientRepository = ingredientRepository;
     }
 
-    public List<PostSimplifiedView> findAllSimplifiedPosts(HttpServletResponse response) {
+    public List<List<PostSimplifiedView>> findAllSimplifiedPosts(HttpServletResponse response) {
+        User currentUser = userDetailsService.findCurrentUser();
         List<PostSimplifiedView> postSimplifiedViewList = new ArrayList<>();
+        List<PostSimplifiedView> followingPostList = new ArrayList<>();
+        List<Follow> followList = new ArrayList<>();
+        if(currentUser != null) {
+            followList = followRepository.findByFollower(currentUser);
+        }
         List<Post> allPosts = postRepository.findAll();
         if (allPosts.isEmpty()) {
             response.setStatus(HttpStatus.NOT_FOUND.value());
@@ -67,10 +81,24 @@ public class ForumService {
                 postSimplifiedView.setCommentsCount(postCommentsRepository.findBypost(post).size());
                 postSimplifiedView.setLikesCount(postLikesRepository.findBypost(post).size());
                 postSimplifiedView.setTitle(post.getTitle());
-                postSimplifiedViewList.add(postSimplifiedView);
+                postSimplifiedView.setUserProfilePicture(post.getUser().getImagePath());
+                if(currentUser != null){
+                    for(Follow follow : followList){
+                        if(post.getUser() == follow.getUser()) {
+                            followingPostList.add(postSimplifiedView);
+                        }
+                    }
+                    postSimplifiedViewList.add(postSimplifiedView);
+                } else {
+                    postSimplifiedViewList.add(postSimplifiedView);
+                }
             }
+            List<List<PostSimplifiedView>> listOfListsToReturn = new ArrayList<>();
+            postSimplifiedViewList.removeAll(followingPostList);
+            listOfListsToReturn.add(followingPostList);
+            listOfListsToReturn.add(postSimplifiedViewList);
             response.setStatus(HttpStatus.OK.value());
-            return postSimplifiedViewList;
+            return listOfListsToReturn;
         }
     }
 
@@ -81,13 +109,13 @@ public class ForumService {
             return null;
         } else {
             List<CommentView> postCommentsView = new ArrayList<>();
-            for (PostComment comment : postCommentsRepository.findBypost(post.get())){
+            for (PostComment comment : postCommentsRepository.findBypost(post.get())) {
                 CommentView newCommentView = new CommentView(
                         comment.getId(),
                         comment.getContent(),
                         comment.getTimestamp(),
                         comment.getUser(),
-                        "TODO" // TODO
+                        comment.getUser().getImagePath()
                 );
                 postCommentsView.add(newCommentView);
             }
@@ -99,28 +127,55 @@ public class ForumService {
                     post.get().getTimestamp(),
                     post.get().getImagePath(),
                     post.get().getUser(),
-                    "ImagePath TODO",
+                    post.get().getUser().getImagePath(),
                     postCommentsView,
                     likes);
         }
     }
 
-    public void createPost(PostRequest post, HttpServletResponse response) {
+    public PostDetailedView viewPostByPost(Post post) {
+            List<CommentView> postCommentsView = new ArrayList<>();
+            for (PostComment comment : postCommentsRepository.findBypost(post)) {
+                CommentView newCommentView = new CommentView(
+                        comment.getId(),
+                        comment.getContent(),
+                        comment.getTimestamp(),
+                        comment.getUser(),
+                        comment.getUser().getImagePath()
+                );
+                postCommentsView.add(newCommentView);
+            }
+            List<PostLike> likes = postLikesRepository.findBypost(post);
+            return new PostDetailedView(post.getId(),
+                    post.getTitle(),
+                    post.getDescription(),
+                    post.getTimestamp(),
+                    post.getImagePath(),
+                    post.getUser(),
+                    post.getUser().getImagePath(),
+                    postCommentsView,
+                    likes);
+
+    }
+
+    public Post createPost(PostRequest post, HttpServletResponse response) {
         User currentUser = userDetailsService.findCurrentUser();
         if (currentUser == null) {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            return null;
         } else {
             if (post.getDescription() == null || post.getTitle() == null) {
                 response.setStatus(HttpStatus.BAD_REQUEST.value());
+                return null;
             } else {
                 Post newPost = new Post();
                 newPost.setTitle(post.getTitle());
-                newPost.setImagePath(post.getImage_path());
+                newPost.setImagePath(post.getImagePath());
                 newPost.setUser(currentUser);
                 newPost.setCreatedAt();
                 newPost.setDescription(post.getDescription());
-                postRepository.save(newPost);
                 response.setStatus(HttpStatus.CREATED.value());
+                return postRepository.save(newPost);
             }
         }
     }
@@ -157,7 +212,7 @@ public class ForumService {
         if (currentUser == existingPost.getUser()) {
             if (post.getTitle() != null) existingPost.setTitle(post.getTitle());
             if (post.getDescription() != null) existingPost.setDescription(post.getDescription());
-            if (post.getImage_path() != null) existingPost.setImagePath(post.getImage_path());
+            if (post.getImagePath() != null) existingPost.setImagePath(post.getImagePath());
             postRepository.save(existingPost);
             response.setStatus(HttpStatus.OK.value());
         } else {
@@ -165,7 +220,7 @@ public class ForumService {
         }
     }
 
-    public void likePost(long postId, HttpServletResponse response) {
+    public Boolean likePost(long postId, HttpServletResponse response) {
         Post existingPost = postRepository.findById(postId)
                 .orElseThrow(() -> new ResourceNotFoundException("Post not found with id :" + postId));
         User currentUser = userDetailsService.findCurrentUser();
@@ -174,6 +229,7 @@ public class ForumService {
             if (existingLike != null) {
                 postLikesRepository.delete(existingLike);
                 response.setStatus(HttpStatus.OK.value());
+                return false;
             } else {
                 PostLike newLike = new PostLike();
                 newLike.setPost(existingPost);
@@ -181,13 +237,15 @@ public class ForumService {
                 newLike.setTimestamp(new Timestamp(System.currentTimeMillis()));
                 postLikesRepository.save(newLike);
                 response.setStatus(HttpStatus.OK.value());
+                return true;
             }
         } else {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            return null;
         }
     }
 
-    public void addPostComment(long postId, CommentRequest request, HttpServletResponse response) {
+    public PostComment addPostComment(long postId, CommentRequest request, HttpServletResponse response) {
         Post existingPost = postRepository.findById(postId)
                 .orElseThrow(() -> new ResourceNotFoundException("Post not found with id :" + postId));
         User currentUser = userDetailsService.findCurrentUser();
@@ -198,13 +256,15 @@ public class ForumService {
                 newComment.setUser(currentUser);
                 newComment.setContent(request.getContent());
                 newComment.setTimestamp(new Timestamp(System.currentTimeMillis()));
-                postCommentsRepository.save(newComment);
                 response.setStatus(HttpStatus.OK.value());
+                return postCommentsRepository.save(newComment);
             } else {
                 response.setStatus(HttpStatus.BAD_REQUEST.value());
+                return null;
             }
         } else {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            return null;
         }
     }
 
@@ -219,14 +279,20 @@ public class ForumService {
         }
     }
 
-    public List<RecipeSimplifiedView> findSimplifiedRecipes(HttpServletResponse response, String option) {
+    public List<List<RecipeSimplifiedView>> findSimplifiedRecipes(HttpServletResponse response, String option) {
+        User currentUser = userDetailsService.findCurrentUser();
         List<RecipeSimplifiedView> recipeSimplifiedViewList = new ArrayList<>();
+        List<RecipeSimplifiedView> followingRecipeList = new ArrayList<>();
+        List<Follow> followList = new ArrayList<>();
+        if(currentUser != null) {
+            followList = followRepository.findByFollower(currentUser);
+        }
         List<Recipe> allRecipes = new ArrayList<>();
-        if(Objects.equals(option, "all")) {
+        if (Objects.equals(option, "all")) {
             allRecipes = recipeRepository.findByUserNotNull();
-        } else if(Objects.equals(option, "verified")){
+        } else if (Objects.equals(option, "verified")) {
             allRecipes = recipeRepository.findByVerifiedTrueAndUserNotNull();
-        } else if(Objects.equals(option, "notVerified")){
+        } else if (Objects.equals(option, "notVerified")) {
             allRecipes = recipeRepository.findByVerifiedFalseAndUserNotNull();
         }
         if (allRecipes.isEmpty()) {
@@ -240,43 +306,26 @@ public class ForumService {
                 newRecipeSimplifiedView.setTimestamp(recipe.getTimestamp());
                 newRecipeSimplifiedView.setDescription(recipe.getInstructions());
                 newRecipeSimplifiedView.setAuthor(recipe.getUser());
-                newRecipeSimplifiedView.setUserProfilePicture("ImagePath TODO"); // TODO
+                newRecipeSimplifiedView.setProfileImagePath(recipe.getUser().getImagePath());
                 newRecipeSimplifiedView.setCommentsCount(recipeCommentsRepository.findByrecipe(recipe).size());
                 newRecipeSimplifiedView.setLikesCount(recipeLikesRepository.findByrecipe(recipe).size());
-                recipeSimplifiedViewList.add(newRecipeSimplifiedView);
+                if(currentUser != null && Objects.equals(option, "all")){
+                    for(Follow follow : followList){
+                        if(recipe.getUser() == follow.getUser()) {
+                            followingRecipeList.add(newRecipeSimplifiedView);
+                        }
+                    }
+                    recipeSimplifiedViewList.add(newRecipeSimplifiedView);
+                } else {
+                    recipeSimplifiedViewList.add(newRecipeSimplifiedView);
+                }
             }
+            List<List<RecipeSimplifiedView>> listOfListsToReturn = new ArrayList<>();
+            recipeSimplifiedViewList.removeAll(followingRecipeList);
+            listOfListsToReturn.add(followingRecipeList);
+            listOfListsToReturn.add(recipeSimplifiedViewList);
             response.setStatus(HttpStatus.OK.value());
-            return recipeSimplifiedViewList;
-        }
-    }
-
-    public RecipeDetailedView viewRecipe(long recipeID, HttpServletResponse response) {
-        Optional<Recipe> recipe = recipeRepository.findById(recipeID);
-        if (recipe.isEmpty()) {
-            response.setStatus(HttpStatus.NOT_FOUND.value());
-            return null;
-        } else {
-            RecipeDetailedView detailedRecipe = new RecipeDetailedView();
-            RecipeView view = recipeService.view(recipeID, response);
-            detailedRecipe.setRecipeView(view);
-            detailedRecipe.setImagePath("ImagePath TODO"); // TODO
-            detailedRecipe.setAuthor(recipe.get().getUser());
-            detailedRecipe.setUserProfilePicture("ImagePath TODO"); // TODO
-            detailedRecipe.setRecipeLikes(recipeLikesRepository.findByrecipe(recipe.get()));
-            List<CommentView> recipeCommentsView = new ArrayList<>();
-            for (RecipeComment comment : recipeCommentsRepository.findByrecipe(recipe.get())){
-                CommentView newCommentView = new CommentView(
-                        comment.getId(),
-                        comment.getContent(),
-                        comment.getTimestamp(),
-                        comment.getUser(),
-                        "TODO" // TODO
-                );
-                recipeCommentsView.add(newCommentView);
-            }
-            detailedRecipe.setRecipeComments(recipeCommentsView);
-            response.setStatus(HttpStatus.OK.value());
-            return detailedRecipe;
+            return listOfListsToReturn;
         }
     }
 
@@ -343,4 +392,25 @@ public class ForumService {
         return null;
     }
 
+    public void follow(long userID, HttpServletResponse response) {
+        User currentUser = userDetailsService.findCurrentUser();
+        Optional<User> userToFollow = userRepository.findById(userID);
+        if (userToFollow.isPresent()) {
+            Follow existingFollow = followRepository.findByUserAndFollower(userToFollow.get(), currentUser);
+            if (existingFollow != null) {
+                followRepository.delete(existingFollow);
+                response.setStatus(HttpStatus.OK.value());
+            } else if (currentUser != userToFollow.get()) {
+                Follow newFollow = new Follow();
+                newFollow.setFollower(currentUser);
+                newFollow.setUser(userToFollow.get());
+                followRepository.save(newFollow);
+                response.setStatus(HttpStatus.OK.value());
+            } else {
+                response.setStatus(HttpStatus.CONFLICT.value());
+            }
+        } else {
+            response.setStatus(HttpStatus.NOT_FOUND.value());
+        }
+    }
 }

@@ -73,7 +73,7 @@ async def generate(body_dict: dict = Body(..., example={
         mydb.close()
         print(str(e))
     if ratings_result is not None and survey_results is not None and recipes_results is not None and users is not None:
-        X = load_and_preprocess_data(ratings_result)
+        X = load_and_preprocess_data(df=ratings_result)
         recommender = Recommender(X)
         recommender.create_and_fit()
         # convert user number to user id
@@ -126,7 +126,7 @@ async def replace(body_dict: dict = Body(..., example={
         print(str(e))
     mydb.close()
     if ratings_result is not None and recipes_results is not None:
-        X = load_and_preprocess_data(ratings_result)
+        X = load_and_preprocess_data(df=ratings_result)
         recommender = Recommender(X)
         recommender.create_and_fit()
         dish_name = recipes_results.loc[recipes_results['id'] == body_dict['dish_id']]['title'].values[0]

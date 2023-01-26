@@ -57,7 +57,7 @@ class Recommender:
         for index, row in user_ratings.iterrows():
             if row[0] == 0:
                 continue
-            similar_dishes = self.similar_dishes(index, correlation_threshold)
+            similar_dishes = self.similar_dishes(index, correlation_threshold, recipes_df=recipes_df)
             similar_dishes.append(get_dish_id(index, df=recipes_df))
             compared_similar_dishes = compare_taste_with_taste_profile(dish_name_list=similar_dishes,
                                                                        user_email=user_email,

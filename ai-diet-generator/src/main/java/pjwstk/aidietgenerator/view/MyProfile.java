@@ -4,11 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import pjwstk.aidietgenerator.entity.Post;
-import pjwstk.aidietgenerator.entity.Socials;
-import pjwstk.aidietgenerator.entity.User;
-import pjwstk.aidietgenerator.entity.UserStats;
-
+import pjwstk.aidietgenerator.entity.*;
 import java.util.List;
 
 @Getter
@@ -17,8 +13,23 @@ import java.util.List;
 public class MyProfile {
     @JsonIgnoreProperties({"password"})
     private User user;
+    private String profileImagePath;
+    private List<Subscription> userSubscriptions;
+    @JsonIgnoreProperties({"discord", "facebook", "instagram", "telegram", "facebook", "twitter", "youtube"})
+    private UserExtras userExtras;
+    private SocialsView socials;
     private List<UserStats> userStats;
-    private Socials socials;
-    private String profilePicturePath;
-    private List<Post> userPosts;
+    @JsonIgnoreProperties("user")
+    private List<PostDetailedView> userPosts;
+    @JsonIgnoreProperties("user")
+    private List<Recipe> userRecipes;
+
+    private DietGoal dietGoal;
+    private Double weightAtDietGeneration;
+    private Integer dailyCalGoal;
+    private Integer mealsPerDay;
+
+    private ExcludedProductsList excludedProductsList;
+
 }
+

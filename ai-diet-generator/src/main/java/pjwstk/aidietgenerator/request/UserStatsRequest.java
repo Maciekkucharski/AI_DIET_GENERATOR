@@ -11,7 +11,6 @@ import javax.persistence.Column;
 @Setter
 @Getter
 public class UserStatsRequest {
-
     private double weight;
     private int height;
     private int age;

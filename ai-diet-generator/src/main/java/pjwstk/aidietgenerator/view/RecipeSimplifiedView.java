@@ -19,10 +19,8 @@ public class RecipeSimplifiedView {
     private Timestamp timestamp;
     @JsonIgnoreProperties({"authorities", "username", "email", "authority"})
     private User author;
-
-    // TODO
-    private String userProfilePicture = "TODO";
-
+    
+    private String profileImagePath;
     private int commentsCount;
     private int likesCount;
 }

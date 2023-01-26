@@ -10,10 +10,11 @@ import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Entity
-@JsonIgnoreProperties({"credentialsNonExpired", "accountNonExpired", "accountNonLocked", "enabled", "password"})
+@JsonIgnoreProperties({"credentialsNonExpired", "accountNonExpired", "accountNonLocked", "enabled", "password", "imagePath", "authorities"})
 @Table(name = "users")
 public class User implements UserDetails {
 
@@ -22,14 +23,13 @@ public class User implements UserDetails {
     @Access(AccessType.PROPERTY)
     private Long id;
 
-//    @JsonView(UserProfile.class)
     @Column(name = "first_name")
     private String firstName;
 
     @Column(name = "last_name")
     private String lastName;
 
-    @Column(name = "email")
+    @Column(name = "email", unique = true)
     @NotNull
     private String email;
 
@@ -44,6 +44,18 @@ public class User implements UserDetails {
     @Column(name = "created_at")
     private Timestamp timestamp;
 
+    @Column(name = "image_path")
+    private String imagePath;
+
+    @Column(name = "subscribed")
+    private Boolean subscribed;
+
+    @Column(name = "survey")
+    private Boolean survey;
+
+    @Column(name = "rating")
+    private Boolean rating;
+
     public User() {
 
     }
@@ -56,7 +68,6 @@ public class User implements UserDetails {
     }
 
     public User(String email, String password) {
-        super();
         this.email = email;
         this.password = password;
     }
@@ -138,6 +149,22 @@ public class User implements UserDetails {
         this.timestamp = new Timestamp(System.currentTimeMillis());
     }
 
+    public String getImagePath() {
+        return imagePath;
+    }
+
+    public void setImagePath(String image_path) {
+        this.imagePath = image_path;
+    }
+
+    public Boolean getSubscribed() {
+        return subscribed;
+    }
+
+    public void setSubscribed(Boolean subscribed) {
+        this.subscribed = subscribed;
+    }
+
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Arrays
                 .stream(this.authority.split(","))
@@ -159,5 +186,21 @@ public class User implements UserDetails {
                 .replace(",,", "")
                 .trim();
         this.authority = remainingAuthorities;
+    }
+
+    public Boolean getSurvey() {
+        return survey;
+    }
+
+    public void setSurvey(Boolean survey) {
+        this.survey = survey;
+    }
+
+    public Boolean getRating() {
+        return rating;
+    }
+
+    public void setRating(Boolean rating) {
+        this.rating = rating;
     }
 }

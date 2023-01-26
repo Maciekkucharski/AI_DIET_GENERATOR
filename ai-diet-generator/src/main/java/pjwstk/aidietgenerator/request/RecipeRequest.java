@@ -5,7 +5,6 @@ import pjwstk.aidietgenerator.entity.Ingredient;
 import pjwstk.aidietgenerator.entity.User;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.List;
 
 @NoArgsConstructor
@@ -13,43 +12,43 @@ public class RecipeRequest {
 
     //    Recipe
     private String title;
-    private int servings;
-    private int readyInMinutes;
-    private String image;
+    private Integer servings;
+    private Integer readyInMinutes;
+    private String imagePath;
     private String instructions;
-    private boolean vegetarian;
-    private boolean vegan;
-    private boolean glutenFree;
-    private boolean dairyFree;
-    private boolean veryHealthy;
-    private boolean verified;
+    private Boolean vegetarian;
+    private Boolean vegan;
+    private Boolean glutenFree;
+    private Boolean dairyFree;
+    private Boolean veryHealthy;
+    private Boolean verified;
     private Timestamp created_at;
     private User user;
     //    Nutrition
-    private int calories;
-    private int carbs;
-    private int fat;
-    private int protein;
+    private Integer calories;
+    private Integer carbs;
+    private Integer fat;
+    private Integer protein;
     //    Ingredients
-    private List<Ingredient> ingredients;
+    private List<Ingredient> recipesIngredients;
 
     public RecipeRequest(String title,
-                      int servings,
-                      int readyInMinutes,
-                      String image,
+                      Integer servings,
+                      Integer readyInMinutes,
+                      String imagePath,
                       String instructions,
-                      boolean vegetarian, boolean vegan, boolean glutenFree, boolean dairyFree, boolean veryHealthy, boolean verified,
+                      Boolean vegetarian, Boolean vegan, Boolean glutenFree, Boolean dairyFree, Boolean veryHealthy, Boolean verified,
                       Timestamp created_at,
                       User user,
-                      int calories,
-                      int carbs,
-                      int fat,
-                      int protein,
-                      List<Ingredient> ingredients) {
+                      Integer calories,
+                      Integer carbs,
+                      Integer fat,
+                      Integer protein,
+                      List<Ingredient> recipesIngredients) {
         this.title = title;
         this.servings = servings;
         this.readyInMinutes = readyInMinutes;
-        this.image = image;
+        this.imagePath = imagePath;
         this.instructions = instructions;
         this.vegetarian = vegetarian;
         this.vegan = vegan;
@@ -63,50 +62,50 @@ public class RecipeRequest {
         this.carbs = carbs;
         this.fat = fat;
         this.protein = protein;
-        this.ingredients = ingredients;
+        this.recipesIngredients = recipesIngredients;
     }
 
     public String getTitle() {
         return title;
     }
 
-    public int getServings() {
+    public Integer getServings() {
         return servings;
     }
 
-    public int getReadyInMinutes() {
+    public Integer getReadyInMinutes() {
         return readyInMinutes;
     }
 
-    public String getImage() {
-        return image;
+    public String getImagePath() {
+        return imagePath;
     }
 
     public String getInstructions() {
         return instructions;
     }
 
-    public boolean isVegetarian() {
+    public Boolean isVegetarian() {
         return vegetarian;
     }
 
-    public boolean isVegan() {
+    public Boolean isVegan() {
         return vegan;
     }
 
-    public boolean isGlutenFree() {
+    public Boolean isGlutenFree() {
         return glutenFree;
     }
 
-    public boolean isDairyFree() {
+    public Boolean isDairyFree() {
         return dairyFree;
     }
 
-    public boolean isVeryHealthy() {
+    public Boolean isVeryHealthy() {
         return veryHealthy;
     }
 
-    public boolean isVerified() {
+    public Boolean isVerified() {
         return verified;
     }
 
@@ -118,24 +117,24 @@ public class RecipeRequest {
         return user;
     }
 
-    public int getCalories() {
+    public Integer getCalories() {
         return calories;
     }
 
-    public int getCarbs() {
+    public Integer getCarbs() {
         return carbs;
     }
 
-    public int getFat() {
+    public Integer getFat() {
         return fat;
     }
 
-    public int getProtein() {
+    public Integer getProtein() {
         return protein;
     }
 
-    public List<Ingredient> getIngredients() {
-        return ingredients;
+    public List<Ingredient> getRecipesIngredients() {
+        return recipesIngredients;
     }
 
 

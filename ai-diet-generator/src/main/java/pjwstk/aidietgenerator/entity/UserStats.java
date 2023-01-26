@@ -1,9 +1,12 @@
 package pjwstk.aidietgenerator.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Cascade;
+
 import javax.persistence.Entity;
 import javax.persistence.*;
 import java.sql.Timestamp;
@@ -32,7 +35,6 @@ public class UserStats {
     private Double bmi;
 
     @Column(name = "gender")
-//    @Enumerated(EnumType.STRING)
     private Gender gender;
 
     @Column(name = "cal")
@@ -42,8 +44,9 @@ public class UserStats {
     private Timestamp timestamp;
 
     @ManyToOne
+    @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
     @JoinColumn(name = "user_id", nullable = false)
-    @JsonIgnoreProperties({"firstName", "lastName", "password", "authorities", "username"})
+    @JsonIgnore
     private User user;
 
     public UserStats(double weight, int height, int age, double bmi, int cal, Gender gender) {

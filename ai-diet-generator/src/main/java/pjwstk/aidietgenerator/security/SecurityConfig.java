@@ -3,14 +3,12 @@ package pjwstk.aidietgenerator.security;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -18,8 +16,6 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import pjwstk.aidietgenerator.service.UserDetailsService;
-
-import javax.swing.*;
 import java.util.Arrays;
 
 import static org.springframework.security.config.Customizer.withDefaults;
@@ -54,41 +50,14 @@ public class SecurityConfig{
         httpSecurity
                 .cors(withDefaults()) // by default uses a Bean by the name of corsConfigurationSource (line 80)
                 .csrf().disable()
-                .authorizeRequests().antMatchers("/authenticate", "/account/register").permitAll()
+                .authorizeRequests()
+                .antMatchers("/authenticate", "/account/register").permitAll()
+                .antMatchers(HttpMethod.GET,"/forum/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-//                        .antMatchers(HttpMethod.GET, "/api/**").hasRole("ADMIN")
-//                        .antMatchers(HttpMethod.GET, "/account/socials/**").permitAll()
-//                        .antMatchers(HttpMethod.PUT, "/account/socials/").hasRole("USER")
-//                        .antMatchers("/account/subscription").permitAll()
-//                        .antMatchers(HttpMethod.POST, "/account/socials/").hasRole("USER")
-//                        .antMatchers( "/userStats").hasRole("USER")
-//                        .anyRequest().authenticated()
-//                .oauth2Login()
-//                .defaultSuccessUrl("/account/loginSuccess")
-//                .failureUrl("/account/loginFailure")
-//                .authorizationEndpoint()
-//                .baseUri("/oauth2/authorize-client")
-//                .authorizationRequestRepository(authorizationRequestRepository());
         httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
         return httpSecurity.build();
     }
-
-    @Bean
-    CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("*", "http://localhost:3000/", "http://localhost:3000"));
-        configuration.setAllowedMethods(Arrays.asList("*"));
-        configuration.setAllowedHeaders(Arrays.asList("*"));
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
-    }
-
-//    @Bean
-//    public WebSecurityCustomizer webSecurityCustomizer() {
-//        return (web) -> web.ignoring().antMatchers();
-//    }
 }
