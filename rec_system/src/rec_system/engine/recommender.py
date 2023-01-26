@@ -64,7 +64,8 @@ class Recommender:
                                                                        user_profiles_df=user_profiles_df,
                                                                        recipes_df=recipes_df)
             for item in compared_similar_dishes:
-                ratings_set.add((item[1], item[0] * int(row[0])))
+                if not [rating for rating in ratings_set if rating[1] == item[1]]:
+                    ratings_set.add((item[1], item[0] * int(row[0])))
         ratings_list = sorted(list(ratings_set), key=lambda x: x[1], reverse=True)
         return [i[0] for i in ratings_list]
 
