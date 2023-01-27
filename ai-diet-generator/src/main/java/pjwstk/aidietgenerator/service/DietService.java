@@ -585,13 +585,15 @@ public class DietService {
         }
     }
     public List<Long> replaceRemovedRecipes(List<Long> removedRecipesIds, List<Product> excludedProductsList,
-                                            Boolean vegetarian, Boolean vegan, Boolean glutenFree, Boolean dairyFree, Boolean veryHealthy, Boolean verified) throws IOException {
+                                            Boolean vegetarian, Boolean vegan, Boolean glutenFree, Boolean dairyFree,
+                                            Boolean veryHealthy, Boolean verified) throws IOException {
         List<Long> replacementRecipesIds = new ArrayList<>();
         double threshold = 0.7;
 
         System.out.println("REMOVED RECIPES TO REPLACE: " + removedRecipesIds.size());
         for(Long removedRecipeId : removedRecipesIds){
-            Long substituteRecipeId = replaceRecipe(removedRecipeId, excludedProductsList, vegetarian, vegan, glutenFree, dairyFree, veryHealthy, verified, threshold);
+            Long substituteRecipeId = replaceRecipe(removedRecipeId, excludedProductsList, vegetarian, vegan, glutenFree,
+                    dairyFree, veryHealthy, verified, threshold);
 
             if(substituteRecipeId != null){
                 replacementRecipesIds.add(substituteRecipeId);
@@ -728,6 +730,7 @@ public class DietService {
                         response.setStatus(HttpStatus.CREATED.value());
                         currentUserDiet.setDietGoal(dietGoal);
                         currentUserDiet.setStartingWeight(lastUserStats.getWeight());
+                        userStatsRepository.save(lastUserStats);
 
                         return weekDietRepository.save(currentUserDiet);
                     } else {
