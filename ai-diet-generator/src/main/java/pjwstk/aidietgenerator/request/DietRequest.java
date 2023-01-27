@@ -19,7 +19,7 @@ public class DietRequest {
     private Boolean dairyFree;
     private Boolean veryHealthy;
     private Boolean verified;
-    private double threshold = 0.8;
+    private double threshold = 0.7;
 
     public DietRequest(){}
 
