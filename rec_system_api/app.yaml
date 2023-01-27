@@ -3,7 +3,9 @@ entrypoint: gunicorn -w 4 -k uvicorn.workers.UvicornWorker main:app  --timeout 6
 instance_class: F4
 inbound_services:
 - warmup
-min_idle_instances: 1
+automatic_scaling:
+  min_idle_instances: 1
+  max_concurrent_requests: 5
 vpc_access_connector:
   name: projects/foodie-recommender-api/locations/europe-central2/connectors/connector-rec-system
   egress_setting: all-traffic
