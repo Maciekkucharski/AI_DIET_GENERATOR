@@ -179,7 +179,8 @@ public class ProfileService {
                             .filter(authority -> !authority.equals(""))
                             .collect(Collectors.toList()),
                     currentUser.getSurvey(),
-                    currentUser.getRating()
+                    currentUser.getRating(),
+                    currentUser.getSubscribed()
                   );
         }
         response.setStatus(HttpStatus.NOT_FOUND.value());

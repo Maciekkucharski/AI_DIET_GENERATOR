@@ -18,6 +18,7 @@ public class ProfileInfoView {
     private int kCal;
     private Boolean completedSurvey;
     private Boolean completedRatings;
+    private Boolean subscribed;
 
     List<String> authorities;
 
@@ -37,7 +38,8 @@ public class ProfileInfoView {
                            int kCal,
                            List<String> authorities,
                            Boolean completedSurvey,
-                           Boolean completedRatings) {
+                           Boolean completedRatings,
+                           Boolean subscribed) {
         this.id = id;
         this.profileImagePath = profilePicturePath;
         this.firstName = firstName;
@@ -52,6 +54,7 @@ public class ProfileInfoView {
         this.authorities = authorities;
         this.completedRatings = completedRatings;
         this.completedSurvey = completedSurvey;
+        this.subscribed = subscribed;
     }
 
     public Long getId() {
@@ -164,5 +167,13 @@ public class ProfileInfoView {
 
     public void setCompletedRatings(Boolean completedRatings) {
         this.completedRatings = completedRatings;
+    }
+
+    public Boolean getSubscribed() {
+        return subscribed;
+    }
+
+    public void setSubscribed(Boolean subscribed) {
+        this.subscribed = subscribed;
     }
 }
