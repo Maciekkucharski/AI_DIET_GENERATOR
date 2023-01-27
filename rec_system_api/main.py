@@ -14,6 +14,12 @@ async def root():
     }
 
 
+@app.route('/_ah/warmup')
+def warmup():
+    # Handle your warmup logic here, e.g. set up a database connection pool
+    return '', 200, {}
+
+
 @app.post("/generate")
 async def generate(body_dict: dict = Body(..., example={
     "user_id": 30,
@@ -136,3 +142,11 @@ async def replace(body_dict: dict = Body(..., example={
         return recommendations
     else:
         return "missing data from database"
+
+
+
+if __name__ == '__main__':
+    # This is used when running locally only. When deploying to Google App
+    # Engine, a webserver process such as Gunicorn will serve the app. This
+    # can be configured by adding an `entrypoint` to app.yaml.
+    app.run(host='127.0.0.1', port=8080, debug=True)
