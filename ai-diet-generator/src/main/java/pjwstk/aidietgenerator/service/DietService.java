@@ -607,7 +607,6 @@ public class DietService {
                                                 Boolean vegetarian, Boolean vegan, Boolean glutenFree,
                                                 Boolean dairyFree, Boolean veryHealthy, Boolean verified) throws IOException {
         List<Recipe> recommendedRecipes = recipeRepository.findAllById(recommendedIds);
-
         List<Long> removedIds = new ArrayList<>();
 
         for(Recipe currentRecipe : recommendedRecipes){
@@ -662,7 +661,6 @@ public class DietService {
                         userStatsRepository.save(lastUserStats);
 
                         List<Long> recommendedRecipesIds = getRecommendedIds(currentUser.getId(), dietRequest.getThreshold());
-
                         recommendedRecipesIds = getFilteredRecommendedIds(recommendedRecipesIds, excludedProductsList,
                                 dietRequest.getVegetarian(), dietRequest.getVegan(), dietRequest.getGlutenFree(),
                                 dietRequest.getDairyFree(), dietRequest.getVeryHealthy(), dietRequest.getVerified());
@@ -679,11 +677,11 @@ public class DietService {
                             DietDay dietDay = generateDietForDay(recommendedRecipesIds, caloriesPerDay, mealsPerDay, usedRecipesIds, dietGoal);
                             if (dietDay == null) {
                                 dietRequest.setThreshold(dietRequest.getThreshold() - 0.05);
-                                if (dietRequest.getThreshold() < 0.5) {
+                                if (dietRequest.getThreshold() < 0.6) {
                                     response.setStatus(HttpStatus.NO_CONTENT.value());
                                     return null;
                                 }
-                                if (!dietWeek.isEmpty() && dietRequest.getThreshold() <= 0.6) {
+                                if (!dietWeek.isEmpty() && dietRequest.getThreshold() <= 0.7) {
                                     List<DietDay> alreadyAddedDays = dietWeek;
                                     for (; i < 7; i++) {
 
