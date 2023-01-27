@@ -119,7 +119,8 @@ public class SubscriptionService {
         Date currentDate = new Date();
         for (Subscription subscription : allSubscriptions) {
             if (currentDate.after(subscription.getValid_till())) {
-                if (Objects.equals(subscription.getStatus(), "ACTIVE") && currentDate.before(new Date(subscription.getFinal_payment_time().getTime() + (1000L * 60 * 60 * 24 * 30)))) {
+                if (Objects.equals(subscription.getStatus(), "ACTIVE") &&
+                        currentDate.before(new Date(subscription.getFinal_payment_time().getTime() + (1000L * 60 * 60 * 24 * 30)))) {
                     subscription.setValid_till(new Date(subscription.getValid_till().getTime() + (1000L * 60 * 60 * 24 * 30))); // plus 30 days
                     subscriptionRepository.save(subscription);
                 } else if (Objects.equals(subscription.getStatus(), "CANCELED")) {

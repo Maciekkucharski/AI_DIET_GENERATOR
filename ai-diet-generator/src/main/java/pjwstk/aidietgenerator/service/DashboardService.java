@@ -56,12 +56,13 @@ public class DashboardService {
         newFeed.setCreators(dietInflu);
 
         List<Recipe> recipesWithUser = recipeRepository.findByUserNotNull();
+        List<Recipe> creatorREcipes = new ArrayList<>();
         for(Recipe recipe: recipesWithUser){
-                if(!recipe.getUser().getAuthorities().contains(new SimpleGrantedAuthority("ROLE_INFLUENCER")) ||
-                    !recipe.getUser().getAuthorities().contains(new SimpleGrantedAuthority("ROLE_DIETITIAN")))
-                    recipesWithUser.remove(recipe);
+                if(recipe.getUser().getAuthorities().contains(new SimpleGrantedAuthority("ROLE_INFLUENCER")) ||
+                    recipe.getUser().getAuthorities().contains(new SimpleGrantedAuthority("ROLE_DIETITIAN")))
+                    creatorREcipes.add(recipe);
             }
-        newFeed.setCreatorRecipes(recipesWithUser);
+        newFeed.setCreatorRecipes(creatorREcipes);
 
         List<Post> allPosts = postRepository.findFirst3ByOrderByIdDesc();
         Collections.reverse(allPosts);
