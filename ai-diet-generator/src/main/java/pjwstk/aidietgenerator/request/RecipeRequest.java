@@ -9,8 +9,6 @@ import java.util.List;
 
 @NoArgsConstructor
 public class RecipeRequest {
-
-    //    Recipe
     private String title;
     private Integer servings;
     private Integer readyInMinutes;
@@ -24,12 +22,10 @@ public class RecipeRequest {
     private Boolean verified;
     private Timestamp created_at;
     private User user;
-    //    Nutrition
     private Integer calories;
     private Integer carbs;
     private Integer fat;
     private Integer protein;
-    //    Ingredients
     private List<Ingredient> recipesIngredients;
 
     public RecipeRequest(String title,

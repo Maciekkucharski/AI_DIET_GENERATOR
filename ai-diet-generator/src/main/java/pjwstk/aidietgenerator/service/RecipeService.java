@@ -198,7 +198,8 @@ public class RecipeService {
     public Recipe verifyRecipe(Long recipeId, HttpServletResponse response) {
         User currentUser = userDetailsService.findCurrentUser();
         
-        if (currentUser == null || !currentUser.getAuthorities().contains(new SimpleGrantedAuthority(Authority.DIETITIAN.role)) || !currentUser.getAuthorities().contains(new SimpleGrantedAuthority(Authority.ADMIN.role))) {
+        if (currentUser == null || !currentUser.getAuthorities().contains(new SimpleGrantedAuthority(Authority.DIETITIAN.role)) ||
+                !currentUser.getAuthorities().contains(new SimpleGrantedAuthority(Authority.ADMIN.role))) {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
         } else {
             Recipe existingRecipe = recipeRepository.findById(recipeId)

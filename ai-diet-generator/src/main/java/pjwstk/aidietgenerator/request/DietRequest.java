@@ -1,11 +1,9 @@
 package pjwstk.aidietgenerator.request;
 
 import pjwstk.aidietgenerator.entity.DietGoal;
-import pjwstk.aidietgenerator.entity.ExcludedProductsList;
 import pjwstk.aidietgenerator.entity.PhysicalActivity;
 import pjwstk.aidietgenerator.entity.Product;
 
-import javax.persistence.Column;
 import java.util.List;
 
 public class DietRequest {
@@ -19,12 +17,15 @@ public class DietRequest {
     private Boolean dairyFree;
     private Boolean veryHealthy;
     private Boolean verified;
+    private Boolean personalized;
+    private Boolean macroCheck;
     private double threshold = 0.9;
 
     public DietRequest(){}
 
     public DietRequest(PhysicalActivity physicalActivity, DietGoal dietGoal, int mealsPerDay, List<Product> excludedProductsList,
-                       Boolean vegetarian, Boolean vegan, Boolean glutenFree, Boolean dairyFree, Boolean veryHealthy, Boolean verified){
+                       Boolean vegetarian, Boolean vegan, Boolean glutenFree, Boolean dairyFree, Boolean veryHealthy, Boolean verified,
+                       Boolean personalized, Boolean macroCheck){
         this.physicalActivity = physicalActivity;
         this.dietGoal = dietGoal;
         this.mealsPerDay = mealsPerDay;
@@ -35,6 +36,8 @@ public class DietRequest {
         this.dairyFree = dairyFree;
         this.veryHealthy = veryHealthy;
         this.verified = verified;
+        this.personalized = personalized;
+        this.macroCheck = macroCheck;
     }
 
     public PhysicalActivity getPhysicalActivity() {
@@ -83,5 +86,21 @@ public class DietRequest {
 
     public void setThreshold(double threshold) {
         this.threshold = threshold;
+    }
+
+    public Boolean getPersonalized() {
+        return personalized;
+    }
+
+    public void setPersonalized(Boolean personalized) {
+        this.personalized = personalized;
+    }
+
+    public Boolean getMacroCheck() {
+        return macroCheck;
+    }
+
+    public void setMacroCheck(Boolean macroCheck) {
+        this.macroCheck = macroCheck;
     }
 }

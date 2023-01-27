@@ -34,8 +34,10 @@ public class DietService {
     private final IngredientRepository ingredientRepository;
 
     @Autowired
-    public DietService(UserDetailsService userDetailsService, ProductRepository productRepository, ExcludedProductsListRepository excludedProductsListRepository,
-                       DayDietRepository dayDietRepository, WeekDietRepository weekDietRepository, UserStatsRepository userStatsRepository, RecipeRepository recipeRepository,
+    public DietService(UserDetailsService userDetailsService, ProductRepository productRepository,
+                       ExcludedProductsListRepository excludedProductsListRepository,
+                       DayDietRepository dayDietRepository, WeekDietRepository weekDietRepository,
+                       UserStatsRepository userStatsRepository, RecipeRepository recipeRepository,
                        IngredientRepository ingredientRepository){
         this.userDetailsService = userDetailsService;
         this.productRepository = productRepository;
@@ -48,7 +50,8 @@ public class DietService {
     }
 
 //    Harris-Benedict Formula
-    public double dailyBMR(double bodyWeight, int bodyHeight, int age, Gender gender, PhysicalActivity physicalActivity){
+    public double dailyBMR(double bodyWeight, int bodyHeight, int age,
+                           Gender gender, PhysicalActivity physicalActivity){
 
         double male = (88.362 + 13.397 * bodyWeight + 4.799 * bodyHeight - 5.677 * age) * physicalActivity.factor;
         double female = (447.593 + 9.247 * bodyWeight + 3.098 * bodyHeight - 4.330 * age) * physicalActivity.factor;
@@ -57,7 +60,8 @@ public class DietService {
 
     }
 
-    public double goalCalories(double bodyWeight, int bodyHeight, int age, Gender gender, PhysicalActivity physicalActivity, DietGoal dietGoal){
+    public double goalCalories(double bodyWeight, int bodyHeight, int age,
+                               Gender gender, PhysicalActivity physicalActivity, DietGoal dietGoal){
         double bmr = dailyBMR(bodyWeight, bodyHeight, age, gender, physicalActivity);
         double kcalIntake = bmr;
 
@@ -88,7 +92,8 @@ public class DietService {
         return kcalIntake;
     }
 
-    public List<Long> getRecommendedIds(Long UserId, Double threshold) throws IOException {
+    public List<Long> getRecommendedIds(Long UserId, Double threshold)
+            throws IOException {
         URL url = new URL (ApiConstants.GENERATOR);
         HttpURLConnection con = (HttpURLConnection)url.openConnection();
         con.setRequestMethod("POST");
@@ -125,7 +130,8 @@ public class DietService {
         }
     }
 
-    public List<Long> getRecommendedReplacementIds(Long recipeId, Double threshold) throws IOException {
+    public List<Long> getRecommendedReplacementIds(Long recipeId, Double threshold)
+            throws IOException {
         URL url = new URL (ApiConstants.REPLACER);
         HttpURLConnection con = (HttpURLConnection)url.openConnection();
         con.setRequestMethod("POST");
@@ -162,7 +168,8 @@ public class DietService {
         }
     }
 
-    public ExcludedProductsList setExcludedProducts(HttpServletResponse response, List<Long> productIds){
+    public ExcludedProductsList setExcludedProducts(HttpServletResponse response,
+                                                    List<Long> productIds){
         User currentUser = userDetailsService.findCurrentUser();
         if (currentUser == null) {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
@@ -184,7 +191,8 @@ public class DietService {
         }
     }
 
-    public Recipe getClosestRecipeToCaloriesNeed(List<Long> recipesIds, int mealsLeft, double remainingCalories, double accuracy){
+    public Recipe getClosestRecipeToCaloriesNeed(List<Long> recipesIds, int mealsLeft,
+                                                 double remainingCalories, double accuracy){
         Recipe closestRecipe = new Recipe();
         double caloriesForAMeal = remainingCalories/mealsLeft;
         double closestCaloriesDif = Double.POSITIVE_INFINITY;
@@ -231,10 +239,13 @@ public class DietService {
         return leastCalRecipe;
     }
 
-    public Recipe getExpandedSearchClosestRecipeToCaloriesNeed(List<Long> recipesListIds, int mealsLeft, double remainingCalories, double accuracy){
-        Recipe recommendedRecipe = getClosestRecipeToCaloriesNeed(recipesListIds, mealsLeft, remainingCalories * (1 + 0.2 * mealsLeft), accuracy);
+    public Recipe getExpandedSearchClosestRecipeToCaloriesNeed(List<Long> recipesListIds, int mealsLeft,
+                                                               double remainingCalories, double accuracy){
+        Recipe recommendedRecipe = getClosestRecipeToCaloriesNeed(recipesListIds, mealsLeft,
+                remainingCalories * (1 + 0.2 * mealsLeft), accuracy);
         if(recommendedRecipe == null){
-            recommendedRecipe = getClosestRecipeToCaloriesNeed(recipesListIds, mealsLeft, remainingCalories * (1 - 0.2 * mealsLeft), accuracy);
+            recommendedRecipe = getClosestRecipeToCaloriesNeed(recipesListIds, mealsLeft,
+                    remainingCalories * (1 - 0.2 * mealsLeft), accuracy);
         }
 
         return recommendedRecipe;
@@ -308,7 +319,10 @@ public class DietService {
         }
         return true;
     }
-    public DietDay generateDietForDay(List<Long> startingRecommendedRecipesIds, double caloriesPerDay, int mealsPerDay, List<Long> startingUsedRecipesIds, DietGoal dietGoal){
+    public DietDay generateDietForDay(List<Long> startingRecommendedRecipesIds,
+                                      double caloriesPerDay, int mealsPerDay,
+                                      List<Long> startingUsedRecipesIds, DietGoal dietGoal,
+                                      Boolean macroCheck){
 
         DietDay dietDay = new DietDay();
         double remainingCalories = caloriesPerDay;
@@ -372,12 +386,14 @@ public class DietService {
                     }
 
                     if(mealsLeft == 0) {
-                        if(!doRecipesFillMacroRequirements(recipesToday, dietGoal)){
-                            firstRecipeIndex += 1;
-                            firstRecipe = true;
-                            mealsLeft = mealsPerDay;
-                            if(firstRecipeIndex >= allRecipeIds.size()-1) {
-                                return null;
+                        if(macroCheck) {
+                            if (!doRecipesFillMacroRequirements(recipesToday, dietGoal)) {
+                                firstRecipeIndex += 1;
+                                firstRecipe = true;
+                                mealsLeft = mealsPerDay;
+                                if (firstRecipeIndex >= allRecipeIds.size() - 1) {
+                                    return null;
+                                }
                             }
                         }
                     }
@@ -531,8 +547,10 @@ public class DietService {
                                     }
                                     continue;
                                 }
-                                if(doesRecipeMissRequirement(suggestedRecipe, recipeReplaceRequest.getVegetarian(), recipeReplaceRequest.getVegan(), recipeReplaceRequest.getGlutenFree(),
-                                        recipeReplaceRequest.getDairyFree(), recipeReplaceRequest.getVeryHealthy(), recipeReplaceRequest.getVerified())){
+                                if(doesRecipeMissRequirement(suggestedRecipe, recipeReplaceRequest.getVegetarian(),
+                                        recipeReplaceRequest.getVegan(), recipeReplaceRequest.getGlutenFree(),
+                                        recipeReplaceRequest.getDairyFree(), recipeReplaceRequest.getVeryHealthy(),
+                                        recipeReplaceRequest.getVerified())){
                                     currentRecipeIndex++;
                                     if(currentRecipeIndex >= allRecipes.size()){
                                         response.setStatus(HttpStatus.NO_CONTENT.value());
@@ -605,7 +623,7 @@ public class DietService {
     }
     public List<Long> getFilteredRecommendedIds(List<Long> recommendedIds, List<Product> excludedProductsList,
                                                 Boolean vegetarian, Boolean vegan, Boolean glutenFree,
-                                                Boolean dairyFree, Boolean veryHealthy, Boolean verified) throws IOException {
+                                                Boolean dairyFree, Boolean veryHealthy, Boolean verified, Boolean personalized) throws IOException {
         List<Recipe> recommendedRecipes = recipeRepository.findAllById(recommendedIds);
         List<Long> removedIds = new ArrayList<>();
 
@@ -620,12 +638,15 @@ public class DietService {
         }
         recommendedIds.removeAll(removedIds);
 
-        List<Long> substitutesForRemovedIds = replaceRemovedRecipes(removedIds, excludedProductsList, vegetarian, vegan, glutenFree, dairyFree, veryHealthy, verified);
-        recommendedIds.addAll(substitutesForRemovedIds);
+        if(personalized) {
+            List<Long> substitutesForRemovedIds = replaceRemovedRecipes(removedIds, excludedProductsList, vegetarian, vegan, glutenFree, dairyFree, veryHealthy, verified);
+            recommendedIds.addAll(substitutesForRemovedIds);
+        }
 
         return recommendedIds;
     }
-    public DietWeek generateDiet(DietRequest dietRequest, HttpServletResponse response) throws IOException {
+    public DietWeek generateDiet(DietRequest dietRequest, HttpServletResponse response)
+            throws IOException {
         User currentUser = userDetailsService.findCurrentUser();
 
         PhysicalActivity physicalActivity = dietRequest.getPhysicalActivity();
@@ -656,14 +677,30 @@ public class DietService {
 
                 if(currentUserWeight !=0 && currentUserHeight !=0 && currentUserAge !=0 && currentUserGender != null) {
                     if(mealsPerDay >= 3 && mealsPerDay <= 5) {
-                        double caloriesPerDay = goalCalories(currentUserWeight, currentUserHeight, currentUserAge, currentUserGender, physicalActivity, dietGoal);
+                        double caloriesPerDay = goalCalories(currentUserWeight, currentUserHeight,
+                                currentUserAge, currentUserGender, physicalActivity, dietGoal);
                         lastUserStats.setCal((int) caloriesPerDay);
                         userStatsRepository.save(lastUserStats);
 
-                        List<Long> recommendedRecipesIds = getRecommendedIds(currentUser.getId(), dietRequest.getThreshold());
+                        List<Long> recommendedRecipesIds = new ArrayList<>();
+                        if(dietRequest.getPersonalized() == null){
+                            dietRequest.setPersonalized(false);
+                        }
+                        if(dietRequest.getMacroCheck() == null){
+                            dietRequest.setMacroCheck(true);
+                        }
+
+                        if(dietRequest.getPersonalized()) {
+                            recommendedRecipesIds = getRecommendedIds(currentUser.getId(), dietRequest.getThreshold());
+                        } else {
+                            List<Recipe> allRecipes = recipeRepository.findAll();
+                            for(Recipe recipe : allRecipes){
+                                recommendedRecipesIds.add(recipe.getId());
+                            }
+                        }
                         recommendedRecipesIds = getFilteredRecommendedIds(recommendedRecipesIds, excludedProductsList,
                                 dietRequest.getVegetarian(), dietRequest.getVegan(), dietRequest.getGlutenFree(),
-                                dietRequest.getDairyFree(), dietRequest.getVeryHealthy(), dietRequest.getVerified());
+                                dietRequest.getDairyFree(), dietRequest.getVeryHealthy(), dietRequest.getVerified(), dietRequest.getPersonalized());
 
                         if (recommendedRecipesIds.isEmpty()) {
                             response.setStatus(HttpStatus.NO_CONTENT.value());
@@ -674,7 +711,8 @@ public class DietService {
                         List<Long> usedRecipesIds = new ArrayList<>();
 
                         for (int i = 0; i < 7; i++) {
-                            DietDay dietDay = generateDietForDay(recommendedRecipesIds, caloriesPerDay, mealsPerDay, usedRecipesIds, dietGoal);
+                            DietDay dietDay = generateDietForDay(recommendedRecipesIds, caloriesPerDay,
+                                    mealsPerDay, usedRecipesIds, dietGoal, dietRequest.getMacroCheck());
                             if (dietDay == null) {
                                 dietRequest.setThreshold(dietRequest.getThreshold() - 0.05);
                                 if (dietRequest.getThreshold() < 0.6) {
@@ -685,7 +723,8 @@ public class DietService {
                                     List<DietDay> alreadyAddedDays = dietWeek;
                                     for (; i < 7; i++) {
 
-                                        DietDay alreadyUsedDietDay = alreadyAddedDays.get((int) (Math.random() * (alreadyAddedDays.size() - 1)));
+                                        DietDay alreadyUsedDietDay = alreadyAddedDays
+                                                .get((int) (Math.random() * (alreadyAddedDays.size() - 1)));
 
                                         List<DietWeek> dietWeeks = new ArrayList<>();
                                         if(alreadyUsedDietDay.getDietWeek() != null) {
