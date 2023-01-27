@@ -474,7 +474,8 @@ public class DietService {
     }
 
     public Long replaceRecipe(Long recipeToReplaceId, List<Product> excludedProductsList,
-                              Boolean vegetarian, Boolean vegan, Boolean glutenFree, Boolean dairyFree, Boolean veryHealthy, Boolean verified,
+                              Boolean vegetarian, Boolean vegan, Boolean glutenFree, Boolean dairyFree,
+                              Boolean veryHealthy, Boolean verified,
                               double threshold) throws IOException {
 
         boolean replaced = false;
@@ -499,10 +500,11 @@ public class DietService {
             }
         }
 
-        return replaced ? returnId : replaceRecipe(recipeToReplaceId, excludedProductsList, vegetarian, vegan, glutenFree, dairyFree, veryHealthy, verified, threshold-0.1);
+        return replaced ? returnId : replaceRecipe(recipeToReplaceId, excludedProductsList, vegetarian, vegan,
+                glutenFree, dairyFree, veryHealthy, verified, threshold-0.1);
     }
 
-    public DietWeek replaceRecipeFromADay(RecipeReplaceRequest recipeReplaceRequest, HttpServletResponse response) throws IOException {
+    public DietWeek replaceRecipeFromADay(RecipeReplaceRequest recipeReplaceRequest, HttpServletResponse response) {
         User currentUser = userDetailsService.findCurrentUser();
         if(currentUser != null) {
             Optional<DietDay> dayToChange = dayDietRepository.findById(recipeReplaceRequest.getDayDietId());
@@ -590,7 +592,6 @@ public class DietService {
         List<Long> replacementRecipesIds = new ArrayList<>();
         double threshold = 0.7;
 
-        System.out.println("REMOVED RECIPES TO REPLACE: " + removedRecipesIds.size());
         for(Long removedRecipeId : removedRecipesIds){
             Long substituteRecipeId = replaceRecipe(removedRecipeId, excludedProductsList, vegetarian, vegan, glutenFree,
                     dairyFree, veryHealthy, verified, threshold);
@@ -658,6 +659,7 @@ public class DietService {
                     if(mealsPerDay >= 3 && mealsPerDay <= 5) {
                         double caloriesPerDay = goalCalories(currentUserWeight, currentUserHeight, currentUserAge, currentUserGender, physicalActivity, dietGoal);
                         lastUserStats.setCal((int) caloriesPerDay);
+                        userStatsRepository.save(lastUserStats);
 
                         List<Long> recommendedRecipesIds = getRecommendedIds(currentUser.getId(), dietRequest.getThreshold());
 
@@ -730,7 +732,6 @@ public class DietService {
                         response.setStatus(HttpStatus.CREATED.value());
                         currentUserDiet.setDietGoal(dietGoal);
                         currentUserDiet.setStartingWeight(lastUserStats.getWeight());
-                        userStatsRepository.save(lastUserStats);
 
                         return weekDietRepository.save(currentUserDiet);
                     } else {
