@@ -74,7 +74,11 @@ public class ProfileService {
             currentUserProfile.setUserStats(userStatsRepository.findByuser(currentUser));
             List<UserStats> currentUserStats = userStatsRepository.findByuser(currentUser);
             if (currentUser != null && !currentUserStats.isEmpty()) {
-                currentUserProfile.setDailyCalGoal(currentUserStats.get(currentUserStats.size() - 1).getCal());
+                if(currentUserStats.get(currentUserStats.size() - 1).getCal() != null) {
+                    currentUserProfile.setDailyCalGoal(currentUserStats.get(currentUserStats.size() - 1).getCal());
+                } else {
+                    currentUserProfile.setDailyCalGoal(0);
+                }
             } else {
                 currentUserProfile.setDailyCalGoal(0);
             }

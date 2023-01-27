@@ -24,8 +24,6 @@ import static pjwstk.aidietgenerator.entity.Gender.MALE;
 
 @Service
 public class DietService {
-
-    private int numberOfCalls = 0;
     private final UserDetailsService userDetailsService;
     private final ProductRepository productRepository;
     private final ExcludedProductsListRepository excludedProductsListRepository;
@@ -326,7 +324,7 @@ public class DietService {
         int firstRecipeIndex = 0;
 
         for(int mealsLeft = mealsPerDay; mealsLeft>0;) {
-            Recipe recommendedRecipe = null;
+            Recipe recommendedRecipe;
 
             if(firstRecipe){
                 dietDay = new DietDay();
@@ -396,7 +394,6 @@ public class DietService {
             }
         }
         dietDay.setRecipesForToday(recipesToday);
-        System.out.println("IM A GOOD DAY");
         return dietDay;
     }
     public Boolean doesRecipeHaveExcludedProduct(Recipe recipe, List<Product> excludedProducts){
@@ -413,7 +410,9 @@ public class DietService {
         return false;
     }
 
-    public Boolean doesRecipeMissRequirement(Recipe recipe, Boolean vegetarian, Boolean vegan, Boolean glutenFree, Boolean dairyFree, Boolean veryHealthy, Boolean verified){
+    public Boolean doesRecipeMissRequirement(Recipe recipe, Boolean vegetarian, Boolean vegan,
+                                             Boolean glutenFree, Boolean dairyFree,
+                                             Boolean veryHealthy, Boolean verified){
         if(vegetarian != null){
             if(vegetarian){
                 if(recipe.getVegetarian() != null) {
@@ -481,21 +480,19 @@ public class DietService {
         boolean replaced = false;
         Long returnId = null;
 
-        if(threshold < 0) {
+        if(threshold < 0.6) {
             return returnId;
         }
 
         List<Long> replacementIds = getRecommendedReplacementIds(recipeToReplaceId, threshold);
+        List<Recipe> replacementRecipes = recipeRepository.findAllById(replacementIds);
 
-        for(Long replacementId : replacementIds){
-            Optional<Recipe> suggestedRecipe = recipeRepository.findById(replacementId);
-
-
-            if(doesRecipeMissRequirement(suggestedRecipe.get(), vegetarian, vegan, glutenFree, dairyFree, veryHealthy, verified)) continue;
-            if(doesRecipeHaveExcludedProduct(suggestedRecipe.get(), excludedProductsList)) continue;
+        for(Recipe suggestedRecipe : replacementRecipes){
+            if(doesRecipeMissRequirement(suggestedRecipe, vegetarian, vegan, glutenFree, dairyFree, veryHealthy, verified)) continue;
+            if(doesRecipeHaveExcludedProduct(suggestedRecipe, excludedProductsList)) continue;
 
             replaced = true;
-            returnId = replacementId;
+            returnId = suggestedRecipe.getId();
 
             if(replaced){
                 break;
@@ -592,11 +589,8 @@ public class DietService {
         List<Long> replacementRecipesIds = new ArrayList<>();
         double threshold = 0.7;
 
-//        TO AVOID 502 RESPONSE FROM MACIEK'S API :)
-
+        System.out.println("REMOVED RECIPES TO REPLACE: " + removedRecipesIds.size());
         for(Long removedRecipeId : removedRecipesIds){
-            numberOfCalls++;
-            System.out.println(numberOfCalls);
             Long substituteRecipeId = replaceRecipe(removedRecipeId, excludedProductsList, vegetarian, vegan, glutenFree, dairyFree, veryHealthy, verified, threshold);
 
             if(substituteRecipeId != null){
@@ -607,8 +601,10 @@ public class DietService {
         return replacementRecipesIds;
     }
     public List<Long> getFilteredRecommendedIds(List<Long> recommendedIds, List<Product> excludedProductsList,
-                                                Boolean vegetarian, Boolean vegan, Boolean glutenFree, Boolean dairyFree, Boolean veryHealthy, Boolean verified) throws IOException {
+                                                Boolean vegetarian, Boolean vegan, Boolean glutenFree,
+                                                Boolean dairyFree, Boolean veryHealthy, Boolean verified) throws IOException {
         List<Recipe> recommendedRecipes = recipeRepository.findAllById(recommendedIds);
+
         List<Long> removedIds = new ArrayList<>();
 
         for(Recipe currentRecipe : recommendedRecipes){
@@ -620,7 +616,6 @@ public class DietService {
                 removedIds.add(currentRecipe.getId());
             }
         }
-
         recommendedIds.removeAll(removedIds);
 
         List<Long> substitutesForRemovedIds = replaceRemovedRecipes(removedIds, excludedProductsList, vegetarian, vegan, glutenFree, dairyFree, veryHealthy, verified);
@@ -661,7 +656,9 @@ public class DietService {
                     if(mealsPerDay >= 3 && mealsPerDay <= 5) {
                         double caloriesPerDay = goalCalories(currentUserWeight, currentUserHeight, currentUserAge, currentUserGender, physicalActivity, dietGoal);
                         lastUserStats.setCal((int) caloriesPerDay);
+
                         List<Long> recommendedRecipesIds = getRecommendedIds(currentUser.getId(), dietRequest.getThreshold());
+
                         recommendedRecipesIds = getFilteredRecommendedIds(recommendedRecipesIds, excludedProductsList,
                                 dietRequest.getVegetarian(), dietRequest.getVegan(), dietRequest.getGlutenFree(),
                                 dietRequest.getDairyFree(), dietRequest.getVeryHealthy(), dietRequest.getVerified());
@@ -678,11 +675,11 @@ public class DietService {
                             DietDay dietDay = generateDietForDay(recommendedRecipesIds, caloriesPerDay, mealsPerDay, usedRecipesIds, dietGoal);
                             if (dietDay == null) {
                                 dietRequest.setThreshold(dietRequest.getThreshold() - 0.05);
-                                if (dietRequest.getThreshold() < 0.6) {
+                                if (dietRequest.getThreshold() < 0.5) {
                                     response.setStatus(HttpStatus.NO_CONTENT.value());
                                     return null;
                                 }
-                                if (!dietWeek.isEmpty() && dietRequest.getThreshold() <= 0.70) {
+                                if (!dietWeek.isEmpty() && dietRequest.getThreshold() <= 0.6) {
                                     List<DietDay> alreadyAddedDays = dietWeek;
                                     for (; i < 7; i++) {
 
