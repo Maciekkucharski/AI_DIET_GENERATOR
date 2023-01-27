@@ -1,5 +1,5 @@
 runtime: python37
-entrypoint: gunicorn -w 4 -k uvicorn.workers.UvicornWorker main:app  --timeout 60
+entrypoint: gunicorn -w 4 -k uvicorn.workers.UvicornWorker main:app  --timeout 120
 instance_class: F4
 inbound_services:
 - warmup
