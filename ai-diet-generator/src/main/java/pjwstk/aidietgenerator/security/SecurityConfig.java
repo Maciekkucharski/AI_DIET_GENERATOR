@@ -51,6 +51,7 @@ public class SecurityConfig{
                 .cors(withDefaults()) // by default uses a Bean by the name of corsConfigurationSource (line 80)
                 .csrf().disable()
                 .authorizeRequests()
+                .antMatchers(HttpMethod.GET, "/forum/post*", "forum/recipe/*").permitAll()
                 .antMatchers("/authenticate", "/account/register").permitAll()
                 .antMatchers(HttpMethod.GET,"/forum/**").permitAll()
                 .anyRequest().authenticated()
