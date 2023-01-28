@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.0.5] - 2023-01-15
 ## Fixed
+- duplicate recipes in recommendations
+
+## [0.0.5] - 2023-01-15
+## Fixed
 - fixed small bug with path in recommender
 ## Modified
 - narrowed requirements

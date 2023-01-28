@@ -19,13 +19,13 @@ public class DietRequest {
     private Boolean verified;
     private Boolean personalized;
     private Boolean macroCheck;
-    private double threshold = 0.9;
+    private Double threshold = 0.9;
 
     public DietRequest(){}
 
     public DietRequest(PhysicalActivity physicalActivity, DietGoal dietGoal, int mealsPerDay, List<Product> excludedProductsList,
                        Boolean vegetarian, Boolean vegan, Boolean glutenFree, Boolean dairyFree, Boolean veryHealthy, Boolean verified,
-                       Boolean personalized, Boolean macroCheck){
+                       Boolean personalized, Boolean macroCheck, Double threshold){
         this.physicalActivity = physicalActivity;
         this.dietGoal = dietGoal;
         this.mealsPerDay = mealsPerDay;
@@ -38,6 +38,7 @@ public class DietRequest {
         this.verified = verified;
         this.personalized = personalized;
         this.macroCheck = macroCheck;
+        this.threshold = threshold;
     }
 
     public PhysicalActivity getPhysicalActivity() {
@@ -80,11 +81,11 @@ public class DietRequest {
         return verified;
     }
 
-    public double getThreshold() {
+    public Double getThreshold() {
         return threshold;
     }
 
-    public void setThreshold(double threshold) {
+    public void setThreshold(Double threshold) {
         this.threshold = threshold;
     }
 

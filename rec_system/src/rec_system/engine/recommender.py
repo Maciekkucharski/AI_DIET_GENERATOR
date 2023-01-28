@@ -53,7 +53,7 @@ class Recommender:
                 "Fit the model before trying to recommend"
             )
         user_ratings = self.data[[user_email]]
-        ratings_set = set()
+        ratings_list = list()
         for index, row in user_ratings.iterrows():
             if row[0] == 0:
                 continue
@@ -64,9 +64,9 @@ class Recommender:
                                                                        user_profiles_df=user_profiles_df,
                                                                        recipes_df=recipes_df)
             for item in compared_similar_dishes:
-                ratings_set.add((item[1], item[0] * int(row[0])))
-        ratings_list = sorted(list(ratings_set), key=lambda x: x[1], reverse=True)
-        return list(dict.fromkeys([i[0] for i in ratings_list]))
+                ratings_list.append((item[1], item[0] * int(row[0])))
+        sorted_ratings_list = sorted(ratings_list, key=lambda x: x[1], reverse=True)
+        return list(dict.fromkeys([i[0] for i in sorted_ratings_list]))
 
     def similar_dishes(self, dish_name: str, correlation_threshold: float = 0.85,
                        recipes_df: pd.DataFrame = None) -> list:
