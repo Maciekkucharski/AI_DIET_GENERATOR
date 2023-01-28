@@ -14,7 +14,7 @@ async def root():
     }
 
 
-@app.route('/_ah/warmup')
+@app.get('/_ah/warmup')
 def warmup():
     # Handle your warmup logic here, e.g. set up a database connection pool
     return '', 200, {}
