@@ -1,7 +1,7 @@
 fastapi
 uvicorn
 gunicorn
-rec-system-trb==0.0.5
+rec-system-trb==0.0.6
 mysql-connector-python
 requests
 pandas

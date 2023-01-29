@@ -34,7 +34,8 @@ public class ProfileController {
     }
 
     @GetMapping("/{id}")
-    public UserProfile getSelectedUserProfile(@PathVariable (value = "id") Long id, HttpServletResponse response){
+    public UserProfile getSelectedUserProfile(@PathVariable (value = "id") Long id,
+                                              HttpServletResponse response){
         return profileService.getSelectedUserProfile(id, response);
     }
 
@@ -44,7 +45,8 @@ public class ProfileController {
     }
 
     @PostMapping("/info")
-    public void updateCurrentUserProfileInfo(@RequestBody ProfileInfoRequest profileInfoRequest, HttpServletResponse response){
+    public void updateCurrentUserProfileInfo(@RequestBody ProfileInfoRequest profileInfoRequest,
+                                             HttpServletResponse response){
         profileService.updateLoggedUserProfileInfo(profileInfoRequest, response);
     }
 
@@ -53,7 +55,8 @@ public class ProfileController {
         return profileService.getCurrentUsersWeightStory(response);
     }
     @DeleteMapping("/info/weights")
-    public void deleteUserStatsWeightEntry(@RequestBody List<Long> ids, HttpServletResponse response){
+    public void deleteUserStatsWeightEntry(@RequestBody List<Long> ids,
+                                           HttpServletResponse response){
         profileService.deleteUserStatsWeightEntry(ids, response);
     }
 
@@ -63,17 +66,20 @@ public class ProfileController {
     }
 
     @GetMapping("/extras/{userID}")
-    public UserExtras getUserExtras(@PathVariable (value = "userID") Long userID, HttpServletResponse response){
+    public UserExtras getUserExtras(@PathVariable (value = "userID") Long userID,
+                                    HttpServletResponse response){
         return profileService.givenUserExtras(userID, response);
     }
 
     @PostMapping("/extras")
-    public UserExtras createUserExtras(@RequestBody UserExtrasRequest userExtrasRequest, HttpServletResponse response){
+    public UserExtras createUserExtras(@RequestBody UserExtrasRequest userExtrasRequest,
+                                       HttpServletResponse response){
         return profileService.saveUserExtras(userExtrasRequest, response);
     }
 
     @PutMapping("/extras")
-    public UserExtras updateExtras(@RequestBody UserExtrasRequest userExtrasRequest, HttpServletResponse response){
+    public UserExtras updateExtras(@RequestBody UserExtrasRequest userExtrasRequest,
+                                   HttpServletResponse response){
         return profileService.updateUserExtras(userExtrasRequest, response);
     }
 
@@ -83,7 +89,8 @@ public class ProfileController {
     }
 
     @PostMapping("/search")
-    public List<ProfileSearchView> search(@RequestBody SearchRequest request, HttpServletResponse response){
+    public List<ProfileSearchView> search(@RequestBody SearchRequest request,
+                                          HttpServletResponse response){
         return profileService.searchUser(request, response);
     }
 }
