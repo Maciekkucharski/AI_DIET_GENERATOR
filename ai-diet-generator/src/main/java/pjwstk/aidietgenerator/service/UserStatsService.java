@@ -1,6 +1,7 @@
 package pjwstk.aidietgenerator.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import pjwstk.aidietgenerator.entity.User;
 import pjwstk.aidietgenerator.entity.UserStats;
@@ -49,9 +50,15 @@ public class UserStatsService {
     public void setUserImage(ImagePathRequest request, HttpServletResponse response) {
         User currentUser = userDetailsService.findCurrentUser();
         if(currentUser != null){
-            if(request.getImagePath() !=null || !request.getImagePath().equals(""))
+            if(request.getImagePath() !=null || !request.getImagePath().equals("")) {
                 currentUser.setImagePath(request.getImagePath());
-            userRepository.save(currentUser);
+                response.setStatus(HttpStatus.OK.value());
+                userRepository.save(currentUser);
+            } else {
+                response.setStatus(HttpStatus.BAD_REQUEST.value());
+            }
+        } else {
+            response.setStatus(HttpStatus.FORBIDDEN.value());
         }
     }
 }

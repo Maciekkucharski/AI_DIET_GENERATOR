@@ -6,9 +6,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 import pjwstk.aidietgenerator.entity.*;
 import pjwstk.aidietgenerator.exception.ResourceNotFoundException;
-import pjwstk.aidietgenerator.repository.IngredientRepository;
-import pjwstk.aidietgenerator.repository.RecipeRepository;
-import pjwstk.aidietgenerator.repository.UserRepository;
+import pjwstk.aidietgenerator.repository.*;
+import pjwstk.aidietgenerator.request.RecipeReplaceRequest;
 import pjwstk.aidietgenerator.request.RecipeRequest;
 
 import javax.servlet.http.HttpServletResponse;
@@ -23,16 +22,37 @@ public class RecipeService {
     private final IngredientRepository ingredientRepository;
     private final UserDetailsService userDetailsService;
     private final UserRepository userRepository;
+    private final RecipeLikesRepository recipeLikesRepository;
+    private final RecipeCommentsRepository recipeCommentsRepository;
+    private final DayDietRepository dayDietRepository;
+    private final DietService dietService;
+    private final WeekDietRepository weekDietRepository;
+    private final ExcludedProductsListRepository excludedProductsListRepository;
+    private final RatingRepository ratingRepository;
 
     @Autowired
     public RecipeService(RecipeRepository recipeRepository,
                          IngredientRepository ingredientRepository,
                          UserDetailsService userDetailsService,
-                         UserRepository userRepository) {
+                         UserRepository userRepository,
+                         DayDietRepository dayDietRepository,
+                         RecipeLikesRepository recipeLikesRepository,
+                         RecipeCommentsRepository recipeCommentsRepository,
+                         DietService dietService,
+                         WeekDietRepository weekDietRepository,
+                         ExcludedProductsListRepository excludedProductsListRepository,
+                         RatingRepository ratingRepository) {
         this.recipeRepository = recipeRepository;
         this.ingredientRepository = ingredientRepository;
         this.userDetailsService = userDetailsService;
         this.userRepository = userRepository;
+        this.dayDietRepository = dayDietRepository;
+        this.recipeLikesRepository = recipeLikesRepository;
+        this.recipeCommentsRepository = recipeCommentsRepository;
+        this.dietService = dietService;
+        this.weekDietRepository = weekDietRepository;
+        this.excludedProductsListRepository = excludedProductsListRepository;
+        this.ratingRepository = ratingRepository;
     }
 
 
@@ -228,6 +248,51 @@ public class RecipeService {
                         for (Ingredient ingredient : existingRecipesIngredients) {
                             ingredientRepository.delete(ingredient);
                         }
+
+                        List<DietDay> dietDays = dayDietRepository.findByRecipesForTodayContaining(existingRecipe);
+
+                        for(DietDay dietDay : dietDays) {
+                            DietWeek currentDiet = weekDietRepository.findByDaysForWeekDietContaining(dietDay);
+                            if (currentDiet != null) {
+                                List<Recipe> recipesInDay = dietDay.getRecipesForToday();
+                                if (recipesInDay.contains(existingRecipe)) {
+                                    recipesInDay.remove(existingRecipe);
+                                    RecipeReplaceRequest recipeReplaceRequest = new RecipeReplaceRequest(dietDay.getId(),
+                                            existingRecipe.getId(),
+                                            currentDiet.getVegetarian(),
+                                            currentDiet.getVegan(),
+                                            currentDiet.getGlutenFree(),
+                                            currentDiet.getDairyFree(),
+                                            currentDiet.getVeryHealthy(),
+                                            currentDiet.getVerified(),
+                                            excludedProductsListRepository.findByuser(currentDiet.getUser()).getListOfExcludedProducts());
+                                    Recipe recipeReplacement = dietService.replaceRecipeFromADay(recipeReplaceRequest, response);
+                                    if (recipeReplacement != null) {
+                                        recipesInDay.add(recipeReplacement);
+                                    }
+                                }
+                                dietDay.setRecipesForToday(recipesInDay);
+                                dayDietRepository.save(dietDay);
+                            } else {
+                                dayDietRepository.delete(dietDay);
+                            }
+                        }
+
+                        List<RecipeLike> existingRecipesLikes = recipeLikesRepository.findByrecipe(existingRecipe);
+                        for(RecipeLike recipeLike : existingRecipesLikes){
+                            recipeLikesRepository.delete(recipeLike);
+                        }
+
+                        List<RecipeComment> existingRecipesComments = recipeCommentsRepository.findByrecipe(existingRecipe);
+                        for(RecipeComment recipeComment : existingRecipesComments){
+                            recipeCommentsRepository.delete(recipeComment);
+                        }
+
+                        List<Rating> existingRecipesRatings = ratingRepository.findByrecipe(existingRecipe);
+                        for(Rating rating : existingRecipesRatings){
+                            ratingRepository.delete(rating);
+                        }
+
                         recipeRepository.delete(existingRecipe);
                         response.setStatus(HttpStatus.ACCEPTED.value());
 
@@ -239,6 +304,51 @@ public class RecipeService {
                                 for (Ingredient ingredient : existingRecipesIngredients) {
                                     ingredientRepository.delete(ingredient);
                                 }
+
+                                List<DietDay> dietDays = dayDietRepository.findByRecipesForTodayContaining(existingRecipe);
+
+                                for(DietDay dietDay : dietDays) {
+                                    DietWeek currentDiet = weekDietRepository.findByDaysForWeekDietContaining(dietDay);
+                                    if (currentDiet != null) {
+                                        List<Recipe> recipesInDay = dietDay.getRecipesForToday();
+                                        if (recipesInDay.contains(existingRecipe)) {
+                                            recipesInDay.remove(existingRecipe);
+                                            RecipeReplaceRequest recipeReplaceRequest = new RecipeReplaceRequest(dietDay.getId(),
+                                                    existingRecipe.getId(),
+                                                    currentDiet.getVegetarian(),
+                                                    currentDiet.getVegan(),
+                                                    currentDiet.getGlutenFree(),
+                                                    currentDiet.getDairyFree(),
+                                                    currentDiet.getVeryHealthy(),
+                                                    currentDiet.getVerified(),
+                                                    excludedProductsListRepository.findByuser(currentDiet.getUser()).getListOfExcludedProducts());
+                                            Recipe recipeReplacement = dietService.replaceRecipeFromADay(recipeReplaceRequest, response);
+                                            if (recipeReplacement != null) {
+                                                recipesInDay.add(recipeReplacement);
+                                            }
+                                        }
+                                        dietDay.setRecipesForToday(recipesInDay);
+                                        dayDietRepository.save(dietDay);
+                                    } else {
+                                        dayDietRepository.delete(dietDay);
+                                    }
+                                }
+
+                                List<RecipeLike> existingRecipesLikes = recipeLikesRepository.findByrecipe(existingRecipe);
+                                for(RecipeLike recipeLike : existingRecipesLikes){
+                                    recipeLikesRepository.delete(recipeLike);
+                                }
+
+                                List<RecipeComment> existingRecipesComments = recipeCommentsRepository.findByrecipe(existingRecipe);
+                                for(RecipeComment recipeComment : existingRecipesComments){
+                                    recipeCommentsRepository.delete(recipeComment);
+                                }
+
+                                List<Rating> existingRecipesRatings = ratingRepository.findByrecipe(existingRecipe);
+                                for(Rating rating : existingRecipesRatings){
+                                    ratingRepository.delete(rating);
+                                }
+
                                 recipeRepository.delete(existingRecipe);
                                 response.setStatus(HttpStatus.ACCEPTED.value());
 

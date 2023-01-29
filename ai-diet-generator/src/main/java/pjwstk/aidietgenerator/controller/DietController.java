@@ -52,7 +52,7 @@ public class DietController {
     }
 
     @PostMapping("/generate/replaceRecipe")
-    public DietWeek replaceRecipeForADayWithClosestCaloriesCount(@RequestBody RecipeReplaceRequest recipeReplaceRequest, HttpServletResponse response) throws IOException {
+    public Recipe replaceRecipeForADayWithClosestCaloriesCount(@RequestBody RecipeReplaceRequest recipeReplaceRequest, HttpServletResponse response) throws IOException {
         return dietService.replaceRecipeFromADay(recipeReplaceRequest, response);
     }
 

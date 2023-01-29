@@ -102,7 +102,11 @@ public class Recipe {
     @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RecipeComment>  recipeComments;
 
-    public Recipe(String title, Float saltiness, Float sourness, Float sweetness, Float bitterness, Float spiciness, Float fattiness, Integer servings, Integer readyInMinutes, String image, String instructions, Boolean vegetarian, Boolean vegan, Boolean glutenFree, Boolean dairyFree, Boolean veryHealthy, Boolean verified, Timestamp timestamp, Integer calories, Integer carbs, Integer fat, Integer protein, User user, List<Ingredient> ingredients, List<RecipeLike> recipeLikes, List<RecipeComment> recipeComments) {
+    public Recipe(String title, Float saltiness, Float sourness, Float sweetness, Float bitterness, Float spiciness, Float fattiness,
+                  Integer servings, Integer readyInMinutes, String image, String instructions,
+                  Boolean vegetarian, Boolean vegan, Boolean glutenFree, Boolean dairyFree, Boolean veryHealthy, Boolean verified,
+                  Timestamp timestamp, Integer calories, Integer carbs, Integer fat, Integer protein, User user, List<Ingredient> ingredients,
+                  List<RecipeLike> recipeLikes, List<RecipeComment> recipeComments) {
 
         this.title = title;
         this.saltiness = saltiness;

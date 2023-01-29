@@ -31,18 +31,42 @@ public class DietWeek {
 
     @Column(name = "goal")
     private DietGoal dietGoal;
-
     @Column(name = "start_weight")
     private Double startingWeight;
 
+    @Column(name = "vegetarian")
+    private Boolean vegetarian;
+
+    @Column(name = "vegan")
+    private Boolean vegan;
+
+    @Column(name = "gluten_free")
+    private Boolean glutenFree;
+
+    @Column(name = "dairy_free")
+    private Boolean dairyFree;
+
+    @Column(name = "very_healthy")
+    private Boolean veryHealthy;
+
+    @Column(name = "verified")
+    private Boolean verified;
+
     public DietWeek(){}
 
-    public DietWeek(List<DietDay> daysForWeekDiet, Timestamp timestamp, User user, DietGoal dietGoal, Double startingWeight){
+    public DietWeek(List<DietDay> daysForWeekDiet, Timestamp timestamp, User user, DietGoal dietGoal, Double startingWeight,
+                    Boolean vegetarian, Boolean vegan, Boolean glutenFree, Boolean dairyFree, Boolean veryHealthy, Boolean verified){
         this.daysForWeekDiet = daysForWeekDiet;
         this.timestamp = timestamp;
         this.user = user;
         this.dietGoal = dietGoal;
         this.startingWeight = startingWeight;
+        this.vegetarian = vegetarian;
+        this.vegan = vegan;
+        this.glutenFree = glutenFree;
+        this.dairyFree = dairyFree;
+        this.veryHealthy = veryHealthy;
+        this.verified = verified;
     }
 
     public Long getId() {
@@ -108,5 +132,53 @@ public class DietWeek {
 
     public void setStartingWeight(Double startingWeight) {
         this.startingWeight = startingWeight;
+    }
+
+    public Boolean getVegetarian() {
+        return vegetarian;
+    }
+
+    public void setVegetarian(Boolean vegetarian) {
+        this.vegetarian = vegetarian;
+    }
+
+    public Boolean getVegan() {
+        return vegan;
+    }
+
+    public void setVegan(Boolean vegan) {
+        this.vegan = vegan;
+    }
+
+    public Boolean getGlutenFree() {
+        return glutenFree;
+    }
+
+    public void setGlutenFree(Boolean glutenFree) {
+        this.glutenFree = glutenFree;
+    }
+
+    public Boolean getDairyFree() {
+        return dairyFree;
+    }
+
+    public void setDairyFree(Boolean dairyFree) {
+        this.dairyFree = dairyFree;
+    }
+
+    public Boolean getVeryHealthy() {
+        return veryHealthy;
+    }
+
+    public void setVeryHealthy(Boolean veryHealthy) {
+        this.veryHealthy = veryHealthy;
+    }
+
+    public Boolean getVerified() {
+        return verified;
+    }
+
+    public void setVerified(Boolean verified) {
+        this.verified = verified;
     }
 }

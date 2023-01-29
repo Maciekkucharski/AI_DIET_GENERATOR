@@ -18,6 +18,11 @@ public class RecipeReplaceRequest {
 
     public RecipeReplaceRequest(){}
 
+    public RecipeReplaceRequest(Long dayDietId, Long recipeToReplaceId){
+        this.dayDietId = dayDietId;
+        this.recipeToReplaceId = recipeToReplaceId;
+    }
+
     public RecipeReplaceRequest(Long dayDietId, Long recipeToReplaceId,
                                 Boolean vegetarian, Boolean vegan, Boolean glutenFree, Boolean dairyFree, Boolean veryHealthy, Boolean verified,
                                 List<Product> excludedProductsList){

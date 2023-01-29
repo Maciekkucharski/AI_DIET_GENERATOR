@@ -38,7 +38,7 @@ public class DietService {
                        ExcludedProductsListRepository excludedProductsListRepository,
                        DayDietRepository dayDietRepository, WeekDietRepository weekDietRepository,
                        UserStatsRepository userStatsRepository, RecipeRepository recipeRepository,
-                       IngredientRepository ingredientRepository){
+                       IngredientRepository ingredientRepository) {
         this.userDetailsService = userDetailsService;
         this.productRepository = productRepository;
         this.excludedProductsListRepository = excludedProductsListRepository;
@@ -50,7 +50,7 @@ public class DietService {
     }
 
     public double dailyBMR(double bodyWeight, int bodyHeight, int age,
-                           Gender gender, PhysicalActivity physicalActivity){
+                           Gender gender, PhysicalActivity physicalActivity) {
 
         double male = (88.362 + 13.397 * bodyWeight + 4.799 * bodyHeight - 5.677 * age) * physicalActivity.factor;
         double female = (447.593 + 9.247 * bodyWeight + 3.098 * bodyHeight - 4.330 * age) * physicalActivity.factor;
@@ -60,17 +60,16 @@ public class DietService {
     }
 
     public double goalCalories(double bodyWeight, int bodyHeight, int age,
-                               Gender gender, PhysicalActivity physicalActivity, DietGoal dietGoal){
+                               Gender gender, PhysicalActivity physicalActivity, DietGoal dietGoal) {
         double bmr = dailyBMR(bodyWeight, bodyHeight, age, gender, physicalActivity);
         double kcalIntake = bmr;
 
-        switch(dietGoal){
+        switch (dietGoal) {
             case LOSE:
                 kcalIntake = bmr - 500;
-                if(kcalIntake <= 1200 && gender == FEMALE){
+                if (kcalIntake <= 1200 && gender == FEMALE) {
                     kcalIntake = 1200;
-                }
-                else if(kcalIntake <= 1500 && gender == MALE){
+                } else if (kcalIntake <= 1500 && gender == MALE) {
                     kcalIntake = 1500;
                 }
                 break;
@@ -84,16 +83,17 @@ public class DietService {
                 break;
 
             case MUSCLE:
-                kcalIntake = 44*bodyWeight;
+                kcalIntake = 44 * bodyWeight;
                 break;
         }
 
         return kcalIntake;
     }
+
     public List<Long> getRecommendedIds(Long UserId, Double threshold)
             throws IOException {
-        URL url = new URL (ApiConstants.GENERATOR);
-        HttpURLConnection con = (HttpURLConnection)url.openConnection();
+        URL url = new URL(ApiConstants.GENERATOR);
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setRequestMethod("POST");
         con.setRequestProperty("Content-Type", "application/json");
         con.setRequestProperty("Accept", "application/json");
@@ -104,12 +104,12 @@ public class DietService {
         List<Long> recommendedIds = new ArrayList<>();
 
 
-        try(OutputStream os = con.getOutputStream()) {
+        try (OutputStream os = con.getOutputStream()) {
             byte[] input = jsonInputString.getBytes(StandardCharsets.UTF_8);
             os.write(input, 0, input.length);
         }
 
-        try(BufferedReader br = new BufferedReader(
+        try (BufferedReader br = new BufferedReader(
                 new InputStreamReader(con.getInputStream(), StandardCharsets.UTF_8))) {
             StringBuilder response = new StringBuilder();
             String responseLine = null;
@@ -118,8 +118,8 @@ public class DietService {
             }
             String[] idList = response.substring(1, response.length() - 1).split(",");
 
-            for(String id : idList){
-                if(!id.isEmpty()) {
+            for (String id : idList) {
+                if (!id.isEmpty()) {
                     recommendedIds.add(Long.valueOf(id));
                 }
             }
@@ -130,8 +130,8 @@ public class DietService {
 
     public List<Long> getRecommendedReplacementIds(Long recipeId, Double threshold)
             throws IOException {
-        URL url = new URL (ApiConstants.REPLACER);
-        HttpURLConnection con = (HttpURLConnection)url.openConnection();
+        URL url = new URL(ApiConstants.REPLACER);
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setRequestMethod("POST");
         con.setRequestProperty("Content-Type", "application/json");
         con.setRequestProperty("Accept", "application/json");
@@ -141,12 +141,12 @@ public class DietService {
 
         List<Long> replacementsIds = new ArrayList<>();
 
-        try(OutputStream os = con.getOutputStream()) {
+        try (OutputStream os = con.getOutputStream()) {
             byte[] input = jsonInputString.getBytes(StandardCharsets.UTF_8);
             os.write(input, 0, input.length);
         }
 
-        try(BufferedReader br = new BufferedReader(
+        try (BufferedReader br = new BufferedReader(
                 new InputStreamReader(con.getInputStream(), StandardCharsets.UTF_8))) {
             StringBuilder response = new StringBuilder();
             String responseLine = null;
@@ -156,8 +156,8 @@ public class DietService {
 
             String[] idList = response.substring(1, response.length() - 1).split(",");
 
-            for(String id : idList){
-                if(!id.isEmpty()) {
+            for (String id : idList) {
+                if (!id.isEmpty()) {
                     replacementsIds.add(Long.valueOf(id));
                 }
             }
@@ -167,7 +167,7 @@ public class DietService {
     }
 
     public ExcludedProductsList setExcludedProducts(HttpServletResponse response,
-                                                    List<Long> productIds){
+                                                    List<Long> productIds) {
         User currentUser = userDetailsService.findCurrentUser();
         if (currentUser == null) {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
@@ -176,7 +176,7 @@ public class DietService {
             ExcludedProductsList excludedProductsList = excludedProductsListRepository.findByuser(currentUser);
             List<Product> listOfProducts = productRepository.findAllById(productIds);
 
-            if(excludedProductsList == null) {
+            if (excludedProductsList == null) {
                 excludedProductsList = new ExcludedProductsList(listOfProducts, currentUser);
             } else {
                 excludedProductsList.setListOfExcludedProducts(listOfProducts);
@@ -190,25 +190,25 @@ public class DietService {
     }
 
     public Recipe getClosestRecipeToCaloriesNeed(List<Long> recipesIds, int mealsLeft,
-                                                 double remainingCalories, double accuracy){
+                                                 double remainingCalories, double accuracy) {
         Recipe closestRecipe = new Recipe();
-        double caloriesForAMeal = remainingCalories/mealsLeft;
+        double caloriesForAMeal = remainingCalories / mealsLeft;
         double closestCaloriesDif = Double.POSITIVE_INFINITY;
 
-        for(Long recipeId : recipesIds){
+        for (Long recipeId : recipesIds) {
             Recipe currentRecipe = recipeRepository.findById(recipeId).get();
-            if(currentRecipe != null){
+            if (currentRecipe != null) {
                 int currentRecipeCalories = currentRecipe.getCalories();
-                double caloriesDifference = Math.abs(caloriesForAMeal-currentRecipeCalories);
+                double caloriesDifference = Math.abs(caloriesForAMeal - currentRecipeCalories);
 
-                if(caloriesDifference < closestCaloriesDif){
+                if (caloriesDifference < closestCaloriesDif) {
                     closestCaloriesDif = caloriesDifference;
                     closestRecipe = currentRecipe;
                 }
             }
         }
 
-        if(closestRecipe.getCalories() != null) {
+        if (closestRecipe.getCalories() != null) {
             if (closestRecipe.getCalories() / caloriesForAMeal > 1 + accuracy || closestRecipe.getCalories() / caloriesForAMeal < 1 - accuracy) {
                 if (accuracy < 0.3) {
                     return getClosestRecipeToCaloriesNeed(recipesIds, mealsLeft, remainingCalories, accuracy + 0.01);
@@ -221,14 +221,15 @@ public class DietService {
         }
         return closestRecipe;
     }
-    public Recipe findRecipeWithLeastCalories(List<Long> recipeIds){
+
+    public Recipe findRecipeWithLeastCalories(List<Long> recipeIds) {
         Recipe leastCalRecipe = new Recipe();
         Double leastCal = Double.POSITIVE_INFINITY;
 
-        for(Long id : recipeIds){
+        for (Long id : recipeIds) {
             Recipe currentRecipe = recipeRepository.findById(id).get();
-            if(currentRecipe != null){
-                if(currentRecipe.getCalories() < leastCal){
+            if (currentRecipe != null) {
+                if (currentRecipe.getCalories() < leastCal) {
                     leastCalRecipe = currentRecipe;
                     leastCal = (double) currentRecipe.getCalories();
                 }
@@ -238,84 +239,86 @@ public class DietService {
     }
 
     public Recipe getExpandedSearchClosestRecipeToCaloriesNeed(List<Long> recipesListIds, int mealsLeft,
-                                                               double remainingCalories, double accuracy){
+                                                               double remainingCalories, double accuracy) {
         Recipe recommendedRecipe = getClosestRecipeToCaloriesNeed(recipesListIds, mealsLeft,
                 remainingCalories * (1 + 0.2 * mealsLeft), accuracy);
-        if(recommendedRecipe == null){
+        if (recommendedRecipe == null) {
             recommendedRecipe = getClosestRecipeToCaloriesNeed(recipesListIds, mealsLeft,
                     remainingCalories * (1 - 0.2 * mealsLeft), accuracy);
         }
 
         return recommendedRecipe;
     }
-    public Boolean doRecipesFillMacroRequirements(List<Recipe> recipes, DietGoal dietGoal){
+
+    public Boolean doRecipesFillMacroRequirements(List<Recipe> recipes, DietGoal dietGoal) {
         double todayProtein = 0;
         double todayFat = 0;
         double todayCarbs = 0;
 
-        for(Recipe recipe : recipes){
+        for (Recipe recipe : recipes) {
             todayProtein += recipe.getProtein();
             todayFat += recipe.getFat();
             todayCarbs += recipe.getCarbs();
         }
 
         double todayMacro = todayProtein + todayFat + todayCarbs;
-        double carbsRatio = todayCarbs/todayMacro * 100;
-        double fatRatio = todayFat/todayMacro * 100;
-        double proteinRatio = todayProtein/todayMacro * 100;
+        double carbsRatio = todayCarbs / todayMacro * 100;
+        double fatRatio = todayFat / todayMacro * 100;
+        double proteinRatio = todayProtein / todayMacro * 100;
 
-        switch (dietGoal){
+        switch (dietGoal) {
             case LOSE:
-                if(carbsRatio < 10 || carbsRatio > 30){
+                if (carbsRatio < 10 || carbsRatio > 30) {
                     return false;
                 }
-                if(fatRatio < 30 || fatRatio > 40) {
+                if (fatRatio < 30 || fatRatio > 40) {
                     return false;
                 }
-                if(proteinRatio < 40 || proteinRatio > 50) {
+                if (proteinRatio < 40 || proteinRatio > 50) {
                     return false;
                 }
                 break;
             case MAINTAIN:
-                if(carbsRatio < 45 || carbsRatio > 65){
+                if (carbsRatio < 45 || carbsRatio > 65) {
                     return false;
                 }
-                if(fatRatio < 20 || fatRatio > 35) {
+                if (fatRatio < 20 || fatRatio > 35) {
                     return false;
                 }
-                if(proteinRatio < 10 || proteinRatio > 35) {
+                if (proteinRatio < 10 || proteinRatio > 35) {
                     return false;
                 }
                 break;
             case GAIN:
-                if(carbsRatio < 50 || carbsRatio > 60){
+                if (carbsRatio < 50 || carbsRatio > 60) {
                     return false;
                 }
-                if(fatRatio < 20 || fatRatio > 30) {
+                if (fatRatio < 20 || fatRatio > 30) {
                     return false;
                 }
-                if(proteinRatio < 15 || proteinRatio > 25){
+                if (proteinRatio < 15 || proteinRatio > 25) {
                     return false;
                 }
                 break;
             case MUSCLE:
-                if(carbsRatio < 30 || carbsRatio > 40){
+                if (carbsRatio < 30 || carbsRatio > 40) {
                     return false;
                 }
-                if(fatRatio < 30 || fatRatio > 40) {
+                if (fatRatio < 30 || fatRatio > 40) {
                     return false;
                 }
-                if(proteinRatio < 30 || proteinRatio > 40) {
+                if (proteinRatio < 30 || proteinRatio > 40) {
                     return false;
                 }
                 break;
         }
         return true;
     }
+
     public DietDay generateDietForDay(List<Long> startingRecommendedRecipesIds,
                                       double caloriesPerDay, int mealsPerDay,
                                       List<Long> startingUsedRecipesIds, DietGoal dietGoal,
-                                      Boolean macroCheck){
+                                      Boolean macroCheck) {
 
         DietDay dietDay = new DietDay();
         double remainingCalories = caloriesPerDay;
@@ -331,9 +334,9 @@ public class DietService {
         boolean firstRecipe = true;
         int firstRecipeIndex = 0;
 
-        for(int mealsLeft = mealsPerDay; mealsLeft>0;) {
+        for (int mealsLeft = mealsPerDay; mealsLeft > 0; ) {
             Recipe recommendedRecipe;
-            if(firstRecipe){
+            if (firstRecipe) {
                 dietDay = new DietDay();
                 recommendedRecipe = recipeRepository.findById(allRecipeIds.get(firstRecipeIndex)).get();
                 remainingCalories = caloriesPerDay;
@@ -363,8 +366,8 @@ public class DietService {
                 }
             }
 
-            if(recommendedRecipe != null) {
-                if(!recipesToday.contains(recommendedRecipe)) {
+            if (recommendedRecipe != null) {
+                if (!recipesToday.contains(recommendedRecipe)) {
                     recipesToday.add(recommendedRecipe);
 
                     remainingCalories -= recommendedRecipe.getCalories();
@@ -378,8 +381,8 @@ public class DietService {
                         remainingCalories = findRecipeWithLeastCalories(allRecommendedRecipes).getCalories();
                     }
 
-                    if(mealsLeft == 0) {
-                        if(macroCheck) {
+                    if (mealsLeft == 0) {
+                        if (macroCheck) {
                             if (!doRecipesFillMacroRequirements(recipesToday, dietGoal)) {
                                 firstRecipeIndex++;
                                 firstRecipe = true;
@@ -397,7 +400,7 @@ public class DietService {
             } else {
                 firstRecipeIndex++;
                 firstRecipe = true;
-                if(firstRecipeIndex >= allRecipeIds.size()-1){
+                if (firstRecipeIndex >= allRecipeIds.size() - 1) {
                     return null;
                 }
             }
@@ -405,10 +408,11 @@ public class DietService {
         dietDay.setRecipesForToday(recipesToday);
         return dietDay;
     }
-    public Boolean doesRecipeHaveExcludedProduct(Recipe recipe, List<Product> excludedProducts){
+
+    public Boolean doesRecipeHaveExcludedProduct(Recipe recipe, List<Product> excludedProducts) {
         List<Ingredient> currentRecipeIngredients = ingredientRepository.findByrecipe(recipe);
 
-        for(Product excludedProduct : excludedProducts) {
+        for (Product excludedProduct : excludedProducts) {
             String currentProductName = excludedProduct.getName();
             for (Ingredient currentIngredient : currentRecipeIngredients) {
                 if (currentProductName.equals(currentIngredient.getName())) {
@@ -421,55 +425,55 @@ public class DietService {
 
     public Boolean doesRecipeMissRequirement(Recipe recipe, Boolean vegetarian, Boolean vegan,
                                              Boolean glutenFree, Boolean dairyFree,
-                                             Boolean veryHealthy, Boolean verified){
-        if(vegetarian != null){
-            if(vegetarian){
-                if(recipe.getVegetarian() != null) {
+                                             Boolean veryHealthy, Boolean verified) {
+        if (vegetarian != null) {
+            if (vegetarian) {
+                if (recipe.getVegetarian() != null) {
                     if (!recipe.getVegetarian()) return true;
                 } else {
                     return true;
                 }
             }
         }
-        if(vegan != null){
-            if(vegan){
-                if(recipe.getVegan() != null) {
+        if (vegan != null) {
+            if (vegan) {
+                if (recipe.getVegan() != null) {
                     if (!recipe.getVegan()) return true;
                 } else {
                     return true;
                 }
             }
         }
-        if(glutenFree != null){
-            if(glutenFree){
-                if(recipe.getGlutenFree() != null) {
+        if (glutenFree != null) {
+            if (glutenFree) {
+                if (recipe.getGlutenFree() != null) {
                     if (!recipe.getGlutenFree()) return true;
                 } else {
                     return true;
                 }
             }
         }
-        if(dairyFree != null){
-            if(dairyFree){
-                if(recipe.getDairyFree() != null) {
+        if (dairyFree != null) {
+            if (dairyFree) {
+                if (recipe.getDairyFree() != null) {
                     if (!recipe.getDairyFree()) return true;
                 } else {
                     return true;
                 }
             }
         }
-        if(veryHealthy != null){
-            if(veryHealthy){
-                if(recipe.getVeryHealthy() != null) {
+        if (veryHealthy != null) {
+            if (veryHealthy) {
+                if (recipe.getVeryHealthy() != null) {
                     if (!recipe.getVeryHealthy()) return true;
                 } else {
                     return true;
                 }
             }
         }
-        if(verified != null){
-            if(verified){
-                if(recipe.getVerified() != null) {
+        if (verified != null) {
+            if (verified) {
+                if (recipe.getVerified() != null) {
                     if (!recipe.getVerified()) return true;
                 } else {
                     return true;
@@ -477,7 +481,7 @@ public class DietService {
             }
         }
 
-        if(recipe.getCalories() == null) return true;
+        if (recipe.getCalories() == null) return true;
 
         return false;
     }
@@ -490,103 +494,160 @@ public class DietService {
         boolean replaced = false;
         Long returnId = null;
 
-        if(threshold < 0.6) {
+        if (threshold < 0.6) {
             return returnId;
         }
 
         List<Long> replacementIds = getRecommendedReplacementIds(recipeToReplaceId, threshold);
         List<Recipe> replacementRecipes = recipeRepository.findAllById(replacementIds);
 
-        for(Recipe suggestedRecipe : replacementRecipes){
-            if(doesRecipeMissRequirement(suggestedRecipe, vegetarian, vegan, glutenFree, dairyFree, veryHealthy, verified)) continue;
-            if(doesRecipeHaveExcludedProduct(suggestedRecipe, excludedProductsList)) continue;
+        for (Recipe suggestedRecipe : replacementRecipes) {
+            if (doesRecipeMissRequirement(suggestedRecipe, vegetarian, vegan, glutenFree, dairyFree, veryHealthy, verified))
+                continue;
+            if (doesRecipeHaveExcludedProduct(suggestedRecipe, excludedProductsList)) continue;
 
             replaced = true;
             returnId = suggestedRecipe.getId();
 
-            if(replaced){
+            if (replaced) {
                 break;
             }
         }
 
         return replaced ? returnId : replaceRecipe(recipeToReplaceId, excludedProductsList, vegetarian, vegan,
-                glutenFree, dairyFree, veryHealthy, verified, threshold-0.1);
+                glutenFree, dairyFree, veryHealthy, verified, threshold - 0.1);
     }
 
-    public DietWeek replaceRecipeFromADay(RecipeReplaceRequest recipeReplaceRequest, HttpServletResponse response) {
+    public Recipe replaceRecipeFromADay(RecipeReplaceRequest recipeReplaceRequest, HttpServletResponse response) {
         User currentUser = userDetailsService.findCurrentUser();
-        if(currentUser != null) {
-            Optional<DietDay> dayToChange = dayDietRepository.findById(recipeReplaceRequest.getDayDietId());
+        if (currentUser != null) {
             DietWeek dietToChange = weekDietRepository.findByuser(currentUser);
-            if(dietToChange != null) {
+
+            Long dayToChangeId = recipeReplaceRequest.getDayDietId();
+            Long recipeToReplaceId = recipeReplaceRequest.getRecipeToReplaceId();
+            Boolean vegetarian = false;
+            Boolean vegan = false;
+            Boolean glutenFree = false;
+            Boolean dairyFree = false;
+            Boolean veryHealthy = false;
+            Boolean verified = false;
+            List<Product> excludedProductsList = null;
+
+            if(recipeReplaceRequest.getVegetarian() != null){
+                vegetarian = recipeReplaceRequest.getVegetarian();
+            } else {
+                if(dietToChange.getVegetarian() != null){
+                    vegetarian = dietToChange.getVegetarian();
+                }
+            }
+            if(recipeReplaceRequest.getVegan() != null){
+                vegan = recipeReplaceRequest.getVegan();
+            } else {
+                if(dietToChange.getVegan() != null){
+                    vegan = dietToChange.getVegan();
+                }
+            }
+            if(recipeReplaceRequest.getGlutenFree() != null){
+                glutenFree = recipeReplaceRequest.getGlutenFree();
+            } else {
+                if(dietToChange.getGlutenFree() != null){
+                    glutenFree = dietToChange.getGlutenFree();
+                }
+            }
+            if(recipeReplaceRequest.getDairyFree() != null){
+                dairyFree = recipeReplaceRequest.getDairyFree();
+            } else {
+                if(dietToChange.getDairyFree() != null){
+                    dairyFree = dietToChange.getDairyFree();
+                }
+            }
+            if(recipeReplaceRequest.getVeryHealthy() != null){
+                veryHealthy = recipeReplaceRequest.getVeryHealthy();
+            } else {
+                if(dietToChange.getVeryHealthy() != null){
+                    veryHealthy = dietToChange.getVeryHealthy();
+                }
+            }
+            if(recipeReplaceRequest.getVerified() != null){
+                verified = recipeReplaceRequest.getVerified();
+            } else {
+                if(dietToChange.getVerified() != null){
+                    verified = dietToChange.getVerified();
+                }
+            }
+            if(recipeReplaceRequest.getExcludedProductsList() != null){
+                excludedProductsList = recipeReplaceRequest.getExcludedProductsList();
+            } else {
+                if(excludedProductsListRepository.findByuser(currentUser) != null){
+                    excludedProductsList = excludedProductsListRepository.findByuser(currentUser).getListOfExcludedProducts();
+                }
+            }
+
+            DietDay dayToChange = dayDietRepository.findById(dayToChangeId).get();
+
+            if (dietToChange != null) {
+                Recipe recipeToReplace = recipeRepository.findById(recipeToReplaceId).get();
                 if (dayToChange != null) {
-                    Long recipeToReplaceId = recipeReplaceRequest.getRecipeToReplaceId();
-                    Optional<Recipe> recipeToReplace = recipeRepository.findById(recipeToReplaceId);
                     boolean changed = false;
+                    if (recipeToReplace != null) {
+                        List<Recipe> allRecipes = recipeRepository.findAll();
+                        allRecipes.remove(recipeToReplace);
+                        int currentRecipeIndex = 0;
+                        Recipe suggestedRecipe = null;
 
-                    if (recipeToReplaceId != null) {
-                        if(recipeToReplace != null) {
-                            List<Recipe> allRecipes = recipeRepository.findAll();
-                            allRecipes.remove(recipeToReplace);
-                            int currentRecipeIndex = 0;
-
-                            while (!changed) {
-                                Recipe suggestedRecipe = allRecipes.get(currentRecipeIndex);
-                                if(doesRecipeHaveExcludedProduct(suggestedRecipe, recipeReplaceRequest.getExcludedProductsList())){
-                                    currentRecipeIndex++;
-                                    if(currentRecipeIndex >= allRecipes.size()){
-                                        response.setStatus(HttpStatus.NO_CONTENT.value());
-                                        return dietToChange;
-                                    }
-                                    continue;
-                                }
-                                if(doesRecipeMissRequirement(suggestedRecipe, recipeReplaceRequest.getVegetarian(),
-                                        recipeReplaceRequest.getVegan(), recipeReplaceRequest.getGlutenFree(),
-                                        recipeReplaceRequest.getDairyFree(), recipeReplaceRequest.getVeryHealthy(),
-                                        recipeReplaceRequest.getVerified())){
-                                    currentRecipeIndex++;
-                                    if(currentRecipeIndex >= allRecipes.size()){
-                                        response.setStatus(HttpStatus.NO_CONTENT.value());
-                                        return dietToChange;
-                                    }
-                                    continue;
-                                }
-
-                                if (suggestedRecipe != null) {
-                                    Integer oldRecipeCalories = recipeToReplace.get().getCalories();
-                                    Integer suggestedRecipeCalories = suggestedRecipe.getCalories();
-                                    if (oldRecipeCalories != null && suggestedRecipeCalories != null) {
-                                        int caloriesDifference = Math.abs(oldRecipeCalories - suggestedRecipeCalories);
-                                        if(caloriesDifference < 100){
-                                            List<Recipe> daysRecipes = dayToChange.get().getRecipesForToday();
-                                            daysRecipes.remove(recipeToReplace.get());
-                                            daysRecipes.add(suggestedRecipe);
-                                            dayToChange.get().setRecipesForToday(daysRecipes);
-                                            dayDietRepository.save(dayToChange.get());
-                                            weekDietRepository.save(dietToChange);
-                                            changed = true;
-                                        }
-                                    }
-                                }
+                        while (!changed) {
+                            suggestedRecipe = allRecipes.get(currentRecipeIndex);
+                            if (doesRecipeHaveExcludedProduct(suggestedRecipe, excludedProductsList)) {
                                 currentRecipeIndex++;
-                                if(currentRecipeIndex >= allRecipes.size()){
+                                if (currentRecipeIndex >= allRecipes.size()) {
                                     response.setStatus(HttpStatus.NO_CONTENT.value());
-                                    return dietToChange;
+                                    return recipeToReplace;
+                                }
+                                continue;
+                            }
+                            if (doesRecipeMissRequirement(suggestedRecipe, vegetarian,
+                                    vegan, glutenFree,
+                                    dairyFree, veryHealthy,
+                                    verified)) {
+                                currentRecipeIndex++;
+                                if (currentRecipeIndex >= allRecipes.size()) {
+                                    response.setStatus(HttpStatus.NO_CONTENT.value());
+                                    return recipeToReplace;
+                                }
+                                continue;
+                            }
+
+                            if (suggestedRecipe != null) {
+                                Integer oldRecipeCalories = recipeToReplace.getCalories();
+                                Integer suggestedRecipeCalories = suggestedRecipe.getCalories();
+                                if (oldRecipeCalories != null && suggestedRecipeCalories != null) {
+                                    int caloriesDifference = Math.abs(oldRecipeCalories - suggestedRecipeCalories);
+                                    if (caloriesDifference < 100) {
+                                        List<Recipe> daysRecipes = dayToChange.getRecipesForToday();
+                                        daysRecipes.remove(recipeToReplace);
+                                        daysRecipes.add(suggestedRecipe);
+                                        dayToChange.setRecipesForToday(daysRecipes);
+                                        dayDietRepository.save(dayToChange);
+                                        weekDietRepository.save(dietToChange);
+                                        changed = true;
+                                    }
                                 }
                             }
-                            response.setStatus(HttpStatus.OK.value());
-                            return dietToChange;
-                        } else {
-                            response.setStatus(HttpStatus.NO_CONTENT.value());
-                            return dietToChange;
+                            currentRecipeIndex++;
+                            if (currentRecipeIndex >= allRecipes.size()) {
+                                response.setStatus(HttpStatus.NO_CONTENT.value());
+                                return recipeToReplace;
+                            }
                         }
+                        response.setStatus(HttpStatus.OK.value());
+                        return suggestedRecipe;
                     } else {
-                        response.setStatus(HttpStatus.BAD_REQUEST.value());
-                        return dietToChange;
+                        response.setStatus(HttpStatus.NO_CONTENT.value());
+                        return recipeToReplace;
                     }
                 } else {
                     response.setStatus(HttpStatus.BAD_REQUEST.value());
-                    return dietToChange;
+                    return recipeToReplace;
                 }
             } else {
                 response.setStatus(HttpStatus.NO_CONTENT.value());
@@ -597,47 +658,50 @@ public class DietService {
             return null;
         }
     }
+
     public List<Long> replaceRemovedRecipes(List<Long> removedRecipesIds, List<Product> excludedProductsList,
                                             Boolean vegetarian, Boolean vegan, Boolean glutenFree, Boolean dairyFree,
                                             Boolean veryHealthy, Boolean verified) throws IOException {
         List<Long> replacementRecipesIds = new ArrayList<>();
         double threshold = 0.7;
 
-        for(Long removedRecipeId : removedRecipesIds){
+        for (Long removedRecipeId : removedRecipesIds) {
             Long substituteRecipeId = replaceRecipe(removedRecipeId, excludedProductsList, vegetarian, vegan, glutenFree,
                     dairyFree, veryHealthy, verified, threshold);
 
-            if(substituteRecipeId != null && !replacementRecipesIds.contains(substituteRecipeId)){
+            if (substituteRecipeId != null && !replacementRecipesIds.contains(substituteRecipeId)) {
                 replacementRecipesIds.add(substituteRecipeId);
             }
         }
 
         return replacementRecipesIds;
     }
+
     public List<Long> getFilteredRecommendedIds(List<Long> recommendedIds, List<Product> excludedProductsList,
                                                 Boolean vegetarian, Boolean vegan, Boolean glutenFree,
                                                 Boolean dairyFree, Boolean veryHealthy, Boolean verified, Boolean personalized) throws IOException {
         List<Recipe> recommendedRecipes = recipeRepository.findAllById(recommendedIds);
         List<Long> removedIds = new ArrayList<>();
 
-        for(Recipe currentRecipe : recommendedRecipes){
-            if(doesRecipeMissRequirement(currentRecipe, vegetarian, vegan, glutenFree, dairyFree, veryHealthy, verified)){
+        for (Recipe currentRecipe : recommendedRecipes) {
+            if (doesRecipeMissRequirement(currentRecipe, vegetarian, vegan, glutenFree, dairyFree, veryHealthy, verified)) {
                 removedIds.add(currentRecipe.getId());
                 continue;
             }
-            if(doesRecipeHaveExcludedProduct(currentRecipe, excludedProductsList)){
+            if (doesRecipeHaveExcludedProduct(currentRecipe, excludedProductsList)) {
                 removedIds.add(currentRecipe.getId());
             }
         }
         recommendedIds.removeAll(removedIds);
 
-        if(personalized) {
+        if (personalized) {
             List<Long> substitutesForRemovedIds = replaceRemovedRecipes(removedIds, excludedProductsList, vegetarian, vegan, glutenFree, dairyFree, veryHealthy, verified);
             recommendedIds.addAll(substitutesForRemovedIds);
         }
 
         return recommendedIds;
     }
+
     public DietWeek generateDiet(DietRequest dietRequest, HttpServletResponse response)
             throws IOException {
         User currentUser = userDetailsService.findCurrentUser();
@@ -646,13 +710,13 @@ public class DietService {
         DietGoal dietGoal = dietRequest.getDietGoal();
 
         List<Product> excludedProductsList = new ArrayList<>();
-        if(dietRequest.getExcludedProductsList() != null) {
+        if (dietRequest.getExcludedProductsList() != null) {
             excludedProductsList = dietRequest.getExcludedProductsList();
         }
 
         int mealsPerDay = dietRequest.getMealsPerDay();
 
-        if(currentUser != null) {
+        if (currentUser != null) {
             List<UserStats> currentUserStatsHistory = userStatsRepository.findByuser(currentUser);
             DietWeek currentUserDiet = weekDietRepository.findByuser(currentUser);
 
@@ -661,7 +725,7 @@ public class DietService {
                 currentUserDiet.setUser(currentUser);
             }
 
-            if(!currentUserStatsHistory.isEmpty()) {
+            if (!currentUserStatsHistory.isEmpty()) {
                 UserStats lastUserStats = currentUserStatsHistory.get(currentUserStatsHistory.size() - 1);
 
                 double currentUserWeight = lastUserStats.getWeight();
@@ -669,26 +733,26 @@ public class DietService {
                 int currentUserAge = lastUserStats.getAge();
                 Gender currentUserGender = lastUserStats.getGender();
 
-                if(currentUserWeight !=0 && currentUserHeight !=0 && currentUserAge !=0 && currentUserGender != null) {
-                    if(mealsPerDay >= 3 && mealsPerDay <= 5) {
+                if (currentUserWeight != 0 && currentUserHeight != 0 && currentUserAge != 0 && currentUserGender != null) {
+                    if (mealsPerDay >= 3 && mealsPerDay <= 5) {
                         double caloriesPerDay = goalCalories(currentUserWeight, currentUserHeight,
                                 currentUserAge, currentUserGender, physicalActivity, dietGoal);
                         lastUserStats.setCal((int) caloriesPerDay);
                         userStatsRepository.save(lastUserStats);
 
                         List<Long> recommendedRecipesIds = new ArrayList<>();
-                        if(dietRequest.getPersonalized() == null){
+                        if (dietRequest.getPersonalized() == null) {
                             dietRequest.setPersonalized(false);
                         }
-                        if(dietRequest.getMacroCheck() == null){
+                        if (dietRequest.getMacroCheck() == null) {
                             dietRequest.setMacroCheck(true);
                         }
 
-                        if(dietRequest.getPersonalized()) {
+                        if (dietRequest.getPersonalized()) {
                             recommendedRecipesIds = getRecommendedIds(currentUser.getId(), dietRequest.getThreshold());
                         } else {
                             List<Recipe> allRecipes = recipeRepository.findAll();
-                            for(Recipe recipe : allRecipes){
+                            for (Recipe recipe : allRecipes) {
                                 recommendedRecipesIds.add(recipe.getId());
                             }
                             dietRequest.setThreshold(null);
@@ -710,7 +774,7 @@ public class DietService {
                                     mealsPerDay, usedRecipesIds, dietGoal, dietRequest.getMacroCheck());
 
                             if (dietDay == null) {
-                                if(dietRequest.getThreshold() != null) {
+                                if (dietRequest.getThreshold() != null) {
                                     dietRequest.setThreshold(dietRequest.getThreshold() - 0.05);
                                     if (dietRequest.getThreshold() < 0.75) {
                                         response.setStatus(HttpStatus.NO_CONTENT.value());
@@ -718,8 +782,8 @@ public class DietService {
                                     }
                                 }
 
-                                if(!dietWeek.isEmpty()) {
-                                    if(dietRequest.getThreshold() == null || dietRequest.getThreshold() <= 0.8) {
+                                if (!dietWeek.isEmpty()) {
+                                    if (dietRequest.getThreshold() == null || dietRequest.getThreshold() <= 0.8) {
                                         for (; i < 7; i++) {
                                             DietDay alreadyUsedDietDay = dietWeek
                                                     .get((int) (Math.random() * (dietWeek.size() - 1)));
@@ -741,7 +805,7 @@ public class DietService {
                                     response.setStatus(HttpStatus.CREATED.value());
                                     return weekDietRepository.save(currentUserDiet);
                                 } else {
-                                    if(dietRequest.getThreshold() != null) {
+                                    if (dietRequest.getThreshold() != null) {
                                         return generateDiet(dietRequest, response);
                                     } else {
                                         response.setStatus(HttpStatus.NO_CONTENT.value());
@@ -757,7 +821,7 @@ public class DietService {
                             }
 
                             List<DietWeek> dietWeeksOfCurrentDay = new ArrayList<>();
-                            if(dietDay.getDietWeek() != null) {
+                            if (dietDay.getDietWeek() != null) {
                                 dietWeeksOfCurrentDay = dietDay.getDietWeek();
                             }
 
@@ -772,6 +836,13 @@ public class DietService {
 
                         currentUserDiet.setDietGoal(dietGoal);
                         currentUserDiet.setStartingWeight(lastUserStats.getWeight());
+
+                        currentUserDiet.setVegetarian(dietRequest.getVegetarian());
+                        currentUserDiet.setVegan(dietRequest.getVegan());
+                        currentUserDiet.setGlutenFree(dietRequest.getGlutenFree());
+                        currentUserDiet.setDairyFree(dietRequest.getDairyFree());
+                        currentUserDiet.setVeryHealthy(dietRequest.getVeryHealthy());
+                        currentUserDiet.setVerified(dietRequest.getVerified());
 
                         response.setStatus(HttpStatus.CREATED.value());
 
