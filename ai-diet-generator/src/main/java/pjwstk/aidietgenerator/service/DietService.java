@@ -592,6 +592,7 @@ public class DietService {
                     if (recipeToReplace != null) {
                         List<Recipe> allRecipes = recipeRepository.findAll();
                         allRecipes.remove(recipeToReplace);
+                        Collections.shuffle(allRecipes);
                         int currentRecipeIndex = 0;
                         Recipe suggestedRecipe = null;
 
@@ -605,10 +606,8 @@ public class DietService {
                                 }
                                 continue;
                             }
-                            if (doesRecipeMissRequirement(suggestedRecipe, vegetarian,
-                                    vegan, glutenFree,
-                                    dairyFree, veryHealthy,
-                                    verified)) {
+                            if (doesRecipeMissRequirement(suggestedRecipe, vegetarian, vegan, glutenFree,
+                                    dairyFree, veryHealthy, verified)) {
                                 currentRecipeIndex++;
                                 if (currentRecipeIndex >= allRecipes.size()) {
                                     response.setStatus(HttpStatus.NO_CONTENT.value());
@@ -617,7 +616,7 @@ public class DietService {
                                 continue;
                             }
 
-                            if (suggestedRecipe != null) {
+                            if (suggestedRecipe != null && !dayToChange.getRecipesForToday().contains(suggestedRecipe)) {
                                 Integer oldRecipeCalories = recipeToReplace.getCalories();
                                 Integer suggestedRecipeCalories = suggestedRecipe.getCalories();
                                 if (oldRecipeCalories != null && suggestedRecipeCalories != null) {
@@ -630,13 +629,26 @@ public class DietService {
                                         dayDietRepository.save(dayToChange);
                                         weekDietRepository.save(dietToChange);
                                         changed = true;
+                                    } else {
+                                        currentRecipeIndex++;
+                                        if (currentRecipeIndex >= allRecipes.size()) {
+                                            response.setStatus(HttpStatus.NO_CONTENT.value());
+                                            return recipeToReplace;
+                                        }
+                                    }
+                                } else {
+                                    currentRecipeIndex++;
+                                    if (currentRecipeIndex >= allRecipes.size()) {
+                                        response.setStatus(HttpStatus.NO_CONTENT.value());
+                                        return recipeToReplace;
                                     }
                                 }
-                            }
-                            currentRecipeIndex++;
-                            if (currentRecipeIndex >= allRecipes.size()) {
-                                response.setStatus(HttpStatus.NO_CONTENT.value());
-                                return recipeToReplace;
+                            } else {
+                                currentRecipeIndex++;
+                                if (currentRecipeIndex >= allRecipes.size()) {
+                                    response.setStatus(HttpStatus.NO_CONTENT.value());
+                                    return recipeToReplace;
+                                }
                             }
                         }
                         response.setStatus(HttpStatus.OK.value());
