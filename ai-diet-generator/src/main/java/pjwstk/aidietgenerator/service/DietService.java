@@ -240,7 +240,6 @@ public class DietService {
 
     public Recipe getExpandedSearchClosestRecipeToCaloriesNeed(List<Long> recipesListIds, int mealsLeft,
                                                                double remainingCalories, double accuracy) {
-        System.out.println("IM IN EXPENDED SEARCH");
         Recipe recommendedRecipe = getClosestRecipeToCaloriesNeed(recipesListIds, mealsLeft,
                 remainingCalories * (1 + 0.1 * mealsLeft), accuracy);
         if (recommendedRecipe == null) {
