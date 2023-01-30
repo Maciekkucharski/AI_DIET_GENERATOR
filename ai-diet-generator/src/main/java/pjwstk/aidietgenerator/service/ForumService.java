@@ -78,8 +78,9 @@ public class ForumService {
                 postSimplifiedView.setId(post.getId());
                 postSimplifiedView.setDescription(post.getDescription());
                 postSimplifiedView.setTimestamp(new Timestamp(System.currentTimeMillis()));
-                postSimplifiedView.setCommentsCount(postCommentsRepository.findBypost(post).size());
-                postSimplifiedView.setLikesCount(postLikesRepository.findBypost(post).size());
+                postSimplifiedView.setPostComments(postCommentsRepository.findBypost(post));
+                postSimplifiedView.setPostLikes(postLikesRepository.findBypost(post));
+                postSimplifiedView.setPostImagePath(post.getImagePath());
                 postSimplifiedView.setTitle(post.getTitle());
                 postSimplifiedView.setUserProfilePicture(post.getUser().getImagePath());
                 if(currentUser != null){
