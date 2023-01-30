@@ -602,7 +602,7 @@ public class DietService {
                                 currentRecipeIndex++;
                                 if (currentRecipeIndex >= allRecipes.size()) {
                                     response.setStatus(HttpStatus.NO_CONTENT.value());
-                                    return recipeToReplace;
+                                    return null;
                                 }
                                 continue;
                             }
@@ -611,7 +611,7 @@ public class DietService {
                                 currentRecipeIndex++;
                                 if (currentRecipeIndex >= allRecipes.size()) {
                                     response.setStatus(HttpStatus.NO_CONTENT.value());
-                                    return recipeToReplace;
+                                    return null;
                                 }
                                 continue;
                             }
@@ -633,21 +633,21 @@ public class DietService {
                                         currentRecipeIndex++;
                                         if (currentRecipeIndex >= allRecipes.size()) {
                                             response.setStatus(HttpStatus.NO_CONTENT.value());
-                                            return recipeToReplace;
+                                            return null;
                                         }
                                     }
                                 } else {
                                     currentRecipeIndex++;
                                     if (currentRecipeIndex >= allRecipes.size()) {
                                         response.setStatus(HttpStatus.NO_CONTENT.value());
-                                        return recipeToReplace;
+                                        return null;
                                     }
                                 }
                             } else {
                                 currentRecipeIndex++;
                                 if (currentRecipeIndex >= allRecipes.size()) {
                                     response.setStatus(HttpStatus.NO_CONTENT.value());
-                                    return recipeToReplace;
+                                    return null;
                                 }
                             }
                         }
@@ -655,11 +655,11 @@ public class DietService {
                         return suggestedRecipe;
                     } else {
                         response.setStatus(HttpStatus.NO_CONTENT.value());
-                        return recipeToReplace;
+                        return null;
                     }
                 } else {
                     response.setStatus(HttpStatus.BAD_REQUEST.value());
-                    return recipeToReplace;
+                    return null;
                 }
             } else {
                 response.setStatus(HttpStatus.NO_CONTENT.value());
