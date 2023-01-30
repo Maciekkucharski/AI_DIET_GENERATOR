@@ -240,11 +240,12 @@ public class DietService {
 
     public Recipe getExpandedSearchClosestRecipeToCaloriesNeed(List<Long> recipesListIds, int mealsLeft,
                                                                double remainingCalories, double accuracy) {
+        System.out.println("IM IN EXPENDED SEARCH");
         Recipe recommendedRecipe = getClosestRecipeToCaloriesNeed(recipesListIds, mealsLeft,
-                remainingCalories * (1 + 0.2 * mealsLeft), accuracy);
+                remainingCalories * (1 + 0.1 * mealsLeft), accuracy);
         if (recommendedRecipe == null) {
             recommendedRecipe = getClosestRecipeToCaloriesNeed(recipesListIds, mealsLeft,
-                    remainingCalories * (1 - 0.2 * mealsLeft), accuracy);
+                    remainingCalories * (1 - 0.1 * mealsLeft), accuracy);
         }
 
         return recommendedRecipe;
@@ -334,7 +335,7 @@ public class DietService {
         boolean firstRecipe = true;
         int firstRecipeIndex = 0;
 
-        for (int mealsLeft = mealsPerDay; mealsLeft > 0; ) {
+        for (int mealsLeft = mealsPerDay; mealsLeft > 0;) {
             Recipe recommendedRecipe;
             if (firstRecipe) {
                 dietDay = new DietDay();
