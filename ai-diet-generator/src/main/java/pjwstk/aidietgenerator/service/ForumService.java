@@ -77,7 +77,7 @@ public class ForumService {
                 postSimplifiedView.setAuthor(post.getUser());
                 postSimplifiedView.setId(post.getId());
                 postSimplifiedView.setDescription(post.getDescription());
-                postSimplifiedView.setTimestamp(new Timestamp(System.currentTimeMillis()));
+                postSimplifiedView.setTimestamp(post.getTimestamp());
                 postSimplifiedView.setPostComments(postCommentsRepository.findBypost(post));
                 postSimplifiedView.setPostLikes(postLikesRepository.findBypost(post));
                 postSimplifiedView.setPostImagePath(post.getImagePath());
