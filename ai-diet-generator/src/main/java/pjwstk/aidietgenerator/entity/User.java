@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 @Entity
 @JsonIgnoreProperties({"credentialsNonExpired", "accountNonExpired",
         "accountNonLocked", "enabled", "password",
-        "imagePath", "authorities"})
+        "imagePath", "authorities" , "survey", "rating", "subscribed"})
 @Table(name = "users")
 public class User implements UserDetails {
 

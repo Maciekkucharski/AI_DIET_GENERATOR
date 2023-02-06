@@ -83,17 +83,17 @@ public class ForumController {
     }
 
     @GetMapping("/recipe")
-    public List<List<RecipeSimplifiedView>> viewAllSimplifiedRecipes(HttpServletResponse response){
+    public List<List<Recipe>> viewAllSimplifiedRecipes(HttpServletResponse response){
         return forumService.findSimplifiedRecipes(response, "all");
     }
 
     @GetMapping("/recipe/verified")
-    public List<List<RecipeSimplifiedView>> viewVerifiedRecipes(HttpServletResponse response){
+    public List<List<Recipe>> viewVerifiedRecipes(HttpServletResponse response){
         return forumService.findSimplifiedRecipes(response, "verified");
     }
 
     @GetMapping("/recipe/notVerified")
-    public List<List<RecipeSimplifiedView>> viewNotVerifiedRecipes(HttpServletResponse response){
+    public List<List<Recipe>> viewNotVerifiedRecipes(HttpServletResponse response){
         return forumService.findSimplifiedRecipes(response, "notVerified");
     }
 

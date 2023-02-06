@@ -280,11 +280,10 @@ public class ForumService {
         }
     }
 
-    public List<List<RecipeSimplifiedView>> findSimplifiedRecipes(HttpServletResponse response, String option) {
+    public List<List<Recipe>> findSimplifiedRecipes(HttpServletResponse response, String option) {
         User currentUser = userDetailsService.findCurrentUser();
-        List<RecipeSimplifiedView> recipeSimplifiedViewList = new ArrayList<>();
-        List<RecipeSimplifiedView> followingRecipeList = new ArrayList<>();
         List<Follow> followList = new ArrayList<>();
+        List<Recipe> followingRecipeList = new ArrayList<>();
         if(currentUser != null) {
             followList = followRepository.findByFollower(currentUser);
         }
@@ -301,30 +300,18 @@ public class ForumService {
             return null;
         } else {
             for (Recipe recipe : allRecipes) {
-                RecipeSimplifiedView newRecipeSimplifiedView = new RecipeSimplifiedView();
-                newRecipeSimplifiedView.setId(recipe.getId());
-                newRecipeSimplifiedView.setTitle(recipe.getTitle());
-                newRecipeSimplifiedView.setTimestamp(recipe.getTimestamp());
-                newRecipeSimplifiedView.setDescription(recipe.getInstructions());
-                newRecipeSimplifiedView.setAuthor(recipe.getUser());
-                newRecipeSimplifiedView.setProfileImagePath(recipe.getUser().getImagePath());
-                newRecipeSimplifiedView.setCommentsCount(recipeCommentsRepository.findByrecipe(recipe).size());
-                newRecipeSimplifiedView.setLikesCount(recipeLikesRepository.findByrecipe(recipe).size());
                 if(currentUser != null && Objects.equals(option, "all")){
                     for(Follow follow : followList){
                         if(recipe.getUser() == follow.getUser()) {
-                            followingRecipeList.add(newRecipeSimplifiedView);
+                            followingRecipeList.add(recipe);
                         }
                     }
-                    recipeSimplifiedViewList.add(newRecipeSimplifiedView);
-                } else {
-                    recipeSimplifiedViewList.add(newRecipeSimplifiedView);
                 }
             }
-            List<List<RecipeSimplifiedView>> listOfListsToReturn = new ArrayList<>();
-            recipeSimplifiedViewList.removeAll(followingRecipeList);
+            List<List<Recipe>> listOfListsToReturn = new ArrayList<>();
+            allRecipes.removeAll(followingRecipeList);
             listOfListsToReturn.add(followingRecipeList);
-            listOfListsToReturn.add(recipeSimplifiedViewList);
+            listOfListsToReturn.add(allRecipes);
             response.setStatus(HttpStatus.OK.value());
             return listOfListsToReturn;
         }

@@ -97,9 +97,11 @@ public class Recipe {
     private List<Ingredient> recipesIngredients;
 
     @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties({"email", "authority", "subscribed", "username"})
     private List<RecipeLike> recipeLikes;
 
     @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties({"email", "authority", "subscribed", "username"})
     private List<RecipeComment>  recipeComments;
 
     public Recipe(String title, Float saltiness, Float sourness, Float sweetness, Float bitterness, Float spiciness, Float fattiness,
