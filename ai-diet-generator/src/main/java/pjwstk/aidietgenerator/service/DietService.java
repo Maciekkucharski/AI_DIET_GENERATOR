@@ -425,7 +425,13 @@ public class DietService {
 
     public Boolean doesRecipeMissRequirement(Recipe recipe, Boolean vegetarian, Boolean vegan,
                                              Boolean glutenFree, Boolean dairyFree,
-                                             Boolean veryHealthy, Boolean verified) {
+                                             Boolean veryHealthy) {
+        if (recipe.getVerified() != null) {
+            if (!recipe.getVerified()) return true;
+        } else {
+            return true;
+        }
+
         if (vegetarian != null) {
             if (vegetarian) {
                 if (recipe.getVegetarian() != null) {
@@ -466,15 +472,6 @@ public class DietService {
             if (veryHealthy) {
                 if (recipe.getVeryHealthy() != null) {
                     if (!recipe.getVeryHealthy()) return true;
-                } else {
-                    return true;
-                }
-            }
-        }
-        if (verified != null) {
-            if (verified) {
-                if (recipe.getVerified() != null) {
-                    if (!recipe.getVerified()) return true;
                 } else {
                     return true;
                 }
