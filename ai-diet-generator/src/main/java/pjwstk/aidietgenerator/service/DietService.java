@@ -499,7 +499,7 @@ public class DietService {
         List<Recipe> replacementRecipes = recipeRepository.findAllById(replacementIds);
 
         for (Recipe suggestedRecipe : replacementRecipes) {
-            if (doesRecipeMissRequirement(suggestedRecipe, vegetarian, vegan, glutenFree, dairyFree, veryHealthy, verified))
+            if (doesRecipeMissRequirement(suggestedRecipe, vegetarian, vegan, glutenFree, dairyFree, veryHealthy))
                 continue;
             if (doesRecipeHaveExcludedProduct(suggestedRecipe, excludedProductsList)) continue;
 
@@ -527,7 +527,6 @@ public class DietService {
             Boolean glutenFree = false;
             Boolean dairyFree = false;
             Boolean veryHealthy = false;
-            Boolean verified = false;
             List<Product> excludedProductsList = null;
 
             if(recipeReplaceRequest.getVegetarian() != null){
@@ -565,13 +564,7 @@ public class DietService {
                     veryHealthy = dietToChange.getVeryHealthy();
                 }
             }
-            if(recipeReplaceRequest.getVerified() != null){
-                verified = recipeReplaceRequest.getVerified();
-            } else {
-                if(dietToChange.getVerified() != null){
-                    verified = dietToChange.getVerified();
-                }
-            }
+
             if(recipeReplaceRequest.getExcludedProductsList() != null){
                 excludedProductsList = recipeReplaceRequest.getExcludedProductsList();
             } else {
@@ -604,7 +597,7 @@ public class DietService {
                                 continue;
                             }
                             if (doesRecipeMissRequirement(suggestedRecipe, vegetarian, vegan, glutenFree,
-                                    dairyFree, veryHealthy, verified)) {
+                                    dairyFree, veryHealthy)) {
                                 currentRecipeIndex++;
                                 if (currentRecipeIndex >= allRecipes.size()) {
                                     response.setStatus(HttpStatus.NO_CONTENT.value());
@@ -693,7 +686,7 @@ public class DietService {
         List<Long> removedIds = new ArrayList<>();
 
         for (Recipe currentRecipe : recommendedRecipes) {
-            if (doesRecipeMissRequirement(currentRecipe, vegetarian, vegan, glutenFree, dairyFree, veryHealthy, verified)) {
+            if (doesRecipeMissRequirement(currentRecipe, vegetarian, vegan, glutenFree, dairyFree, veryHealthy)) {
                 removedIds.add(currentRecipe.getId());
                 continue;
             }
