@@ -29,7 +29,7 @@ async def generate(body_dict: dict = Body(..., example={
     survey_results = None
     recipes_results = None
     try:
-        mydb = connection.connect(host="35.198.85.35", user="root", password="jajco123", database="DietGenerator",
+        mydb = connection.connect(host="_", user="_", password="_", database="DietGenerator",
                                   use_pure=True)
         query = """
         SELECT
